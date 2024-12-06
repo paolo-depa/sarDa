@@ -7,8 +7,7 @@ from pathlib import Path
 format_args = {
     "csv": "-d",
     "json": "-j",
-    "xml": "-x",
-    "pcp": "-l"
+    "xml": "-x"
 }
 
 options = {
@@ -58,9 +57,9 @@ def parse_sa1_file(source_file, output_dir, format_option, timeout):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Parse a sa1 binary file using sadf and convert it to various formats (CSV, JSON, XML, PCP).")
+    parser = argparse.ArgumentParser(description="Parse a sa1 binary file using sadf and convert it to various formats (CSV, JSON, XML).")
     parser.add_argument("source_file", type=Path, help="Path to the sa1 binary file")
-    parser.add_argument("-f", "--format", required=True, choices=["csv", "json", "xml", "pcp"], help="Output format (csv, json, xml, pcp)")
+    parser.add_argument("-f", "--format", required=True, choices=["csv", "json", "xml", "pcp"], help="Output format (csv, json, xml)")
     parser.add_argument("-d", "--output_dir", type=Path, default=Path.cwd(), help="Directory to store the output files (default: current directory)")
     parser.add_argument("-t", "--timeout", type=int, default=60, help="Timeout for sadf command in seconds (default: 60)")
 
