@@ -1,5 +1,7 @@
-# This script parses sa1 binary files using the sadf command and converts them to various formats (csv, json, xml).
-# It merges the parsed data from multiple files and saves the output in the specified format.
+# This script parses multiple sa1 binary files using the sadf command.
+# Each sa1 file is parsed once for each of the metrics defined in the options dictionary.
+# When a metric is gathered from all the sa1 files passed as arguments, it is aggregated in a specific format (see format_args dictionary) 
+# and saved in the corresponding output directory.
 
 import argparse
 import json
@@ -148,7 +150,7 @@ def parse_sa1_files(source_files, output_dir, format_option, timeout, verbose):
                 result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE if verbose else subprocess.DEVNULL, check=True, timeout=timeout,encoding="utf-8")
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
                 if verbose:
-                    print(f"Warning: Command '{' '.join(command)}' for file '{source_file}' failed with exit code {e.returncode}.", file=sys.stderr)
+                    print(f"Warning: Command '{' '.join(command)}' for file '{source_file}' failed with exit code {e.returncode}. Exception: {e}", file=sys.stderr)
                 continue
             
             if result.stdout:
@@ -165,10 +167,6 @@ if __name__ == "__main__":
         print("Error: sadf binary not found.", file=sys.stderr)
         sys.exit(1)
 
-    if sys.version_info < (3.10):
-        print("Error: This script requires Python 3.10 or higher.", file=sys.stderr)
-        sys.exit(1)
-    
     parser = argparse.ArgumentParser(description="Parse sa1 binary files using sadf and convert them to various formats (csv, json, xml).")
     parser.add_argument("source_files", type=Path, nargs='+', help="Paths to the sa1 binary files")
     parser.add_argument("-f", "--format", required=True, choices=["csv", "json", "xml"], help="Output format (csv, json, xml)")
@@ -198,7 +196,7 @@ if __name__ == "__main__":
 
     if not output_dir.is_dir():
         try:
-            output_dir.mkdir(parents=True)
+            output_dir.mkdir(parents=True, exist_ok=True)
         except OSError as e:
             print(f"Error: Unable to create output directory '{output_dir}': {e.strerror}", file=sys.stderr)
             sys.exit(1)
