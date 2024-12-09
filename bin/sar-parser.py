@@ -1,3 +1,6 @@
+# This script parses sa1 binary files using the sadf command and converts them to various formats (csv, json, xml).
+# It merges the parsed data from multiple files and saves the output in the specified format.
+
 import argparse
 import json
 import shutil
@@ -35,6 +38,16 @@ options = {
 }
 
 def merge_json_objects(obj1, obj2):
+    """
+    Merges two JSON objects recursively.
+
+    Args:
+        obj1 (dict): The first JSON object.
+        obj2 (dict): The second JSON object.
+
+    Returns:
+        dict: The merged JSON object.
+    """
     for key, value in obj2.items():
         if key in obj1:
             if isinstance(obj1[key], dict) and isinstance(value, dict):
@@ -49,6 +62,16 @@ def merge_json_objects(obj1, obj2):
     return obj1
 
 def merge_xml_trees(root1, root2):
+    """
+    Merges two XML trees by combining their nodes.
+
+    Args:
+        root1 (ET.Element): The root element of the first XML tree.
+        root2 (ET.Element): The root element of the second XML tree.
+
+    Returns:
+        str: The merged XML content as a string.
+    """
 
     def merge_nodes(node1, node2):
         for child2 in node2:
@@ -65,7 +88,18 @@ def merge_xml_trees(root1, root2):
     retval = ET.tostring(root1, encoding="unicode")
     return retval
 
-def merge_contents(file_content, result, format_option, verbose):
+def merge_contents(file_content, result, format_option):
+    """
+    Merges the content of the current file with the result from the sadf command based on the format option.
+
+    Args:
+        file_content (str): The current content of the file being processed.
+        result (subprocess.CompletedProcess): The result of the sadf command execution.
+        format_option (str): The format option (csv, json, xml) to determine how to merge the content.
+
+    Returns:
+        str: The merged content.
+    """
 
     result_content = result.stdout
 
@@ -98,8 +132,12 @@ def parse_sa1_files(source_files, output_dir, format_option, timeout, verbose):
     format_arg = format_args[format_option]
 
     for option, label in options.items():
+        if verbose:
+            print(f"- Processing: {label}")
         file_content = None
         for source_file in source_files:
+            if verbose:
+                print(f"-- Parsing: {source_file}")
             command = ["sadf", format_arg, "-t", str(source_file), "--"] + option.split()
             try:
                 # Run the sadf command with specified parameters
@@ -114,7 +152,7 @@ def parse_sa1_files(source_files, output_dir, format_option, timeout, verbose):
                 continue
             
             if result.stdout:
-                file_content = merge_contents(file_content, result, format_option, verbose)
+                file_content = merge_contents(file_content, result, format_option)
             
         if file_content is not None:
             output_file = output_dir / f"{label}.{format_option}"
@@ -125,6 +163,10 @@ if __name__ == "__main__":
 
     if not shutil.which("sadf"):
         print("Error: sadf binary not found.", file=sys.stderr)
+        sys.exit(1)
+
+    if sys.version_info < (3.10):
+        print("Error: This script requires Python 3.10 or higher.", file=sys.stderr)
         sys.exit(1)
     
     parser = argparse.ArgumentParser(description="Parse sa1 binary files using sadf and convert them to various formats (csv, json, xml).")
