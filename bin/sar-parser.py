@@ -27,7 +27,30 @@ options = {
     "-H": "hugepages",
     "-I ALL": "interrupts",
     "-m ALL": "power",
-    "-n ALL": "network",
+    # This would produce a single file including all the statistics
+    # which use different metrics: hardly readable by grafana
+    # "-n ALL": "network",
+    "-n DEV": "network_dev",
+    "-n EDEV": "network_edev",
+    "-n FC": "network_fc",
+    "-n ICMP": "network_icmp",
+    "-n EICMP": "network_eicmp",
+    "-n ICMP6": "network_icmp6",
+    "-n EICMP6": "network_eicmp6",
+    "-n IP": "network_ip",
+    "-n EIP": "network_eip",
+    "-n IP6": "network_ip6",
+    "-n EIP6": "network_eip6",
+    "-n NFS": "network_nfs",
+    "-n NFSD": "network_nfsd",
+    "-n SOCK": "network_sock",
+    "-n SOCK6": "network_sock6",
+    # Not working as expected
+    # "-n SOFT": "network_soft",
+    "-n TCP": "network_tcp",
+    "-n ETCP": "network_etcp",
+    "-n UDP": "network_udp",
+    "-n UDP6": "network_udp6",
     "-P ALL": "per_cpu",
     "-q ALL": "queue",
     "-r ALL": "memory",
@@ -124,6 +147,8 @@ def merge_contents(file_content, result, format_option):
 
             case _:
                 result_content = result_content.splitlines()
+                if not result_content[-1].endswith("\n"):
+                    result_content[-1] += "\n"
                 file_content += "\n".join(result_content[1:])
 
     return file_content
