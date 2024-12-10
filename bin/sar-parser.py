@@ -19,7 +19,7 @@ format_args = {
 }
 
 
-#TODO pivot the CPU, DISK and NETWORK_DEV metrics to have a single file per metric
+#TODO pivot the CPU, DISK and NETWORK_DEV aggragators to cpus, disks and network_devslisted as columns rather then in line
 aggregators = {
     "-b": "io",
     "-B": "paging",
