@@ -1,5 +1,5 @@
 # This script parses multiple sa1 binary files using the sadf command.
-# Each sa1 file is parsed once for each of the metrics defined in the options dictionary.
+# Each sa1 file is parsed once for each of the metrics defined in the aggregators dictionary.
 # When a metric is gathered from all the sa1 files passed as arguments, it is aggregated in a specific format (see format_args dictionary) 
 # and saved in the corresponding output directory.
 
@@ -18,10 +18,12 @@ format_args = {
     "xml": "-x"
 }
 
-options = {
+
+#TODO pivot the CPU, DISK and NETWORK_DEV metrics to have a single file per metric
+aggregators = {
     "-b": "io",
     "-B": "paging",
-#    "-C": "cpu",
+    # "-C": "cpu",
     "-d": "disk",
     "-F": "filesystem",
     "-H": "hugepages",
@@ -55,7 +57,7 @@ options = {
     "-q ALL": "queue",
     "-r ALL": "memory",
     "-S": "swap_util",
-#    "-u ALL": "cpu_util",
+    # "-u ALL": "cpu_util",
     "-v": "inode",
     "-W": "swap",
     "-w": "task",
@@ -113,14 +115,14 @@ def merge_xml_trees(root1, root2):
     retval = ET.tostring(root1, encoding="unicode")
     return retval
 
-def merge_contents(file_content, result, format_option):
+def merge_contents(file_content, result, format):
     """
-    Merges the content of the current file with the result from the sadf command based on the format option.
+    Merges the content of the current file with the result from the sadf command based on the format aggregator.
 
     Args:
         file_content (str): The current content of the file being processed.
         result (subprocess.CompletedProcess): The result of the sadf command execution.
-        format_option (str): The format option (csv, json, xml) to determine how to merge the content.
+        format (str): The aggregator's format (csv, json, xml) to determine how to merge the content.
 
     Returns:
         str: The merged content.
@@ -131,7 +133,7 @@ def merge_contents(file_content, result, format_option):
     if not file_content:
         file_content = result_content
     else:
-        match format_option:
+        match format:
 
             case "json":
                 result_content = json.loads(result_content)
@@ -154,18 +156,18 @@ def merge_contents(file_content, result, format_option):
     return file_content
 
 
-def parse_sa1_files(source_files, output_dir, format_option, timeout, verbose):
+def parse_sa1_files(source_files, output_dir, format, timeout, verbose):
 
-    format_arg = format_args[format_option]
+    format_arg = format_args[format]
 
-    for option, label in options.items():
+    for aggregator, label in aggregators.items():
         if verbose:
             print(f"- Processing: {label}")
         file_content = None
         for source_file in source_files:
             if verbose:
                 print(f"-- Parsing: {source_file}")
-            command = ["sadf", format_arg, "-t", str(source_file), "--"] + option.split()
+            command = ["sadf", format_arg, "-t", str(source_file), "--"] + aggregator.split()
             try:
                 # Run the sadf command with specified parameters
                 # - stdout=subprocess.PIPE: Capture standard output
@@ -179,10 +181,10 @@ def parse_sa1_files(source_files, output_dir, format_option, timeout, verbose):
                 continue
             
             if result.stdout:
-                file_content = merge_contents(file_content, result, format_option)
+                file_content = merge_contents(file_content, result, format)
             
         if file_content is not None:
-            output_file = output_dir / f"{label}.{format_option}"
+            output_file = output_dir / f"{label}.{format}"
             with open(output_file, "w") as f:
                 f.write(file_content)
 
@@ -202,12 +204,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     source_files = args.source_files
-    format_option = args.format
+    format = args.format
     timeout = args.timeout
     verbose = args.verbose
     
-    if format_option not in format_args:
-        print("Error: Invalid format option. Choose from csv, json, or xml.", file=sys.stderr)
+    if format not in format_args:
+        print("Error: Invalid format aggregator. Choose from csv, json, or xml.", file=sys.stderr)
         sys.exit(1)
 
     for source_file in source_files:
@@ -215,7 +217,7 @@ if __name__ == "__main__":
             print(f"Error: File {source_file} does not exist.", file=sys.stderr)
             sys.exit(1)
 
-    output_dir = Path(format_option)
+    output_dir = Path(format)
     if args.output_dir:
         output_dir = args.output_dir
 
@@ -226,4 +228,4 @@ if __name__ == "__main__":
             print(f"Error: Unable to create output directory '{output_dir}': {e.strerror}", file=sys.stderr)
             sys.exit(1)
 
-    parse_sa1_files(source_files, output_dir, format_option, timeout, verbose)
+    parse_sa1_files(source_files, output_dir, format, timeout, verbose)
