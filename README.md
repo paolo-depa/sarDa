@@ -1,7 +1,7 @@
 # sarDa
 
 ## Project Overview
-sarDa (SAR Dashboard) is a project aimed at creating a Grafana dashboard for sa1 data.
+sarDa (SAR Dashboard) is a project aimed at creating a Grafana dashboard for sa1 data series.
 
 ## Data Conversion Tool
 We provide a binary tool for data conversion. For more details, please refer to the [bin tool README](bin/README.md).
