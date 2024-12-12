@@ -115,20 +115,18 @@ def merge_xml_trees(root1, root2):
     retval = ET.tostring(root1, encoding="unicode")
     return retval
 
-def merge_contents(file_content, result, format):
+def merge_contents(file_content, result_content, format):
     """
     Merges the content of the current file with the result from the sadf command based on the format aggregator.
 
     Args:
         file_content (str): The current content of the file being processed.
-        result (subprocess.CompletedProcess): The result of the sadf command execution.
+        result_content (str): The result of the sadf command execution.
         format (str): The aggregator's format (csv, json, xml) to determine how to merge the content.
 
     Returns:
         str: The merged content.
     """
-
-    result_content = result.stdout
 
     if not file_content:
         file_content = result_content
@@ -178,10 +176,12 @@ def parse_sa1_files(source_files, output_dir, format, timeout, verbose):
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
                 if verbose:
                     print(f"Warning: Command '{' '.join(command)}' for file '{source_file}' failed with exit code {e.returncode}. Exception: {e}", file=sys.stderr)
+                    if e.stdout and len(e.stdout) > 0:
+                        file_content = merge_contents(file_content, e.stdout, format)
                 continue
             
-            if result.stdout:
-                file_content = merge_contents(file_content, result, format)
+            if result.stdout and len(result.stdout) > 0:
+                file_content = merge_contents(file_content, result.stdout, format)
             
         if file_content is not None:
             output_file = output_dir / f"{label}.{format}"
