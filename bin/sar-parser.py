@@ -165,7 +165,7 @@ def parse_sa1_files(source_files, output_dir, format, timeout, verbose):
         for source_file in source_files:
             if verbose:
                 print(f"-- Parsing: {source_file}")
-            command = ["sadf", format_arg, "-t", str(source_file), "--"] + aggregator.split()
+            command = ["sadf", format_arg, str(source_file), "--"] + aggregator.split()
             try:
                 # Run the sadf command with specified parameters
                 # - stdout=subprocess.PIPE: Capture standard output
