@@ -21,47 +21,47 @@ format_args = {
 
 #TODO pivot the CPU, DISK and NETWORK_DEV aggragators to cpus, disks and network_devslisted as columns rather then in line
 aggregators = {
-    "-b": "io",
-    "-B": "paging",
-    # "-C": "cpu",
-    "-d": "disk",
-    "-F": "filesystem",
-    "-H": "hugepages",
-    "-I ALL": "interrupts",
-    "-m ALL": "power",
+    "io": { "sar_param": "-b" },
+    "paging": { "sar_param": "-B" },
+    # "cpu": { "sar_param": "-C" },
+    "disk": { "sar_param": "-d" },
+    "filesystem": { "sar_param": "-F" },
+    "hugepages": { "sar_param": "-H" },
+    "interrupts": { "sar_param": "-I ALL" },
+    "power": { "sar_param": "-m ALL" },
     # This would produce a single file including all the statistics
     # which use different metrics: hardly readable by grafana
-    # "-n ALL": "network",
-    "-n DEV": "network_dev",
-    "-n EDEV": "network_edev",
-    "-n FC": "network_fc",
-    "-n ICMP": "network_icmp",
-    "-n EICMP": "network_eicmp",
-    "-n ICMP6": "network_icmp6",
-    "-n EICMP6": "network_eicmp6",
-    "-n IP": "network_ip",
-    "-n EIP": "network_eip",
-    "-n IP6": "network_ip6",
-    "-n EIP6": "network_eip6",
-    "-n NFS": "network_nfs",
-    "-n NFSD": "network_nfsd",
-    "-n SOCK": "network_sock",
-    "-n SOCK6": "network_sock6",
+    # "network": { "sar_param": "-n ALL" },
+    "network_dev": { "sar_param": "-n DEV" },
+    "network_edev": { "sar_param": "-n EDEV" },
+    "network_fc": { "sar_param": "-n FC" },
+    "network_icmp": { "sar_param": "-n ICMP" },
+    "network_eicmp": { "sar_param": "-n EICMP" },
+    "network_icmp6": { "sar_param": "-n ICMP6" },
+    "network_eicmp6": { "sar_param": "-n EICMP6" },
+    "network_ip": { "sar_param": "-n IP" },
+    "network_eip": { "sar_param": "-n EIP" },
+    "network_ip6": { "sar_param": "-n IP6" },
+    "network_eip6": { "sar_param": "-n EIP6" },
+    "network_nfs": { "sar_param": "-n NFS" },
+    "network_nfsd": { "sar_param": "-n NFSD" },
+    "network_sock": { "sar_param": "-n SOCK" },
+    "network_sock6": { "sar_param": "-n SOCK6" },
     # Not working as expected
-    # "-n SOFT": "network_soft",
-    "-n TCP": "network_tcp",
-    "-n ETCP": "network_etcp",
-    "-n UDP": "network_udp",
-    "-n UDP6": "network_udp6",
-    "-P ALL": "per_cpu",
-    "-q ALL": "queue",
-    "-r ALL": "memory",
-    "-S": "swap_util",
-    # "-u ALL": "cpu_util",
-    "-v": "inode",
-    "-W": "swap",
-    "-w": "task",
-    "-y": "tty",
+    # "network_soft": { "sar_param": "-n SOFT" },
+    "network_tcp": { "sar_param": "-n TCP" },
+    "network_etcp": { "sar_param": "-n ETCP" },
+    "network_udp": { "sar_param": "-n UDP" },
+    "network_udp6": { "sar_param": "-n UDP6" },
+    "per_cpu": { "sar_param": "-P ALL" },
+    "queue": { "sar_param": "-q ALL" },
+    "memory": { "sar_param": "-r ALL" },
+    "swap_util": { "sar_param": "-S" },
+    # "cpu_util": { "sar_param": "-u ALL" },
+    "inode": { "sar_param": "-v" },
+    "swap": { "sar_param": "-W" },
+    "task": { "sar_param": "-w" },
+    "tty": { "sar_param": "-y" },
 }
 
 def merge_json_objects(obj1, obj2):
@@ -158,14 +158,14 @@ def parse_sa1_files(source_files, output_dir, format, timeout, verbose):
 
     format_arg = format_args[format]
 
-    for aggregator, label in aggregators.items():
+    for label, aggregator in aggregators.items():
         if verbose:
             print(f"- Processing: {label}")
         file_content = None
         for source_file in source_files:
             if verbose:
                 print(f"-- Parsing: {source_file}")
-            command = ["sadf", format_arg, str(source_file), "--"] + aggregator.split()
+            command = ["sadf", format_arg, str(source_file), "--"] + aggregator["sar_param"].split()
             try:
                 # Run the sadf command with specified parameters
                 # - stdout=subprocess.PIPE: Capture standard output
