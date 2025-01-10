@@ -8,6 +8,8 @@ import json
 import shutil
 import subprocess
 import sys
+import pandas as pd
+import os
 
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -24,16 +26,41 @@ aggregators = {
     "io": { "sar_param": "-b" },
     "paging": { "sar_param": "-B" },
     # "cpu": { "sar_param": "-C" },
-    "disk": { "sar_param": "-d" },
+    "disk": { 
+                "sar_param": "-d", 
+                "pivot": {
+                            "index": ["timestamp"], 
+                            "columns": ["DEV"],
+                            "skip_columns": ["# hostname", "interval"]
+                }
+    },
     "filesystem": { "sar_param": "-F" },
     "hugepages": { "sar_param": "-H" },
-    "interrupts": { "sar_param": "-I ALL" },
+    "interrupts": { "sar_param": "-I ALL",
+                    "pivot": {
+                                "index": ["timestamp"], 
+                                "columns": ["INTR"],
+                                "skip_columns": ["# hostname", "interval"]
+                    }
+    },
     "power": { "sar_param": "-m ALL" },
     # This would produce a single file including all the statistics
     # which use different metrics: hardly readable by grafana
     # "network": { "sar_param": "-n ALL" },
-    "network_dev": { "sar_param": "-n DEV" },
-    "network_edev": { "sar_param": "-n EDEV" },
+    "network_dev": { "sar_param": "-n DEV",
+                    "pivot": {
+                                "index": ["timestamp"], 
+                                "columns": ["IFACE"],
+                                "skip_columns": ["# hostname", "interval"]
+                    }
+    },
+    "network_edev": { "sar_param": "-n EDEV",
+                     "pivot": {
+                                "index": ["timestamp"], 
+                                "columns": ["IFACE"],
+                                "skip_columns": ["# hostname", "interval"]
+                    }
+    },
     "network_fc": { "sar_param": "-n FC" },
     "network_icmp": { "sar_param": "-n ICMP" },
     "network_eicmp": { "sar_param": "-n EICMP" },
@@ -53,7 +80,13 @@ aggregators = {
     "network_etcp": { "sar_param": "-n ETCP" },
     "network_udp": { "sar_param": "-n UDP" },
     "network_udp6": { "sar_param": "-n UDP6" },
-    "per_cpu": { "sar_param": "-P ALL" },
+    "per_cpu": { "sar_param": "-P ALL",
+                    "pivot": {
+                                "index": ["timestamp"], 
+                                "columns": ["CPU"],
+                                "skip_columns": ["# hostname", "interval"]
+                    }
+    },
     "queue": { "sar_param": "-q ALL" },
     "memory": { "sar_param": "-r ALL" },
     "swap_util": { "sar_param": "-S" },
@@ -63,6 +96,31 @@ aggregators = {
     "task": { "sar_param": "-w" },
     "tty": { "sar_param": "-y" },
 }
+
+def pivot_csv(file_path, index, columns, skip_columns ):
+    
+    separator = ";"
+    
+    df = pd.read_csv(file_path, sep=separator)
+    values = [col for col in df.columns if col not in (index + columns + skip_columns)]
+    for value in values:
+
+        try:
+            pivot_df = df.pivot(index=index, columns=columns, values=value)
+        except Exception as e:
+            print(f"An error occurred while pivotting the CSV: {e}")
+            return
+
+        # Sanitize the output file name
+        suffix="".join(c if c.isalnum() or c in ('_', '.', '-') else '_' for c in value)
+        output_file = f"{os.path.splitext(file_path)[0]}_{suffix}.csv"
+        try:
+            pivot_df.to_csv(output_file, sep=separator)
+        except Exception as e:
+            print(f"An error occurred while writing the pivotted CSV: {e}")
+            return
+        else:
+            print(f"{file_path} pivotted and saved to {output_file}")
 
 def merge_json_objects(obj1, obj2):
     """
@@ -182,11 +240,15 @@ def parse_sa1_files(source_files, output_dir, format, timeout, verbose):
             
             if result.stdout and len(result.stdout) > 0:
                 file_content = merge_contents(file_content, result.stdout, format)
+                
             
         if file_content is not None:
             output_file = output_dir / f"{label}.{format}"
             with open(output_file, "w") as f:
                 f.write(file_content)
+        
+            if format == "csv" and "pivot" in aggregator:
+                pivot_csv(output_file, aggregator["pivot"]["index"], aggregator["pivot"]["columns"], aggregator["pivot"]["skip_columns"])
 
 if __name__ == "__main__":
 
