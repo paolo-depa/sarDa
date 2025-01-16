@@ -6,7 +6,7 @@ This Grafana dashboard visualizes system activity report (SAR) data from CSV fil
 
 - Grafana 7.0 or higher
 - `yesoreyeram-infinity-datasource` plugin for Grafana
-- CSV files containing SAR data
+- CSV files containing SAR data, generated using the [sar-parser.py](../bin/sar-parser.py) tool
 
 ## Configuration
 
