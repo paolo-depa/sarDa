@@ -21,7 +21,6 @@ format_args = {
 }
 
 
-#TODO pivot the CPU, DISK and NETWORK_DEV aggragators to cpus, disks and network_devslisted as columns rather then in line
 aggregators = {
     "io": { "sar_param": "-b" },
     "paging": { "sar_param": "-B" },
