@@ -90,8 +90,8 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
-            "w": 12,
+            "h": 10,
+            "w": 24,
             "x": 0,
             "y": 1
           },
@@ -212,10 +212,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 1
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 11
           },
           "id": 100,
           "options": {
@@ -334,10 +334,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
             "w": 12,
             "x": 0,
-            "y": 10
+            "y": 21
           },
           "id": 103,
           "options": {
@@ -456,10 +456,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
             "w": 12,
             "x": 12,
-            "y": 10
+            "y": 21
           },
           "id": 105,
           "options": {
@@ -578,132 +578,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
             "w": 12,
             "x": 0,
-            "y": 19
-          },
-          "id": 107,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__soft.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "soft",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 3,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 19
+            "y": 31
           },
           "id": 101,
           "options": {
@@ -780,7 +658,7 @@
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "barAlignment": 0,
-                "drawStyle": "line",
+                "drawStyle": "points",
                 "fillOpacity": 0,
                 "gradientMode": "none",
                 "hideFrom": {
@@ -790,7 +668,7 @@
                 },
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
-                "pointSize": 5,
+                "pointSize": 3,
                 "scaleDistribution": {
                   "type": "linear"
                 },
@@ -809,7 +687,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -821,133 +700,12 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 0,
-            "y": 28
-          },
-          "id": 104,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__guest.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "guest",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
+            "h": 10,
             "w": 12,
             "x": 12,
-            "y": 28
+            "y": 31
           },
-          "id": 106,
+          "id": 107,
           "options": {
             "legend": {
               "calcs": [],
@@ -995,14 +753,14 @@
               "source": "url",
               "type": "csv",
               "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__steal.csv",
+              "url": "$baseurl/per_cpu__soft.csv",
               "url_options": {
                 "data": "",
                 "method": "GET"
               }
             }
           ],
-          "title": "steal",
+          "title": "soft",
           "transparent": true,
           "type": "timeseries"
         },
@@ -1063,10 +821,131 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
             "w": 12,
             "x": 0,
-            "y": 37
+            "y": 41
+          },
+          "id": 102,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dev254-0",
+                  "text": "dev254-0",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+              "url": "$baseurl/per_cpu__nice.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "nice",
+          "transparent": true,
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 12,
+            "y": 41
           },
           "id": 97,
           "options": {
@@ -1172,7 +1051,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -1184,12 +1064,12 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 37
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 51
           },
-          "id": 102,
+          "id": 106,
           "options": {
             "legend": {
               "calcs": [],
@@ -1237,14 +1117,136 @@
               "source": "url",
               "type": "csv",
               "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__nice.csv",
+              "url": "$baseurl/per_cpu__steal.csv",
               "url_options": {
                 "data": "",
                 "method": "GET"
               }
             }
           ],
-          "title": "nice",
+          "title": "steal",
+          "transparent": true,
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 61
+          },
+          "id": 104,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dev254-0",
+                  "text": "dev254-0",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+              "url": "$baseurl/per_cpu__guest.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "guest",
           "transparent": true,
           "type": "timeseries"
         }
@@ -1307,8 +1309,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1320,132 +1321,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
-            "w": 12,
+            "h": 10,
+            "w": 24,
             "x": 0,
-            "y": 5
-          },
-          "id": 95,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/disk_tps.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "tps",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 5
+            "y": 2
           },
           "id": 89,
           "options": {
@@ -1551,8 +1430,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1564,12 +1442,12 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
-            "w": 12,
+            "h": 10,
+            "w": 24,
             "x": 0,
-            "y": 14
+            "y": 12
           },
-          "id": 90,
+          "id": 92,
           "options": {
             "legend": {
               "calcs": [],
@@ -1617,14 +1495,14 @@
               "source": "url",
               "type": "csv",
               "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/disk_rkB_s.csv",
+              "url": "$baseurl/disk_await.csv",
               "url_options": {
                 "data": "",
                 "method": "GET"
               }
             }
           ],
-          "title": "rkB_s",
+          "title": "await",
           "transparent": true,
           "type": "timeseries"
         },
@@ -1673,8 +1551,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1686,10 +1563,131 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 22
+          },
+          "id": 95,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dev254-0",
+                  "text": "dev254-0",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+              "url": "$baseurl/disk_tps.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "tps",
+          "transparent": true,
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
             "w": 12,
-            "x": 12,
-            "y": 14
+            "x": 0,
+            "y": 32
           },
           "id": 94,
           "options": {
@@ -1807,10 +1805,131 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
+            "w": 12,
+            "x": 12,
+            "y": 32
+          },
+          "id": 90,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dev254-0",
+                  "text": "dev254-0",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+              "url": "$baseurl/disk_rkB_s.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "rkB_s",
+          "transparent": true,
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
             "w": 12,
             "x": 0,
-            "y": 23
+            "y": 42
           },
           "id": 91,
           "options": {
@@ -1928,10 +2047,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
             "w": 12,
             "x": 12,
-            "y": 23
+            "y": 42
           },
           "id": 93,
           "options": {
@@ -1989,127 +2108,6 @@
             }
           ],
           "title": "aqu-sz",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 0,
-            "y": 32
-          },
-          "id": 92,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/disk_await.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "await",
           "transparent": true,
           "type": "timeseries"
         }
@@ -2172,8 +2170,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2185,10 +2182,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 7,
+            "h": 10,
             "w": 24,
             "x": 0,
-            "y": 2
+            "y": 53
           },
           "id": 15,
           "options": {
@@ -2305,8 +2302,7 @@
                 "lineWidth": 1,
                 "pointSize": 5,
                 "scaleDistribution": {
-                  "log": 2,
-                  "type": "log"
+                  "type": "linear"
                 },
                 "showPoints": "auto",
                 "spanNulls": false,
@@ -2323,8 +2319,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2336,7 +2331,7 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 7,
+            "h": 10,
             "w": 24,
             "x": 0,
             "y": 4
@@ -2424,142 +2419,6 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 6
-      },
-      "id": 126,
-      "panels": [
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 24,
-            "x": 0,
-            "y": 7
-          },
-          "id": 127,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/interrupts_intr_s.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "intr/s",
-          "transparent": true,
-          "type": "timeseries"
-        }
-      ],
-      "title": "interrupts",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
         "y": 4
       },
       "id": 3,
@@ -2621,10 +2480,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
-            "w": 12,
+            "h": 10,
+            "w": 24,
             "x": 0,
-            "y": 12
+            "y": 5
           },
           "id": 1,
           "options": {
@@ -2756,10 +2615,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 12
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 15
           },
           "id": 19,
           "options": {
@@ -2841,6 +2700,141 @@
         "x": 0,
         "y": 5
       },
+      "id": 126,
+      "panels": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "points",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 6
+          },
+          "id": 127,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dev254-0",
+                  "text": "dev254-0",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+              "url": "$baseurl/interrupts_intr_s.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "intr/s",
+          "transparent": true,
+          "type": "timeseries"
+        }
+      ],
+      "title": "interrupts",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
       "id": 18,
       "panels": [
         {
@@ -2871,8 +2865,7 @@
                 "lineWidth": 1,
                 "pointSize": 5,
                 "scaleDistribution": {
-                  "log": 2,
-                  "type": "log"
+                  "type": "linear"
                 },
                 "showPoints": "auto",
                 "spanNulls": false,
@@ -2898,41 +2891,13 @@
                 ]
               }
             },
-            "overrides": [
-              {
-                "__systemRef": "hideSeriesFrom",
-                "matcher": {
-                  "id": "byNames",
-                  "options": {
-                    "mode": "exclude",
-                    "names": [
-                      "kbcommit",
-                      "kbactive",
-                      "kbcached",
-                      "kbslab"
-                    ],
-                    "prefix": "All except:",
-                    "readOnly": true
-                  }
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
+            "overrides": []
           },
           "gridPos": {
-            "h": 8,
-            "w": 12,
+            "h": 10,
+            "w": 24,
             "x": 0,
-            "y": 13
+            "y": 7
           },
           "id": 2,
           "options": {
@@ -2973,56 +2938,6 @@
                   "type": "number"
                 },
                 {
-                  "selector": "kbbuffers",
-                  "text": "kbbuffers",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbcached",
-                  "text": "kbcached",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbcommit",
-                  "text": "kbcommit",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbactive",
-                  "text": "kbactive",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbinact",
-                  "text": "kbinact",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbdirty",
-                  "text": "kbdirty",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbanonpg",
-                  "text": "kbanonpg",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbslab",
-                  "text": "kbslab",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbkstack",
-                  "text": "kbkstack",
-                  "type": "number"
-                },
-                {
-                  "selector": "kbpgtbl",
-                  "text": "kbpgtbl",
-                  "type": "number"
-                },
-                {
                   "selector": "kbvmused",
                   "text": "kbvmused",
                   "type": "number"
@@ -3054,7 +2969,7 @@
               }
             }
           ],
-          "title": "memory",
+          "title": "General",
           "type": "timeseries"
         },
         {
@@ -3114,10 +3029,406 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 13
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 17
+          },
+          "id": 132,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "kbactive",
+                  "text": "kbactive",
+                  "type": "number"
+                },
+                {
+                  "selector": "kbinact",
+                  "text": "kbinact",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "backend",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv",
+              "url": "$baseurl/memory.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "Active/Inactive",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 27
+          },
+          "id": 133,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "kbbuffers",
+                  "text": "kbbuffers",
+                  "type": "number"
+                },
+                {
+                  "selector": "kbslab",
+                  "text": "kbslab",
+                  "type": "number"
+                },
+                {
+                  "selector": "kbkstack",
+                  "text": "kbkstack",
+                  "type": "number"
+                },
+                {
+                  "selector": "kbpgtbl",
+                  "text": "kbpgtbl",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "backend",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv",
+              "url": "$baseurl/memory.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "Kernel mem",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h":  10,
+            "w": 24,
+            "x": 0,
+            "y": 37
+          },
+          "id": 131,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "kbcached",
+                  "text": "kbcached",
+                  "type": "number"
+                },
+                {
+                  "selector": "kbcommit",
+                  "text": "kbcommit",
+                  "type": "number"
+                },
+                {
+                  "selector": "kbdirty",
+                  "text": "kbdirty",
+                  "type": "number"
+                },
+                {
+                  "selector": "kbanonpg",
+                  "text": "kbanonpg",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "backend",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv",
+              "url": "$baseurl/memory.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "Cached/Committed/Anon/Dirty",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 45
           },
           "id": 20,
           "options": {
@@ -3143,7 +3454,7 @@
                   "type": "timestamp"
                 },
                 {
-                  "selector": "%memused",
+                  "selector": "=%memused",
                   "text": "%memused",
                   "type": "number"
                 },
@@ -3192,7 +3503,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 7
       },
       "id": 108,
       "panels": [
@@ -3254,10 +3565,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 12
+            "y": 56
           },
           "id": 113,
           "options": {
@@ -3376,10 +3687,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 12
+            "y": 56
           },
           "id": 112,
           "options": {
@@ -3498,10 +3809,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 65
           },
           "id": 114,
           "options": {
@@ -3620,10 +3931,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 21
+            "y": 65
           },
           "id": 116,
           "options": {
@@ -3729,7 +4040,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -3741,10 +4053,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 30
+            "y": 74
           },
           "id": 110,
           "options": {
@@ -3850,7 +4162,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -3862,10 +4175,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 30
+            "y": 74
           },
           "id": 111,
           "options": {
@@ -3971,7 +4284,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -3983,10 +4297,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 39
+            "y": 83
           },
           "id": 115,
           "options": {
@@ -4092,7 +4406,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4104,10 +4419,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 39
+            "y": 83
           },
           "id": 109,
           "options": {
@@ -4213,7 +4528,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4225,10 +4541,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 48
+            "y": 92
           },
           "id": 117,
           "options": {
@@ -4334,7 +4650,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4346,10 +4663,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 48
+            "y": 92
           },
           "id": 118,
           "options": {
@@ -4455,7 +4772,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4467,10 +4785,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 57
+            "y": 101
           },
           "id": 119,
           "options": {
@@ -4576,7 +4894,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4588,10 +4907,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 57
+            "y": 101
           },
           "id": 120,
           "options": {
@@ -4697,7 +5016,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4709,10 +5029,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 66
+            "y": 110
           },
           "id": 121,
           "options": {
@@ -4818,7 +5138,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4830,10 +5151,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 66
+            "y": 110
           },
           "id": 122,
           "options": {
@@ -4939,7 +5260,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -4951,10 +5273,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 75
+            "y": 119
           },
           "id": 123,
           "options": {
@@ -5060,7 +5382,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -5072,10 +5395,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 75
+            "y": 119
           },
           "id": 124,
           "options": {
@@ -5181,7 +5504,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -5193,10 +5517,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 84
+            "y": 128
           },
           "id": 125,
           "options": {
@@ -5267,7 +5591,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 8
       },
       "id": 67,
       "panels": [
@@ -5316,7 +5640,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -5328,10 +5653,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 15
+            "y": 79
           },
           "id": 70,
           "options": {
@@ -5496,7 +5821,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -5508,10 +5834,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 15
+            "y": 79
           },
           "id": 71,
           "options": {
@@ -5676,7 +6002,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -5688,10 +6015,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 23
+            "y": 87
           },
           "id": 68,
           "options": {
@@ -5851,7 +6178,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -5863,10 +6191,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 23
+            "y": 87
           },
           "id": 69,
           "options": {
@@ -5991,7 +6319,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "id": 72,
       "panels": [
@@ -6052,10 +6380,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 14
+            "y": 10
           },
           "id": 73,
           "options": {
@@ -6207,10 +6535,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 14
+            "y": 10
           },
           "id": 74,
           "options": {
@@ -6362,10 +6690,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 22
+            "y": 18
           },
           "id": 75,
           "options": {
@@ -6517,10 +6845,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 22
+            "y": 18
           },
           "id": 76,
           "options": {
@@ -6625,7 +6953,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 10
       },
       "id": 84,
       "panels": [
@@ -6686,10 +7014,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 41
+            "y": 11
           },
           "id": 85,
           "options": {
@@ -6826,10 +7154,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 41
+            "y": 11
           },
           "id": 86,
           "options": {
@@ -6949,7 +7277,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 11
       },
       "id": 77,
       "panels": [
@@ -7010,10 +7338,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 16
+            "y": 12
           },
           "id": 78,
           "options": {
@@ -7145,10 +7473,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 16
+            "y": 12
           },
           "id": 79,
           "options": {
@@ -7285,10 +7613,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 24
+            "y": 20
           },
           "id": 82,
           "options": {
@@ -7420,10 +7748,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 24
+            "y": 20
           },
           "id": 83,
           "options": {
@@ -7555,10 +7883,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 0,
-            "y": 32
+            "y": 28
           },
           "id": 80,
           "options": {
@@ -7700,10 +8028,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h":  10,
             "w": 12,
             "x": 12,
-            "y": 32
+            "y": 28
           },
           "id": 81,
           "options": {
@@ -7788,189 +8116,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 11
-      },
-      "id": 28,
-      "panels": [
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "log": 2,
-                  "type": "log"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 24,
-            "x": 0,
-            "y": 15
-          },
-          "id": 29,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "pgpgin/s",
-                  "text": "pgpgin/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "pgpgout/s",
-                  "text": "pgpgout/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "majflt/s",
-                  "text": "majflt/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "pgfree/s",
-                  "text": "pgfree/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "pgscank/s",
-                  "text": "pgscank/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "pgscand/s",
-                  "text": "pgscand/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "pgsteal/s",
-                  "text": "pgsteal/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "pgprom/s",
-                  "text": "pgprom/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "pgdem/s",
-                  "text": "pgdem/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "fault/s",
-                  "text": "fault/s",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "backend",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv",
-              "url": "$baseurl/paging.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "paging",
-          "type": "timeseries"
-        }
-      ],
-      "title": "paging",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
         "y": 12
       },
-      "id": 30,
+      "id": 28,
       "panels": [
         {
           "datasource": {
@@ -8029,10 +8177,426 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 9,
+            "h": 10,
             "w": 24,
             "x": 0,
-            "y": 16
+            "y": 13
+          },
+          "id": 29,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "pgpgin/s",
+                  "text": "pgpgin/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "pgpgout/s",
+                  "text": "pgpgout/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "pgfree/s",
+                  "text": "pgfree/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "fault/s",
+                  "text": "fault/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "majflt/s",
+                  "text": "majflt/s",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "backend",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv",
+              "url": "$baseurl/paging.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "Mem Management",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 23
+          },
+          "id": 129,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "pgscank/s",
+                  "text": "pgscank/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "pgscand/s",
+                  "text": "pgscand/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "pgsteal/s",
+                  "text": "pgsteal/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "pgprom/s",
+                  "text": "pgprom/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "pgdem/s",
+                  "text": "pgdem/s",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "backend",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv",
+              "url": "$baseurl/paging.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "Reclamation",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 33
+          },
+          "id": 130,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "pgprom/s",
+                  "text": "pgprom/s",
+                  "type": "number"
+                },
+                {
+                  "selector": "pgdem/s",
+                  "text": "pgdem/s",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "backend",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv",
+              "url": "$baseurl/paging.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "NUMA management",
+          "type": "timeseries"
+        }
+      ],
+      "title": "paging",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 30,
+      "panels": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 14
           },
           "id": 31,
           "options": {
@@ -8069,15 +8633,15 @@
                 "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
-              "format": "table",
+              "format": "timeseries",
               "global_query_id": "",
               "parser": "uql",
               "refId": "A",
               "root_selector": "",
               "source": "url",
               "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| pivot mean(\"MHz\"), \"timestamp\", \"CPU\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/power.csv",
+              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
+              "url": "$baseurl/power_MHz.csv",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -8097,7 +8661,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 14
       },
       "id": 32,
       "panels": [
@@ -8128,10 +8692,7 @@
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
                 "pointSize": 5,
-                "scaleDistribution": {
-                  "log": 2,
-                  "type": "log"
-                },
+                
                 "showPoints": "auto",
                 "spanNulls": false,
                 "stacking": {
@@ -8159,10 +8720,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h": 10,
             "w": 12,
             "x": 0,
-            "y": 17
+            "y": 15
           },
           "id": 36,
           "options": {
@@ -8289,10 +8850,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h": 10,
             "w": 12,
             "x": 12,
-            "y": 17
+            "y": 15
           },
           "id": 34,
           "options": {
@@ -8372,7 +8933,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 15
       },
       "id": 35,
       "panels": [
@@ -8403,10 +8964,7 @@
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
                 "pointSize": 5,
-                "scaleDistribution": {
-                  "log": 2,
-                  "type": "log"
-                },
+                
                 "showPoints": "auto",
                 "spanNulls": false,
                 "stacking": {
@@ -8434,10 +8992,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h": 10,
             "w": 12,
             "x": 0,
-            "y": 18
+            "y": 16
           },
           "id": 37,
           "options": {
@@ -8544,10 +9102,7 @@
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
                 "pointSize": 5,
-                "scaleDistribution": {
-                  "log": 2,
-                  "type": "log"
-                },
+                
                 "showPoints": "auto",
                 "spanNulls": false,
                 "stacking": {
@@ -8575,10 +9130,10 @@
             "overrides": []
           },
           "gridPos": {
-            "h": 8,
+            "h": 10,
             "w": 12,
             "x": 12,
-            "y": 18
+            "y": 16
           },
           "id": 33,
           "options": {
@@ -8648,848 +9203,962 @@
       "type": "row"
     },
     {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 15
-      },
-      "id": 38,
-      "panels": [
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "log": 2,
-                  "type": "log"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 24,
-            "x": 0,
-            "y": 11
-          },
-          "id": 39,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "proc/s",
-                  "text": "proc/s",
-                  "type": "number"
-                },
-                {
-                  "selector": "cswch/s",
-                  "text": "cswch/s",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "backend",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv",
-              "url": "$baseurl/task.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "Free",
-          "type": "timeseries"
-        }
-      ],
-      "title": "task",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 16
       },
-      "id": 40,
-      "panels": [
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      "id": 38,
+      "panels": [],
+      "title": "task",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 20
-          },
-          "id": 41,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
             },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [],
-              "computed_columns": [
-                {
-                  "selector": "",
-                  "text": "",
-                  "type": "string"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| pivot mean(\"rcvin/s\"), \"timestamp\", \"TTY\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/tty.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
+              {
+                "color": "red",
+                "value": 80
               }
-            }
-          ],
-          "title": "rcvin/s",
-          "type": "timeseries"
+            ]
+          }
         },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 20
-          },
-          "id": 42,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [],
-              "computed_columns": [
-                {
-                  "selector": "",
-                  "text": "",
-                  "type": "string"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| pivot mean(\"xmtin/s\"), \"timestamp\", \"TTY\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/tty.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "xmtin/s",
-          "type": "timeseries"
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 39,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
         {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "cswch/s",
+              "text": "cswch/s",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
           "datasource": {
             "type": "yesoreyeram-infinity-datasource",
             "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
           },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 28
-          },
-          "id": 43,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [],
-              "computed_columns": [
-                {
-                  "selector": "",
-                  "text": "",
-                  "type": "string"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| pivot mean(\"framerr/s\"), \"timestamp\", \"TTY\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/tty.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "framerr/s",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 28
-          },
-          "id": 44,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [],
-              "computed_columns": [
-                {
-                  "selector": "",
-                  "text": "",
-                  "type": "string"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| pivot mean(\"prtyerr/s\"), \"timestamp\", \"TTY\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/tty.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "prtyerr/s",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 36
-          },
-          "id": 45,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [],
-              "computed_columns": [
-                {
-                  "selector": "",
-                  "text": "",
-                  "type": "string"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| pivot mean(\"brk/s\"), \"timestamp\", \"TTY\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/tty.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "brk/s",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 36
-          },
-          "id": 46,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [],
-              "computed_columns": [
-                {
-                  "selector": "",
-                  "text": "",
-                  "type": "string"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| pivot mean(\"ovrun/s\"), \"timestamp\", \"TTY\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/tty.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "ovrun/s",
-          "type": "timeseries"
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv",
+          "url": "$baseurl/task.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
+      "title": "cswch/s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 128,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "proc/s",
+              "text": "proc/s",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv",
+          "url": "$baseurl/task.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Free",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 40,
+      "panels": [],
       "title": "tty",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 28
+      },
+      "id": 41,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [],
+          "computed_columns": [
+            {
+              "selector": "",
+              "text": "",
+              "type": "string"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
+          "url": "$baseurl/tty_rcvin_s.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "rcvin/s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 28
+      },
+      "id": 42,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [],
+          "computed_columns": [
+            {
+              "selector": "",
+              "text": "",
+              "type": "string"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
+          "url": "$baseurl/tty_txmtin_s.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "txmtin/s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 38
+      },
+      "id": 43,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [],
+          "computed_columns": [
+            {
+              "selector": "",
+              "text": "",
+              "type": "string"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
+          "url": "$baseurl/tty_framerr_s.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "framerr/s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 38
+      },
+      "id": 44,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [],
+          "computed_columns": [
+            {
+              "selector": "",
+              "text": "",
+              "type": "string"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
+          "url": "$baseurl/tty_prtyerr_s.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "prtyerr/s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h":  10,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 45,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [],
+          "computed_columns": [
+            {
+              "selector": "",
+              "text": "",
+              "type": "string"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
+          "url": "$baseurl/tty_brk_s.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "brk/s",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h":  10,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 46,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [],
+          "computed_columns": [
+            {
+              "selector": "",
+              "text": "",
+              "type": "string"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
+          "url": "$baseurl/tty_ovrun_s.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "ovrun/s",
+      "type": "timeseries"
     }
   ],
   "refresh": false,
@@ -9501,20 +10170,20 @@
       {
         "hide": 2,
         "name": "baseurl",
-        "query": "<YOUR_BASE_URL>",
+        "query": "<-YOUR-URL-HERE->",
         "skipUrlSync": false,
         "type": "constant"
       }
     ]
   },
   "time": {
-    "from": "2024-12-22T22:00:00.000Z",
-    "to": "2024-12-23T17:00:00.000Z"
+    "from": "2025-02-23T20:30:00.000Z",
+    "to": "2025-02-23T23:00:00.000Z"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "utc",
   "title": "SAR-CSV",
   "uid": "d5763753-d3a2-460b-8d9d-a9d534ae9d9b",
-  "version": 2,
+  "version": 40,
   "weekStart": ""
 }
