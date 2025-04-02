@@ -7272,6 +7272,185 @@
       "type": "row"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 134,
+      "panels": [],
+      "title": "network_soft",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "total/s"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "id": 135,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "total/s",
+              "text": "total/s",
+              "type": "number"
+            },
+            {
+              "selector": "dropd/s",
+              "text": "dropd/s",
+              "type": "number"
+            },
+            {
+              "selector": "squeezd/s",
+              "text": "squeezd/s",
+              "type": "number"
+            },
+            {
+              "selector": "rx_rps/s",
+              "text": "rx_rps/s",
+              "type": "number"
+            },
+            {
+              "selector": "flw_lim/s",
+              "text": "flw_lim/s",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "simple",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv",
+          "url": "$baseurl/network_soft.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Software",
+      "type": "timeseries"
+    },
+    {
       "collapsed": true,
       "gridPos": {
         "h": 1,
@@ -8537,43 +8716,43 @@
       "panels": [
         {
           "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+            "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441",
+            "type": "yesoreyeram-infinity-datasource"
           },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
               "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
                 "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "barAlignment": 0,
+                "lineWidth": 1,
                 "fillOpacity": 0,
                 "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
+                "spanNulls": false,
+                "showPoints": "auto",
                 "pointSize": 5,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "axisLabel": "",
+                "axisColorMode": "text",
                 "scaleDistribution": {
                   "type": "linear"
                 },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
+                "axisCenteredZero": false,
+                "hideFrom": {
+                  "tooltip": false,
+                  "viz": false,
+                  "legend": false
                 },
                 "thresholdsStyle": {
                   "mode": "off"
                 }
+              },
+              "color": {
+                "mode": "palette-classic"
               },
               "mappings": [],
               "thresholds": {
@@ -8600,21 +8779,36 @@
           },
           "id": 31,
           "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
             "tooltip": {
               "mode": "single",
               "sort": "none"
+            },
+            "legend": {
+              "showLegend": true,
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": []
             }
           },
           "pluginVersion": "9.5.18",
           "targets": [
             {
-              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
+              },
+              "columns": [
+                {
+                  "text": "timestamp",
+                  "selector": "timestamp",
+                  "type": "timestamp"
+                },
+                {
+                  "text": "MHz",
+                  "selector": "MHz",
+                  "type": "number"
+                }
+              ],
               "computed_columns": [
                 {
                   "selector": "",
@@ -8628,20 +8822,16 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
-              "parser": "uql",
+              "parser": "simple",
               "refId": "A",
               "root_selector": "",
               "source": "url",
               "type": "csv",
               "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")\n",
-              "url": "$baseurl/power_MHz.csv",
+              "url": "$baseurl/power_cpu.csv",
               "url_options": {
                 "data": "",
                 "method": "GET"

@@ -14,6 +14,12 @@ FORMAT_CONFIG = {"format": "csv", "sadf_arg": "-d", "separator": ";"}
 aggregators = {
     "io": {"sar_param": "-b"},
     "paging": {"sar_param": "-B"},
+    "power_cpu": {"sar_param": "-m CPU"},
+    "power_fan": {"sar_param": "-m FAN"},
+    "power_freq": {"sar_param": "-m FREQ"},
+    "power_in": {"sar_param": "-m IN"},
+    "power_temp": {"sar_param": "-m TEMP"},
+    "power_USB": {"sar_param": "-m USB"},
     "disk": {
         "sar_param": "-d",
         "pivot": {
@@ -61,6 +67,7 @@ aggregators = {
     "network_nfsd": {"sar_param": "-n NFSD"},
     "network_sock": {"sar_param": "-n SOCK"},
     "network_sock6": {"sar_param": "-n SOCK6"},
+    "network_soft": {"sar_param": "-n SOFT"},
     "network_tcp": {"sar_param": "-n TCP"},
     "network_etcp": {"sar_param": "-n ETCP"},
     "network_udp": {"sar_param": "-n UDP"},
@@ -76,6 +83,7 @@ aggregators = {
     "queue": {"sar_param": "-q ALL"},
     "memory": {"sar_param": "-r ALL"},
     "swap_util": {"sar_param": "-S"},
+    # "cpu%": {"sar_param": "-u ALL"},
     "inode": {"sar_param": "-v"},
     "swap": {"sar_param": "-W"},
     "task": {"sar_param": "-w"},
