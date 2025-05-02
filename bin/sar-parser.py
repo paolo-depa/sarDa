@@ -1,7 +1,11 @@
 #!/usr/bin/python3.11
 
 import argparse
+import time
+import pytz
+import datetime
 import io
+import json
 import logging
 import re
 import shutil
@@ -13,12 +17,12 @@ from typing import Any, Dict, List, Optional, Tuple, TextIO, Union
 
 import pandas as pd
 
-
+from dateutil import parser
 # --- Constants ---
 SADF_TIMEOUT_RC = -1  # Custom return code for sadf timeout
 SADF_ERROR_RC = -2    # Custom return code for other sadf execution errors
 TIMESTAMP_COL = "timestamp" # Standard column name for time filtering
-TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S"
+TIMESTAMP_FORMAT = "%Y%m%dT%H%M%S"
 
 # --- Global regexps ---
 FILTER_REGEXPS = [re.compile(r"RESTART"), re.compile(r"^#")]
@@ -124,6 +128,35 @@ aggregators: Dict[str, Dict[str, Any]] = {
     },
 }
 # --- End Configuration ---
+
+def get_sar_file_time_window(sar_file: Path) ->  Tuple[str, str]:
+    """
+    Determines the time window of observation from a sar binary data file using sadf.
+
+    Args:
+        sar_file: Path to the sar binary file.
+
+    Returns:
+        A tuple containing the start and end timestamps (as strings) for the day of the sar file.
+    """
+    if not sar_file.is_file():
+        raise FileNotFoundError(f"Sar file not found: {sar_file}")
+
+    try:
+        # Get the first timestamp
+        command_start = ["sadf", "-j", "-H", str(sar_file)]
+        result_start = subprocess.run(command_start, capture_output=True, text=True, check=True)
+        sar_file_metadata = json.loads(result_start.stdout)
+        sar_file_date = sar_file_metadata["sysstat"]["hosts"][0]["file-date"]
+        
+        # A single SAR file is expected to cover all the day
+        start_time = sar_file_date + "T00:00:00"
+        end_time = sar_file_date + "T23:59:59"
+
+        return start_time, end_time
+    except (subprocess.CalledProcessError, json.JSONDecodeError, KeyError) as e:
+        raise RuntimeError(f"Error processing sar file {sar_file}: {e}") from e    
+
 
 def validate_csv(data_io: TextIO, separator: str, label: str) -> Optional[TextIO]:
     """
@@ -297,7 +330,7 @@ def merge_contents(current_content: Optional[str], new_content: str) -> Optional
 # Removed the separate write_csv function as its logic is now part of validate_csv's return
 
 
-def run_sadf(source_file: Path, sadf_args: List[str], sar_params: str, timeout: int) -> Tuple[Optional[str], Optional[str], int]:
+def run_sadf(source_file: Path, sadf_args: List[str], sar_params: str, timeout: int, start_date: Optional[str] = None, end_date: Optional[str] = None) -> Tuple[Optional[str], Optional[str], int]:
     """
     Runs a single sadf command and returns its output and status.
 
@@ -305,12 +338,23 @@ def run_sadf(source_file: Path, sadf_args: List[str], sar_params: str, timeout: 
         source_file: Path to the input sa binary file.
         sadf_args: List of base arguments for sadf (e.g., ['-d']).
         sar_params: String of sar options to pass via '--'.
-        timeout: Command timeout in seconds.
+        timeout: Command timeout in seconds.        
+        start_date: Optional start date for filtering.
+        end_date: Optional end date for filtering.
 
     Returns:
         A tuple containing: (stdout string or None, stderr string or None, return code).
         Return code is from subprocess, or SADF_TIMEOUT_RC / SADF_ERROR_RC on error.
     """
+    
+    if start_date:
+        sadf_args.extend(["-s", start_date])
+    if end_date:
+        sadf_args.extend(["-e", end_date])
+
+    if start_date or end_date:
+        logger.debug(f"Time filtering enabled: start_date={start_date}, end_date={end_date}")
+    
     command = ["sadf"] + sadf_args + [str(source_file), "--"] + sar_params.split()
     logger.debug(f"Running command: {' '.join(command)}")
 
@@ -343,6 +387,8 @@ def process_metric(
     output_dir: Path,
     sadf_base_args: List[str],
     timeout: int,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
     ) -> None:
     """
     Processes a single metric: runs sadf across files, merges, validates, writes, pivots.
@@ -354,6 +400,8 @@ def process_metric(
         output_dir: Directory to save output files.
         sadf_base_args: Base arguments for sadf command.
         timeout: Timeout for sadf commands.
+        start_date: Optional start date for filtering.
+        end_date: Optional end date for filtering.
     """
 
     logger.info(f"Processing metric: {label} ({config['sar_param']}) ")
@@ -362,12 +410,65 @@ def process_metric(
     processed_files_count = 0
     separator = FORMAT_CONFIG["separator"]
 
+    
     for source_file in source_files:
         logging.debug(f"Reading source: {source_file} for metric {label} ({config['sar_param']}) ")
+        sadf_args = sadf_base_args.copy()
+        
 
+        # Check if time filtering is needed for this file, if so, check if the file is in the time window
+        if start_date or end_date:
+
+            sadf_start_param = None;
+            sadf_end_param = None;
+            
+            file_start_date, file_end_date = get_sar_file_time_window(source_file)
+            file_start_date_obj = parser.parse(file_start_date).replace(tzinfo=pytz.utc)
+            file_end_date_obj = parser.parse(file_end_date).replace(tzinfo=pytz.utc)
+             
+            # calculating local timezone
+            local_tz_name = time.tzname[0] if time.daylight else time.tzname[1]
+            local_tz = pytz.timezone(local_tz_name)
+            
+
+            if start_date:
+                start_date_obj = parser.parse(start_date, tzinfos={"timezone_name": local_tz})
+                # convert to utc to make comparisons
+                start_date_utc=start_date_obj.astimezone(pytz.utc)
+
+                if start_date_utc > file_end_date_obj:
+                    continue                
+                if file_start_date_obj < start_date_utc and start_date_utc < file_end_date_obj:
+                   # sadf assumes local timezones
+                   sadf_start_param = start_date_obj.strftime("%H:%M:%S")
+                
+                
+            if end_date:
+                end_date_obj = parser.parse(end_date,tzinfos={"timezone_name": local_tz})
+                # convert to utc to make comparisons
+                end_date_utc=end_date_obj.astimezone(pytz.utc)
+                if end_date_utc <= file_start_date_obj:
+                    continue
+                if file_start_date_obj < end_date_utc and end_date_utc < file_end_date_obj:
+                    # sadf assumes local timezones
+                    sadf_end_param = end_date_obj.strftime("%H:%M:%S")
+                    
+
+            if sadf_start_param:
+                sadf_args.extend(["-s", sadf_start_param])
+                if sadf_end_param and sadf_end_param > sadf_start_param:
+                    sadf_end_param = sadf_end_param
+                else:
+                    sadf_end_param="23:59:59"
+                sadf_args.extend(["-e", sadf_end_param])
+            elif sadf_end_param:
+                # no start, only end set
+                sadf_args.extend(["-s", "00:00:00"])
+                sadf_args.extend(["-e", sadf_end_param])
+           
         # Run sadf and merge results
-        stdout, stderr, returncode = run_sadf(
-            source_file, sadf_base_args, config["sar_param"], timeout
+        stdout, stderr, returncode = run_sadf(            
+            source_file, sadf_args, config["sar_param"], timeout
         )
 
         # Log significant stderr messages
@@ -445,6 +546,14 @@ def main() -> None:
         "-v", "--verbose", action="store_true", default=False,
         help="Enable debug logs."
     )
+    parser.add_argument(
+        "-s", "--start-date", type=str, help="Start date for time filtering (YYYY-MM-DDTHH:mm:ss) in local timezone"
+    )
+    parser.add_argument(
+        "-e", "--end-date", type=str, help="End date for time filtering (YYYY-MM-DDTHH:mm:ss) in local timezone"
+    )
+
+
 
     args = parser.parse_args()
 
@@ -488,7 +597,7 @@ def main() -> None:
     for label, config in aggregators.items():
         process_metric(
             label, config, valid_source_files, output_dir,
-            sadf_base_args, args.timeout
+            sadf_base_args, args.timeout, args.start_date, args.end_date
         )
 
     logger.info(f"Processing complete. Output files are in: {output_dir.resolve()}")
