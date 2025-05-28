@@ -1,9 +1,8 @@
-#!/usr/bin/python3.11
+#!/usr/bin/env python3
 
 import argparse
 import time
 import pytz
-import datetime
 import io
 import json
 import logging
