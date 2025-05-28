@@ -1,6 +1,7 @@
 # SAR CSV Grafana Dashboard
 
-This Grafana dashboard visualizes system activity report (SAR) data from CSV files. The data is parsed and displayed using various panels to provide insights into system performance metrics.
+This Grafana dashboard visualizes system activity report (SAR) data from CSV files.
+The data is parsed and displayed using various panels to provide insights into system performance metrics.
 
 ## Requirements
 
@@ -25,100 +26,119 @@ This Grafana dashboard visualizes system activity report (SAR) data from CSV fil
 
 ## Panels
 
-### CPU Usage
-- **%user**: Per CPU Percentage utilization that occurred while executing at the user level.
-- **%nice**: Per CPU Percentage utilization that occurred while executing at the user level with nice priority.
-- **%system**: Per CPU Percentage utilization that occurred while executing at the system level.
-- **%iowait**: Per CPU Percentage of time that the CPU or CPUs were idle during which the system had an outstanding disk I/O request.
-- **%steal**: Per CPU Percentage of time spent in involuntary wait by the virtual CPU or CPUs while the hypervisor was servicing another virtual processor.
-- **%idle**: Per CPU Percentage of time that the CPU or CPUs were idle and the system did not have an outstanding disk I/O request.
-- **soft**: Per CPU Percentage utilization that occurred while servicing software interrupts.
-- **irq**: Per CPU Percentage utilization that occurred while servicing hardware interrupts.
-- **guest**: Per CPU Percentage utilization that occurred while executing at the guest level.
-- **steal**: Per CPU Percentage of time spent in involuntary wait by the virtual CPU or CPUs while the hypervisor was servicing another virtual processor.
-- **gnice**: Per CPU Percentage utilization that occurred while executing at the guest level with nice priority.
-- **nice**: Per CPU Percentage utilization that occurred while executing at the user level with nice priority.
+### CPU
+This section visualizes per-CPU metrics from the `per_cpu_*.csv` files.
+- **idle**: Per-CPU percentage of time the CPU was idle with no outstanding I/O requests.
+- **iowait**: Per-CPU percentage of time the CPU was idle waiting for I/O completion.
+- **system**: Per-CPU percentage utilization while executing in kernel space.
+- **user**: Per-CPU percentage utilization while executing in user space.
+- **irq**: Per-CPU percentage utilization while servicing hardware interrupts.
+- **soft**: Per-CPU percentage utilization while servicing software interrupts.
+- **nice**: Per-CPU percentage utilization while executing user-level processes with nice priority.
+- **gnice**: Per-CPU percentage utilization while executing guest processes with nice priority.
+- **steal**: Per-CPU percentage of time spent in involuntary wait by a virtual CPU while the hypervisor was servicing another virtual processor.
+- **guest**: Per-CPU percentage utilization while executing a guest virtual machine.
 
 ### Disks
-- **TPS**: Per device number of transactions per second
-- **rkB/s**: Per device amount of read kilobytes per second.
-- **wkB/s**: Per device amount of written kilobytes per second.
-- **areq-sz**: Per device average request size in kilobytes.
-- **aqu-sz**: Per device average queue size.
-- **await**: Per device average wait time in milliseconds.
-- **%util**: Per device percentage of CPU time during which I/O requests were issued to the device.
+- **%util**: Per-device percentage of CPU time during which I/O requests were issued to the device.
+- **await**: Per-device average wait time (queue + service) for I/O requests in milliseconds.
+- **tps**: Per-device number of transactions (requests) per second.
+- **wkB_s**: Per-device amount of written kilobytes per second.
+- **rkB_s**: Per-device amount of read kilobytes per second.
+- **areq-sz**: Per-device average request size in kilobytes.
+- **aqu-sz**: Per-device average queue size.
 
 ### Hugepages
-- **hugepages**: Displays metrics such as the percentage of hugepages used and the amount of free hugepages in kilobytes
+- **hugepages**: Displays hugepage usage metrics including free (`kbhugfree`), used (`kbhugused`), percentage used (`%hugused`), reserved (`kbhugrsvd`), and surplus (`kbhugsurp`) hugepages in kilobytes.
 
 ### Inodes
-- **Inode**: Shows metrics such as unused dentries and inodes, file handles, inode handles, and pseudo-terminal handles.
+- **inode**: Shows inode and file handle usage metrics including unused dentries (`dentunusd`), file handles (`file-nr`), inode handles (`inode-nr`), and pseudo-terminal handles (`pty-nr`).
 
 ### Interrupts
-- **intr/s**: Per CPU number of interrupts per second.
+- **intr/s**: Per-CPU number of interrupts per second.
 
 ### IO
-- **TPS**: Displays overall transactions per second (written/read/discarded) 
-- **r/w per sec**: Displays overall read/written data
+- **TPS**: Displays overall I/O transactions per second (`tps`), including read (`rtps`), write (`wtps`), and discard (`dtps`) transactions.
+- **r/w per sec**: Displays overall I/O data transfer rates in kilobytes per second, including read (`bread/s`), written (`bwrtn/s`), and discarded (`bdscd/s`) data.
 
 ### Memory Usage
-- **Memory**: Displays various memory metrics such as free memory, available memory, used memory, buffers, cached memory, committed memory, active memory, inactive memory, and dirty memory.
-- **Memory Percentage**: Shows the percentage of memory used and committed.
+- **General**: Displays general memory usage metrics including free (`kbmemfree`), available (`kbavail`), used (`kbmemused`), and virtual memory used (`kbvmused`) in kilobytes.
+- **Active/Inactive**: Displays active (`kbactive`) and inactive (`kbinact`) memory in kilobytes.
+- **Kernel mem**: Displays kernel memory usage metrics including buffers (`kbbuffers`), slab (`kbslab`), kernel stack (`kbkstack`), and page table (`kbpgtbl`) memory in kilobytes.
+- **Cached/Committed/Anon/Dirty**: Displays cached (`kbcached`), committed (`kbcommit`), dirty (`kbdirty`), and anonymous pages (`kbanonpg`) memory in kilobytes.
+- **memory perc.**: Shows the percentage of memory used (`%=memused`) and committed (`%commit`).
 
 ### Network Device
-- **rxKB_s**: Per device received kilobytes per second.
-- **txKB_s**: Per device transmitted kilobytes per second.
-- **rxpck_s**: Per device received packets per second.
-- **txpck_s**: Per device transmitted packets per second.
-- **rxcmp_s**: Per device received compressed packets per second.
-- **txcmp_s**: Per device transmitted compressed packets per second.
-- **rxmcst_s**: Per device received multicast packets per second.
-- **%ifutil**: Per device percentage of interface utilization.
-- **rxfifo_s**: Per device received FIFO errors per second.
-- **txfifo_s**: Per device transmitted FIFO errors per second.
-- **rxerr_s**: Per device received errors per second.
-- **txerr_s**: Per device transmitted errors per second.
-- **rxdrop_s**: Per device received dropped packets per second.
-- **txdrop_s**: Per device transmitted dropped packets per second.
-- **rxfram_s**: Per device received frame errors per second.
-- **txcarr_s**: Per device transmitted carrier errors per second.
-- **coll_s**: Per device collisions per second.
+- **rxkB_s**: Per-device received kilobytes per second.
+- **txkB_s**: Per-device transmitted kilobytes per second.
+- **rxpck_s**: Per-device received packets per second.
+- **txpck_s**: Per-device transmitted packets per second.
+- **rxcmp_s**: Per-device received compressed packets per second.
+- **txcmp_s**: Per-device transmitted compressed packets per second.
+- **rxmcst_s**: Per-device received multicast packets per second.
+- **%ifutil**: Per-device percentage of interface utilization.
+- **rxfifo_s**: Per-device received FIFO errors per second.
+- **txfifo_s**: Per-device transmitted FIFO errors per second.
+- **rxerr_s**: Per-device received errors per second.
+- **txerr_s**: Per-device transmitted errors per second.
+- **rxdrop_s**: Per-device received dropped packets per second.
+- **txdrop_s**: Per-device transmitted dropped packets per second.
+- **rxfram_s**: Per-device received frame errors per second.
+- **txcarr_s**: Per-device transmitted carrier errors per second.
+- **coll_s**: Per-device collisions per second.
 
 ### Network ICMP
-- **ICMP/ICMP6**: Displays metrics such as incoming messages per second, outgoing messages per second, incoming echo requests per second, outgoing echo requests per second, incoming echo replies per second, outgoing echo replies per second, incoming timestamp requests per second, outgoing timestamp requests per second, incoming address mask requests per second, and outgoing address mask requests per second (ICMP for IPv4, ICMP6 for IPV6).
-- **ICMP/ICMP6 Errors**: Shows metrics such as incoming errors per second, outgoing errors per second, incoming destination unreachable errors per second, outgoing destination unreachable errors per second, incoming parameter problem errors per second, outgoing parameter problem errors per second, incoming source quench errors per second, and outgoing source quench errors per second (ICMP for IPv4, ICMP6 for IPV6)..
+- **icmp**: Displays IPv4 ICMP metrics including incoming/outgoing messages, echo requests/replies, timestamp requests, and address mask requests per second.
+- **icmp6**: Displays IPv6 ICMP metrics including incoming/outgoing messages, echo requests/replies, timestamp requests, and address mask requests per second.
+- **icmp errors**: Displays IPv4 ICMP error metrics including incoming/outgoing errors, destination unreachable, parameter problem, source quench, and redirect errors per second.
+- **icmp6 errors**: Displays IPv6 ICMP error metrics including incoming/outgoing errors, destination unreachable, parameter problem, source quench, and redirect errors per second.
 
 ### Network IP
-- **IP/IP6**: Displays metrics such as received datagrams per second, forwarded datagrams per second, incoming datagrams discarded per second, outgoing datagrams discarded per second, and reassembled fragments per second (IP for IPv4, IP6 for IPV6).
-- **IP/IP6 Errors**: Shows metrics such as header errors per second, address errors per second, unknown protocol errors per second, incoming packets discarded per second, outgoing packets discarded per second, and reassembly failures per second (ICMP for IPv4, ICMP6 for IPV6).
+- **ip**: Displays IPv4 IP metrics including received datagrams, forwarded datagrams, incoming/outgoing discarded datagrams, and reassembled/fragmented packets per second.
+- **ip6**: Displays IPv6 IP metrics including received datagrams, forwarded datagrams, incoming/outgoing discarded datagrams, and reassembled/fragmented packets per second.
+- **ip errors**: Displays IPv4 IP error metrics including header errors, address errors, unknown protocol errors, incoming/outgoing discarded packets, and reassembly/fragmentation failures per second.
+- **ip6 errors**: Displays IPv6 IP error metrics including header errors, address errors, unknown protocol errors, incoming/outgoing discarded packets, and reassembly/fragmentation failures per second.
 
 ### Network NFS
-- **NFS**: Displays metrics such as retransmissions per second, reads per second, writes per second, accesses per second, and get attributes per second.
-- **NFSD**: Shows metrics such as server calls per second, bad calls per second, packets per second, UDP packets per second, TCP packets per second, cache hits per second, cache misses per second, server reads per second, server writes per second, server accesses per second, and server get attributes per second.
+- **nfs**: Displays NFS client metrics including retransmissions, reads, writes, accesses, and get attributes per second.
+- **nfsd**: Displays NFS server metrics including server calls, bad calls, packets, UDP/TCP packets, cache hits/misses, and server reads/writes/accesses/get attributes per second.
+
+### Network soft
+- **Software**: Displays software-based network processing statistics including total packets processed per second (`total/s`), dropped packets per second (`dropd/s`), squeezed packets per second (`squeezd/s`), receive RPS (`rx_rps/s`), and flow limit count per second (`flw_lim/s`).
 
 ### Network TCP/UDP
-- **TCP**: Displays metrics such as active connections per second, passive connections per second, segments received per second, and segments sent per second.
-- **TCP Errors**: Shows metrics such as failed connection attempts per second, reset connections per second, retransmitted segments per second, incoming segments with errors per second, and outgoing segments with resets per second.
-- **UDP/UDP6**: Displays metrics such as received datagrams per second, sent datagrams per second, no port errors per second, and received datagrams with errors per second (UDP for IPv4, UDP6 for IPV6)..
-- **Sockets/Socket6**: Shows metrics such as total sockets, TCP sockets, UDP sockets, raw sockets, IP fragments, and TCP time-wait sockets (Sockets for IPv4, Sockets6 for IPV6).
-
+- **tcp**: Displays TCP connection metrics including active/passive connections, and segments received/sent per second.
+- **tcp errors**: Displays TCP error metrics including failed connection attempts, reset connections, retransmitted segments, incoming segments with errors, and outgoing segments with resets per second.
+- **udp**: Displays IPv4 UDP metrics including received/sent datagrams, no port errors, and received datagrams with errors per second.
+- **udp6**: Displays IPv6 UDP metrics including received/sent datagrams, no port errors, and received datagrams with errors per second.
+- **sock**: Shows IPv4 socket usage metrics including total sockets, TCP, UDP, raw sockets, IP fragments, and TCP time-wait sockets.
+- **sock6**: Shows IPv6 socket usage metrics including TCP, UDP, raw sockets, and IP fragments.
 
 ### Paging
-- **Paging**: Displays metrics such as pages paged in per second, pages paged out per second, major faults per second, pages freed per second, pages scanned by kswapd per second, pages scanned directly per second, pages stolen per second, pages promoted per second, pages demoted per second, and total faults per second.
+- **Mem Management**: Displays memory management metrics including pages paged in/out, pages freed, faults, and major faults per second.
+- **Reclamation**: Displays page reclamation metrics including pages scanned by kswapd/directly, and pages stolen per second.
+- **NUMA management**: Displays NUMA memory management metrics including pages promoted and demoted per second.
 
 ### Power
-- **Power**: Displays CPU frequency in MHz.
+- **MHz**: Displays CPU frequency in MHz.
 
 ### Queue
-- **Queue**: Shows metrics such as process list size, run queue size, and blocked processes.
-- **Load Average**: Displays load average metrics for 1 minute, 5 minutes, and 15 minutes.
+- **load**: Displays queue and load metrics including process list size (`plist-sz`), run queue size (`runq-sz`), and blocked processes (`blocked`).
+- **load**: Displays load average metrics for 1 minute (`ldavg-1`), 5 minutes (`ldavg-5`), and 15 minutes (`ldavg-15`).
 
 ### Swap
-- **Swap Utilization**: Displays metrics such as free swap space, used swap space, cached swap space, percentage of swap space used, and percentage of cached swap space.
-- **Swap I/O**: Shows metrics such as pages swapped in per second and pages swapped out per second.
+- **Free**: Displays swap space usage metrics including free (`kbswpfree`), used (`kbswpused`), and cached (`kbswpcad`) swap space in kilobytes.
+- **Percentages**: Shows the percentage of swap space used (`%swpused`) and cached (`%swpcad`).
+- **i/o**: Displays swap I/O metrics including pages swapped in (`pswpin/s`) and pages swapped out (`pswpout/s`) per second.
 
 ### Task
-- **Task**: Displays metrics such as processes created per second and context switches per second.
+- **cswch/s**: Displays the number of context switches per second.
+- **proc/s**: Displays the number of processes created per second.
 
 ### TTY
-- **TTY**: Shows metrics such as received characters per second, transmitted characters per second, framing errors per second, parity errors per second, break conditions per second, and overrun errors per second.
+- **rcvin/s**: Displays the number of received characters per second from TTYs.
+- **txmtin/s**: Displays the number of transmitted characters per second to TTYs.
+- **framerr_s**: Displays the number of framing errors per second on TTYs.
+- **prtyerr_s**: Displays the number of parity errors per second on TTYs.
+- **brk_s**: Displays the number of break conditions per second on TTYs.
+- **ovrun_s**: Displays the number of overrun errors per second on TTYs.
