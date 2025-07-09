@@ -3,10 +3,6 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
-        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -18,12 +14,11 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
-  "id": 17,
+  "id": 9,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -31,1190 +26,1159 @@
         "y": 0
       },
       "id": 96,
-      "panels": [
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 3,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 9
-          },
-          "id": 99,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__idle.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "idle",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 3,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 19
-          },
-          "id": 100,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__iowait.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "iowait",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 3,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 0,
-            "y": 29
-          },
-          "id": 103,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__system.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "system",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 3,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 12,
-            "y": 29
-          },
-          "id": 105,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__user.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "user",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 3,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 0,
-            "y": 39
-          },
-          "id": 101,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__irq.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "irq",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "points",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 3,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 12,
-            "y": 39
-          },
-          "id": 107,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__soft.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "soft",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 0,
-            "y": 49
-          },
-          "id": 102,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__nice.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "nice",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 12,
-            "x": 12,
-            "y": 49
-          },
-          "id": 97,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__gnice.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "gnice",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 59
-          },
-          "id": 106,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__steal.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "steal",
-          "transparent": true,
-          "type": "timeseries"
-        },
-        {
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 69
-          },
-          "id": 104,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.18",
-          "targets": [
-            {
-              "columns": [
-                {
-                  "selector": "timestamp",
-                  "text": "datetime",
-                  "timestampFormat": "2006/01/02 15:04:05",
-                  "type": "timestamp"
-                },
-                {
-                  "selector": "dev254-0",
-                  "text": "dev254-0",
-                  "type": "number"
-                }
-              ],
-              "csv_options": {
-                "comment": "!",
-                "delimiter": ";",
-                "skip_empty_lines": true,
-                "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
-              "filters": [],
-              "format": "timeseries",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "",
-              "source": "url",
-              "type": "csv",
-              "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
-              "url": "$baseurl/per_cpu__guest.csv",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              }
-            }
-          ],
-          "title": "guest",
-          "transparent": true,
-          "type": "timeseries"
-        }
-      ],
+      "panels": [],
       "title": "cpu",
       "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 99,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.5",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__idle.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "idle",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 100,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.5",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__iowait.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "iowait",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "id": 103,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.5",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__system.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "system",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "id": 105,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.5",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__user.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "user",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "id": 101,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__irq.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "irq",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "points",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "id": 107,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__soft.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "soft",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 41
+      },
+      "id": 102,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__nice.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "nice",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 41
+      },
+      "id": 97,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__gnice.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "gnice",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 106,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__steal.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "steal",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 61
+      },
+      "id": 104,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.18",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "datetime",
+              "timestampFormat": "2006/01/02 15:04:05",
+              "type": "timestamp"
+            },
+            {
+              "selector": "dev254-0",
+              "text": "dev254-0",
+              "type": "number"
+            }
+          ],
+          "csv_options": {
+            "comment": "!",
+            "delimiter": ";",
+            "skip_empty_lines": true,
+            "skip_lines_with_error": true
+          },
+          "filters": [],
+          "format": "timeseries",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "uql": "parse-csv --delimiter \";\"\n| project-away \"sum\",\"-1\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+          "url": "$baseurl/per_cpu__guest.csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "guest",
+      "transparent": true,
+      "type": "timeseries"
     },
     {
       "collapsed": true,
@@ -1222,7 +1186,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 1
+        "y": 71
       },
       "id": 87,
       "panels": [
@@ -1267,8 +1231,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1283,7 +1246,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 10
+            "y": 80
           },
           "id": 89,
           "options": {
@@ -1319,10 +1282,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -1385,8 +1344,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1401,7 +1359,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 20
+            "y": 90
           },
           "id": 92,
           "options": {
@@ -1437,10 +1395,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -1503,8 +1457,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1519,7 +1472,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 30
+            "y": 100
           },
           "id": 95,
           "options": {
@@ -1555,10 +1508,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -1621,8 +1570,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1637,7 +1585,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 40
+            "y": 110
           },
           "id": 94,
           "options": {
@@ -1673,10 +1621,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -1739,8 +1683,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1755,7 +1698,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 40
+            "y": 110
           },
           "id": 90,
           "options": {
@@ -1791,10 +1734,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -1857,8 +1796,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1873,7 +1811,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 50
+            "y": 120
           },
           "id": 91,
           "options": {
@@ -1909,10 +1847,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -1975,8 +1909,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1991,7 +1924,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 50
+            "y": 120
           },
           "id": 93,
           "options": {
@@ -2028,10 +1961,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -2062,7 +1991,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 2
+        "y": 72
       },
       "id": 14,
       "panels": [
@@ -2107,8 +2036,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2123,7 +2051,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 11
+            "y": 81
           },
           "id": 15,
           "options": {
@@ -2175,10 +2103,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -2208,7 +2132,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 73
       },
       "id": 16,
       "panels": [
@@ -2253,8 +2177,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2269,7 +2192,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 12
+            "y": 82
           },
           "id": 17,
           "options": {
@@ -2321,10 +2244,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -2354,7 +2273,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 4
+        "y": 74
       },
       "id": 3,
       "panels": [
@@ -2399,8 +2318,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2415,7 +2333,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 13
+            "y": 83
           },
           "id": 1,
           "options": {
@@ -2466,10 +2384,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -2531,8 +2445,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2547,7 +2460,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 23
+            "y": 93
           },
           "id": 19,
           "options": {
@@ -2594,10 +2507,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -2627,7 +2536,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 75
       },
       "id": 126,
       "panels": [
@@ -2672,8 +2581,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2688,7 +2596,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 14
+            "y": 84
           },
           "id": 127,
           "options": {
@@ -2725,10 +2633,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -2759,7 +2663,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 76
       },
       "id": 18,
       "panels": [
@@ -2804,8 +2708,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2845,7 +2748,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 15
+            "y": 85
           },
           "id": 2,
           "options": {
@@ -2896,10 +2799,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -2961,8 +2860,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3002,7 +2900,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 25
+            "y": 95
           },
           "id": 132,
           "options": {
@@ -3043,10 +2941,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -3108,8 +3002,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3124,7 +3017,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 35
+            "y": 105
           },
           "id": 133,
           "options": {
@@ -3175,10 +3068,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -3240,8 +3129,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3281,7 +3169,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 45
+            "y": 115
           },
           "id": 131,
           "options": {
@@ -3332,10 +3220,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -3397,8 +3281,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3413,7 +3296,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 55
+            "y": 125
           },
           "id": 20,
           "options": {
@@ -3455,10 +3338,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -3488,7 +3367,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 77
       },
       "id": 108,
       "panels": [
@@ -3533,8 +3412,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3549,7 +3427,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 16
+            "y": 86
           },
           "id": 113,
           "options": {
@@ -3585,10 +3463,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -3651,8 +3525,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3667,7 +3540,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 16
+            "y": 86
           },
           "id": 112,
           "options": {
@@ -3703,10 +3576,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -3769,8 +3638,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3785,7 +3653,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 26
+            "y": 96
           },
           "id": 114,
           "options": {
@@ -3821,10 +3689,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -3887,8 +3751,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3903,7 +3766,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 26
+            "y": 96
           },
           "id": 116,
           "options": {
@@ -3939,10 +3802,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4005,8 +3864,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4021,7 +3879,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 36
+            "y": 106
           },
           "id": 110,
           "options": {
@@ -4057,10 +3915,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4123,8 +3977,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4139,7 +3992,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 36
+            "y": 106
           },
           "id": 111,
           "options": {
@@ -4175,10 +4028,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4241,8 +4090,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4257,7 +4105,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 46
+            "y": 116
           },
           "id": 115,
           "options": {
@@ -4293,10 +4141,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4359,8 +4203,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4375,7 +4218,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 46
+            "y": 116
           },
           "id": 109,
           "options": {
@@ -4411,10 +4254,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4477,8 +4316,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4493,7 +4331,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 56
+            "y": 126
           },
           "id": 117,
           "options": {
@@ -4529,10 +4367,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4595,8 +4429,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4611,7 +4444,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 56
+            "y": 126
           },
           "id": 118,
           "options": {
@@ -4647,10 +4480,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4713,8 +4542,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4729,7 +4557,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 66
+            "y": 136
           },
           "id": 119,
           "options": {
@@ -4765,10 +4593,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4831,8 +4655,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4847,7 +4670,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 66
+            "y": 136
           },
           "id": 120,
           "options": {
@@ -4883,10 +4706,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -4949,8 +4768,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -4965,7 +4783,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 76
+            "y": 146
           },
           "id": 121,
           "options": {
@@ -5001,10 +4819,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -5067,8 +4881,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -5083,7 +4896,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 76
+            "y": 146
           },
           "id": 122,
           "options": {
@@ -5119,10 +4932,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -5185,8 +4994,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -5201,7 +5009,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 86
+            "y": 156
           },
           "id": 123,
           "options": {
@@ -5237,10 +5045,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -5303,8 +5107,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -5319,7 +5122,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 86
+            "y": 156
           },
           "id": 124,
           "options": {
@@ -5355,10 +5158,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -5421,8 +5220,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -5437,7 +5235,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 96
+            "y": 166
           },
           "id": 125,
           "options": {
@@ -5474,10 +5272,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -5508,7 +5302,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 78
       },
       "id": 67,
       "panels": [
@@ -5553,8 +5347,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -5569,7 +5362,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 17
+            "y": 87
           },
           "id": 70,
           "options": {
@@ -5666,10 +5459,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -5730,8 +5519,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -5746,7 +5534,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 17
+            "y": 87
           },
           "id": 71,
           "options": {
@@ -5843,10 +5631,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -5907,8 +5691,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -5923,7 +5706,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 27
+            "y": 97
           },
           "id": 68,
           "options": {
@@ -6015,10 +5798,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -6079,8 +5858,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -6095,7 +5873,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 27
+            "y": 97
           },
           "id": 69,
           "options": {
@@ -6187,10 +5965,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -6220,7 +5994,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 79
       },
       "id": 72,
       "panels": [
@@ -6265,8 +6039,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -6281,7 +6054,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 18
+            "y": 88
           },
           "id": 73,
           "options": {
@@ -6353,10 +6126,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -6417,8 +6186,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -6433,7 +6201,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 18
+            "y": 88
           },
           "id": 74,
           "options": {
@@ -6505,10 +6273,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -6569,8 +6333,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -6585,7 +6348,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 28
+            "y": 98
           },
           "id": 75,
           "options": {
@@ -6657,10 +6420,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -6721,8 +6480,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -6737,7 +6495,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 28
+            "y": 98
           },
           "id": 76,
           "options": {
@@ -6809,10 +6567,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -6842,7 +6596,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 80
       },
       "id": 84,
       "panels": [
@@ -6887,8 +6641,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -6903,7 +6656,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 19
+            "y": 89
           },
           "id": 85,
           "options": {
@@ -6959,10 +6712,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -7024,8 +6773,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -7040,7 +6788,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 19
+            "y": 89
           },
           "id": 86,
           "options": {
@@ -7127,10 +6875,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -7160,7 +6904,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 11
+        "y": 81
       },
       "id": 134,
       "panels": [
@@ -7205,8 +6949,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -7246,7 +6989,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 20
+            "y": 90
           },
           "id": 135,
           "options": {
@@ -7303,10 +7046,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -7336,7 +7075,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 12
+        "y": 82
       },
       "id": 77,
       "panels": [
@@ -7381,8 +7120,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -7397,7 +7135,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 91
           },
           "id": 78,
           "options": {
@@ -7448,10 +7186,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -7513,8 +7247,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -7529,7 +7262,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 21
+            "y": 91
           },
           "id": 79,
           "options": {
@@ -7585,10 +7318,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -7650,8 +7379,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -7666,7 +7394,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 31
+            "y": 101
           },
           "id": 82,
           "options": {
@@ -7717,10 +7445,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -7782,8 +7506,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -7798,7 +7521,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 31
+            "y": 101
           },
           "id": 83,
           "options": {
@@ -7849,10 +7572,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -7929,7 +7648,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 41
+            "y": 111
           },
           "id": 80,
           "options": {
@@ -7990,10 +7709,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -8070,7 +7785,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 41
+            "y": 111
           },
           "id": 81,
           "options": {
@@ -8122,10 +7837,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -8155,7 +7866,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 83
       },
       "id": 28,
       "panels": [
@@ -8200,8 +7911,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -8216,7 +7926,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 22
+            "y": 92
           },
           "id": 29,
           "options": {
@@ -8272,10 +7982,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -8337,8 +8043,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -8353,7 +8058,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 32
+            "y": 102
           },
           "id": 129,
           "options": {
@@ -8409,10 +8114,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -8475,8 +8176,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -8491,7 +8191,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 42
+            "y": 112
           },
           "id": 130,
           "options": {
@@ -8533,10 +8233,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -8566,7 +8262,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 84
       },
       "id": 30,
       "panels": [
@@ -8611,8 +8307,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -8627,7 +8322,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 23
+            "y": 93
           },
           "id": 31,
           "options": {
@@ -8670,10 +8365,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -8703,7 +8394,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 85
       },
       "id": 32,
       "panels": [
@@ -8749,8 +8440,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -8765,7 +8455,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 24
+            "y": 94
           },
           "id": 36,
           "options": {
@@ -8811,10 +8501,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -8876,8 +8562,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -8892,7 +8577,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 24
+            "y": 94
           },
           "id": 34,
           "options": {
@@ -8939,10 +8624,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -8972,7 +8653,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 86
       },
       "id": 35,
       "panels": [
@@ -9017,8 +8698,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -9033,7 +8713,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 17
+            "y": 87
           },
           "id": 37,
           "options": {
@@ -9079,10 +8759,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -9144,8 +8820,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -9160,7 +8835,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 17
+            "y": 87
           },
           "id": 136,
           "options": {
@@ -9201,10 +8876,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -9282,7 +8953,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 27
+            "y": 97
           },
           "id": 33,
           "options": {
@@ -9324,10 +8995,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -9357,7 +9024,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 87
       },
       "id": 38,
       "panels": [
@@ -9402,8 +9069,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -9418,7 +9084,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 18
+            "y": 88
           },
           "id": 39,
           "options": {
@@ -9454,10 +9120,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -9519,8 +9181,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -9535,7 +9196,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 18
+            "y": 88
           },
           "id": 128,
           "options": {
@@ -9572,10 +9233,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -9605,7 +9262,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 88
       },
       "id": 40,
       "panels": [
@@ -9650,8 +9307,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -9666,7 +9322,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 19
+            "y": 89
           },
           "id": 41,
           "options": {
@@ -9697,10 +9353,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -9762,8 +9414,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -9778,7 +9429,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 19
+            "y": 89
           },
           "id": 42,
           "options": {
@@ -9809,10 +9460,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -9874,8 +9521,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -9890,7 +9536,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 29
+            "y": 99
           },
           "id": 43,
           "options": {
@@ -9921,10 +9567,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -9986,8 +9628,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -10002,7 +9643,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 29
+            "y": 99
           },
           "id": 44,
           "options": {
@@ -10033,10 +9674,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -10098,8 +9735,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -10114,7 +9750,7 @@
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 39
+            "y": 109
           },
           "id": 45,
           "options": {
@@ -10145,10 +9781,6 @@
                 "delimiter": ";",
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
               },
               "filters": [],
               "format": "timeseries",
@@ -10210,8 +9842,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -10226,7 +9857,7 @@
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 39
+            "y": 109
           },
           "id": 46,
           "options": {
@@ -10258,10 +9889,6 @@
                 "skip_empty_lines": true,
                 "skip_lines_with_error": true
               },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "ff89e93c-3242-4b38-a4fb-23bd9fac8441"
-              },
               "filters": [],
               "format": "timeseries",
               "global_query_id": "",
@@ -10286,9 +9913,9 @@
       "type": "row"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 38,
-  "style": "dark",
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": [
@@ -10296,8 +9923,21 @@
         "hide": 2,
         "name": "baseurl",
         "query": "<!-- YOUR URL HERE -->",
-        "skipUrlSync": false,
+        "skipUrlSync": true,
         "type": "constant"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "SAR CSV Data Source",
+          "value": "aerbn4xypvv28a"
+        },
+        "name": "SAR_CSV_DATASOURCE",
+        "options": [],
+        "query": "yesoreyeram-infinity-datasource",
+        "refresh": 1,
+        "regex": "/^SAR.*/",
+        "type": "datasource"
       }
     ]
   },
@@ -10305,6 +9945,6 @@
   "timezone": "utc",
   "title": "SAR-CSV",
   "uid": "d5763753-d3a2-460b-8d9d-a9d534ae9d9b",
-  "version": 50,
+  "version": 3,
   "weekStart": ""
 }
