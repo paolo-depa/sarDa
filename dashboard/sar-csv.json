@@ -1416,6 +1416,119 @@
           "transparent": true,
           "type": "timeseries"
         },
+                {
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 90
+          },
+          "id": 92,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.5.18",
+          "targets": [
+            {
+              "columns": [
+                {
+                  "selector": "timestamp",
+                  "text": "datetime",
+                  "timestampFormat": "2006/01/02 15:04:05",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dev254-0",
+                  "text": "dev254-0",
+                  "type": "number"
+                }
+              ],
+              "csv_options": {
+                "comment": "!",
+                "delimiter": ";",
+                "skip_empty_lines": true,
+                "skip_lines_with_error": true
+              },
+              "filters": [],
+              "format": "timeseries",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "",
+              "source": "url",
+              "type": "csv",
+              "uql": "parse-csv --delimiter \";\"\n| extend \"timestamp\"=todatetime(\"timestamp\")",
+              "url": "$baseurl/disk_svctm.csv",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "svctm",
+          "transparent": true,
+          "type": "timeseries"
+        },
         {
           "fieldConfig": {
             "defaults": {
