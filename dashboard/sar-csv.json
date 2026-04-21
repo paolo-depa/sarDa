@@ -16,6 +16,40 @@
   "graphTooltip": 2,
   "id": 9,
   "links": [],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "hide": 2,
+        "name": "baseurl",
+        "query": "<!-- YOUR URL HERE -->",
+        "skipUrlSync": true,
+        "type": "constant"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "SAR CSV Data Source",
+          "value": "aerbn4xypvv28a"
+        },
+        "name": "SAR_CSV_DATASOURCE",
+        "options": [],
+        "query": "yesoreyeram-infinity-datasource",
+        "refresh": 1,
+        "regex": "/^SAR.*/",
+        "type": "datasource"
+      }
+    ]
+  },
+  "timepicker": {},
+  "timezone": "utc",
+  "title": "SAR-CSV",
+  "uid": "d5763753-d3a2-460b-8d9d-a9d534ae9d9b",
+  "version": 3,
+  "weekStart": "",
   "panels": [
     {
       "collapsed": false,
@@ -1416,7 +1450,7 @@
           "transparent": true,
           "type": "timeseries"
         },
-                {
+        {
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -10025,39 +10059,5 @@
       "title": "tty",
       "type": "row"
     }
-  ],
-  "preload": false,
-  "refresh": "",
-  "schemaVersion": 40,
-  "tags": [],
-  "templating": {
-    "list": [
-      {
-        "hide": 2,
-        "name": "baseurl",
-        "query": "<!-- YOUR URL HERE -->",
-        "skipUrlSync": true,
-        "type": "constant"
-      },
-      {
-        "allowCustomValue": false,
-        "current": {
-          "text": "SAR CSV Data Source",
-          "value": "aerbn4xypvv28a"
-        },
-        "name": "SAR_CSV_DATASOURCE",
-        "options": [],
-        "query": "yesoreyeram-infinity-datasource",
-        "refresh": 1,
-        "regex": "/^SAR.*/",
-        "type": "datasource"
-      }
-    ]
-  },
-  "timepicker": {},
-  "timezone": "utc",
-  "title": "SAR-CSV",
-  "uid": "d5763753-d3a2-460b-8d9d-a9d534ae9d9b",
-  "version": 3,
-  "weekStart": ""
+  ]
 }
