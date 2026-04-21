@@ -38,4 +38,9 @@ def test_pivot_data_writes_pivot_file(tmp_path: Path) -> None:
     )
 
     assert ok
-    assert (tmp_path / "metric_value.csv").is_file()
+    pivoted = tmp_path / "metric_value.csv"
+    assert pivoted.is_file()
+    content = pivoted.read_text(encoding="utf-8")
+    assert "dev1" in content
+    assert "dev2" in content
+    assert "2024-01-01T00:00:00;1;2" in content

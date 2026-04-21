@@ -1,17 +1,20 @@
 import io
 import logging
-import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, TextIO
 
 import pandas as pd
-import pytz
 from dateutil import parser
 
 from .config import FILTER_REGEXPS, FORMAT_CONFIG, TIMESTAMP_COL
 from .sadf import get_sar_file_time_window, run_sadf
 
 logger = logging.getLogger(__name__)
+
+
+def _get_local_tz():
+    return datetime.now().astimezone().tzinfo or timezone.utc
 
 
 def validate_csv(data_io: TextIO, separator: str, label: str) -> Optional[TextIO]:
@@ -62,7 +65,7 @@ def pivot_data(file_path: Path, pivot_config: Dict[str, List[str]]) -> bool:
     except pd.errors.EmptyDataError:
         logger.warning("Skipping pivot for empty file: %s", file_path)
         return False
-    except Exception as exc:  # noqa: BLE001
+    except (OSError, pd.errors.ParserError, ValueError) as exc:
         logger.error("Failed to read file for pivoting %s: %s", file_path, exc)
         return False
 
@@ -95,14 +98,10 @@ def pivot_data(file_path: Path, pivot_config: Dict[str, List[str]]) -> bool:
                 continue
 
             pivot_df = df.pivot(index=index_cols, columns=column_cols, values=value)
-            pivot_df.fillna(0, inplace=True)
+            pivot_df = pivot_df.fillna(0)
         except (ValueError, KeyError) as exc:
             logger.error("Pivot failed for %s, value '%s': %s", file_path, value, exc)
             continue
-        except Exception as exc:  # noqa: BLE001
-            logger.error("Error during pivot for %s, value '%s': %s", file_path, value, exc)
-            continue
-
         suffix = "".join(c if c.isalnum() or c in ("_", ".", "-") else "_" for c in str(value))
         if not suffix:
             suffix = f"pivot_value_{value_cols.index(value)}"
@@ -112,7 +111,7 @@ def pivot_data(file_path: Path, pivot_config: Dict[str, List[str]]) -> bool:
             pivot_df.to_csv(output_file, sep=separator)
             logger.debug("Saved pivoted data for '%s' to %s", value, output_file)
             pivoted_files_saved = True
-        except Exception as exc:  # noqa: BLE001
+        except OSError as exc:
             logger.error("Failed writing pivoted file %s: %s", output_file, exc)
 
     return pivoted_files_saved
@@ -164,15 +163,14 @@ def process_metric(
             sadf_end_param = None
 
             file_start_date, file_end_date = get_sar_file_time_window(source_file)
-            file_start_date_obj = parser.parse(file_start_date).replace(tzinfo=pytz.utc)
-            file_end_date_obj = parser.parse(file_end_date).replace(tzinfo=pytz.utc)
-
-            local_tz_name = time.tzname[0] if time.daylight else time.tzname[1]
-            local_tz = pytz.timezone(local_tz_name)
-
+            file_start_date_obj = parser.parse(file_start_date).replace(tzinfo=timezone.utc)
+            file_end_date_obj = parser.parse(file_end_date).replace(tzinfo=timezone.utc)
+            local_tz = _get_local_tz()
             if start_date:
-                start_date_obj = parser.parse(start_date, tzinfos={"timezone_name": local_tz})
-                start_date_utc = start_date_obj.astimezone(pytz.utc)
+                start_date_obj = parser.parse(start_date)
+                if start_date_obj.tzinfo is None:
+                    start_date_obj = start_date_obj.replace(tzinfo=local_tz)
+                start_date_utc = start_date_obj.astimezone(timezone.utc)
 
                 if start_date_utc > file_end_date_obj:
                     continue
@@ -180,8 +178,10 @@ def process_metric(
                     sadf_start_param = start_date_obj.strftime("%H:%M:%S")
 
             if end_date:
-                end_date_obj = parser.parse(end_date, tzinfos={"timezone_name": local_tz})
-                end_date_utc = end_date_obj.astimezone(pytz.utc)
+                end_date_obj = parser.parse(end_date)
+                if end_date_obj.tzinfo is None:
+                    end_date_obj = end_date_obj.replace(tzinfo=local_tz)
+                end_date_utc = end_date_obj.astimezone(timezone.utc)
                 if end_date_utc <= file_start_date_obj:
                     continue
                 if file_start_date_obj < end_date_utc < file_end_date_obj:
@@ -189,7 +189,12 @@ def process_metric(
 
             if sadf_start_param:
                 sadf_args.extend(["-s", sadf_start_param])
-                if not sadf_end_param or sadf_end_param <= sadf_start_param:
+                if sadf_end_param:
+                    sadf_end_time = datetime.strptime(sadf_end_param, "%H:%M:%S").time()
+                    sadf_start_time = datetime.strptime(sadf_start_param, "%H:%M:%S").time()
+                    if sadf_end_time <= sadf_start_time:
+                        sadf_end_param = "23:59:59"
+                else:
                     sadf_end_param = "23:59:59"
                 sadf_args.extend(["-e", sadf_end_param])
             elif sadf_end_param:

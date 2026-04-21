@@ -55,8 +55,18 @@ def run_sadf(
         )
         return result.stdout, result.stderr, result.returncode
     except subprocess.TimeoutExpired as exc:
-        logger.error("Command timed out (%ss) for %s: %s", timeout, source_file, " ".join(command))
-        return exc.stdout, exc.stderr, SADF_TIMEOUT_RC
-    except Exception as exc:  # noqa: BLE001
+        logger.error("Command timed out (%s s) for %s: %s", timeout, source_file, " ".join(command))
+        stdout = (
+            exc.stdout.decode("utf-8", errors="ignore")
+            if isinstance(exc.stdout, bytes)
+            else exc.stdout
+        )
+        stderr = (
+            exc.stderr.decode("utf-8", errors="ignore")
+            if isinstance(exc.stderr, bytes)
+            else exc.stderr
+        )
+        return stdout, stderr, SADF_TIMEOUT_RC
+    except (OSError, subprocess.SubprocessError) as exc:
         logger.error("Failed running sadf command for %s: %s", source_file, exc)
         return None, str(exc), SADF_ERROR_RC
