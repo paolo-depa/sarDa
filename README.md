@@ -18,7 +18,7 @@ It converts the files, starts a preconfigured Grafana container, loads your data
 | Requirement | Why |
 |---|---|
 | `podman` or `docker` (detected automatically, podman first) | runs `sadf` and Grafana |
-| a **sysstat image** | provides `sadf`; build it once (~20 MB, SUSE BCI base), see below |
+| a **sysstat image** | provides `sadf` (SUSE BCI 16.1, sysstat 12.7.9); build it once, see below |
 | a **Grafana image** (default `docker.io/grafana/grafana-oss:12.4.3`) | the dashboard server |
 | Linux | Grafana uses host networking |
 
@@ -42,9 +42,9 @@ On the **air-gapped** machine:
 podman load -i sarda-images.tar
 ```
 
-The sysstat image is a SUSE Base Container Image (`bci-micro`, about 20 MB) plus a single binary; sysstat itself is compiled in a build stage from a checksummed release tarball. That matters: a *newer* SA file than the image's sysstat yields no data, sometimes without an error, and an older sysstat silently drops counters it does not know. To move to a newer sysstat release, rebuild with `--build-arg SYSSTAT_VERSION=... --build-arg SYSSTAT_SHA256=...` (and `SYSSTAT_URL` for a mirror).
+The sysstat image is `registry.suse.com/bci/bci-base:16.1` with the sysstat package it delivers (12.7.9 today; about 125 MB). sarDa checks every SA file's own version header and **refuses files written by a newer sysstat**, because `sadf` returns no data at all for them instead of failing. To read such files, put an image with a newer sysstat behind `--sadf-image`.
 
-Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` / `SARDA_GRAFANA_IMAGE`), for example from an internal registry, and `podman build --arch <arch>` for other architectures. The sysstat inside the sysstat image must be at least as new as the one that wrote your SA files.
+Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` / `SARDA_GRAFANA_IMAGE`), for example from an internal registry, and `podman build --arch <arch>` for other architectures. The sysstat inside the sysstat image must be at least as new as the one that wrote your SA files; sarDa enforces this and exits with code 8 when it is not.
 
 ## Usage
 
@@ -94,6 +94,7 @@ stdout carries only the result (the URL, or JSON events with `--json`); progress
 | 5 | no usable data in the SA files or in the `--start`/`--end` window |
 | 6 | Grafana failed to start or cannot reach the data |
 | 7 | a network port is unavailable |
+| 8 | an SA file cannot be read by the image's sysstat: written by a newer sysstat, or not a system activity file |
 
 ### JSON events (`--json`)
 
@@ -111,7 +112,7 @@ One JSON object per line on stdout:
 
 ## How it works
 
-1. One throwaway container (the sysstat image, no network) reads each file's header with `sadf -j -H`. A file it cannot read is reported and skipped; a datafile in the old binary format is converted in place with `sadf -c`; a file whose day (from the header, not the file name) cannot overlap `--start`/`--end` is skipped without reading its data. Everything else is converted activity by activity.
+1. Each file's sysstat version is read from its magic header and compared with the image's `sadf`; a file written by a newer sysstat, or one `sadf` cannot read, aborts the run with exit 8 (an empty dashboard would be misleading). Then one throwaway container (the sysstat image, no network) reads each file's header with `sadf -j -H`; a datafile in the old binary format is converted in place with `sadf -c`; a file whose day (from the header, not the file name) cannot overlap `--start`/`--end` is skipped without reading its data. Everything else is converted activity by activity.
 2. sarda merges the files, drops `RESTART` markers and bad rows, and keeps the requested window (all UTC).
 3. It serves the result on `127.0.0.1` through a small Prometheus-compatible API (the **Sarda API**).
 4. It starts Grafana with `--network=host` on `127.0.0.1`, provisioned with a data source pointing at that API and a dashboard generated from what your files actually contain. Anonymous Admin access is enabled, which is safe only because everything listens on loopback.
@@ -181,7 +182,7 @@ The Sarda API understands a subset of PromQL: selectors with `=`, `!=`, `=~`, `!
 | a panel is flat at zero | the activity was collected but that device or counter did nothing in the window; the data is complete |
 | `no working container runtime` | `podman info` (or `docker info`) must succeed for your user |
 | `image ... is not available locally` | follow the printed instructions; names are overridable with the options above |
-| `not a readable system activity file` | the file is corrupt, or the sysstat image is older than the one that wrote it; rebuild the image from a newer base. Datafiles in the old format are converted automatically, but files older than sysstat 9.1.6 cannot be |
+| `was written by sysstat X, but the sysstat image provides Y` | the files are newer than the image's sysstat: use `--sadf-image` with an image built on a newer sysstat. Datafiles in the old format are converted automatically, but files older than sysstat 9.1.6 cannot be |
 | `no usable data` with `--start/--end` | times without an offset are **UTC**; add one, e.g. `+01:00` |
 | Grafana cannot reach the data | something blocks loopback connections; check `-v` output and local firewall/proxy settings |
 | port 3000 busy | sarda picks a free port automatically; pass `--port` to choose |

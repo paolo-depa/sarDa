@@ -29,6 +29,7 @@ fn readme_lists_every_exit_code() {
         Kind::NoRuntime,
         Kind::MissingImage,
         Kind::NoData,
+        Kind::IncompatibleFile,
         Kind::GrafanaFailed,
         Kind::PortUnavailable,
     ] {

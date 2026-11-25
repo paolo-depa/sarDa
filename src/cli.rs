@@ -18,6 +18,7 @@ EXIT CODES:
   5  no usable data in the SA files (or in the --start/--end window)
   6  the Grafana grafana failed to start
   7  a network port is unavailable
+  8  an SA file cannot be read by the image's sysstat (newer sysstat, or not a system activity file)
 
 ENVIRONMENT:
   SARDA_RUNTIME, SARDA_GRAFANA_IMAGE, SARDA_SADF_IMAGE provide defaults for

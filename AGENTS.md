@@ -24,8 +24,9 @@ One Rust executable: SA files in, Grafana URL out. It converts with `sadf` in a 
 - **Exit codes are a contract**: `error::Kind` maps to the table in the README, and a test checks they agree. Add a `Kind` and a README row together.
 - **Time is UTC end to end.** `sadf -d` emits UTC; `--start/--end` without an offset mean UTC.
 - **Cleanup must survive SIGTERM and Ctrl-C** in every phase (`session::install_signal_handler`). A new container or temp path needs a matching removal there and in `Grafana::cleanup`.
-- **The sysstat image compiles sysstat itself** (ADR 0007). Do not replace it with the distro package: SLE 15.7's 12.0.2 silently drops newer counters, SLE 16.0's 12.7.5 silently returns nothing for 12.8 files. Bump `ARG SYSSTAT_VERSION`/`SYSSTAT_SHA256` in `container/Containerfile.sysstat` instead.
-- **The parser script runs in a BCI micro image**: `sh`, `sadf`, `mktemp`, `tr`, `cat`, `rm` only. No `sed`, `grep` or `awk` (a unit test enforces it); `tests/script.rs` executes it with a fake `sadf`.
+- **The sysstat image is the delivered package** (BCI 16.1, sysstat 12.7.9); do not compile sysstat (ADR 0007).
+- **Compatibility is enforced host-side before the data path.** `sadf::read_sa_version` reads each file's magic header and compares it with the version in the `@@VERSION` stream marker; a newer file aborts with `Kind::IncompatibleFile` (exit 8), as does any file the probe cannot read. Never infer incompatibility from empty output: `sadf` exits 0 with zero rows for newer files.
+- **The parser script stays within POSIX `sh` and coreutils**: `sh`, `sadf`, `mktemp`, `tr`, `cat`, `rm`. No `sed`, `grep` or `awk` (a unit test enforces it); `tests/script.rs` executes it with a fake `sadf`.
 - **No async runtime.** New crates must be vendorable: check with `scripts/dist.sh` (ADR 0004).
 
 ## Fixtures

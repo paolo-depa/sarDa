@@ -37,6 +37,10 @@ case "$1" in
       *) echo "Invalid system activity file: $2" >&2; exit 3;;
     esac
     ;;
+  -V)
+    echo "sysstat version 12.7.9"
+    echo "(C) Sebastien Godard (sysstat <at> orange.fr)"
+    ;;
   -d)
     echo "# hostname;interval;timestamp;tps"
     echo "testhost;1;2026-11-25 00:00:00 UTC;1.00"
@@ -94,6 +98,14 @@ fn readable_file_runs_every_activity() {
     assert_eq!(out.probes[0].nodename(), Some("testhost"));
     assert_eq!(out.probes[0].file_date(), Some("2026-11-25"));
     assert_eq!(out.probes[0].cpus(), Some(4));
+    assert_eq!(
+        out.sadf_version,
+        Some(sarda::sadf::Version {
+            major: 12,
+            minor: 7,
+            patch: 9
+        })
+    );
     assert_eq!(out.files[0].len(), sarda::catalog::ACTIVITIES.len());
     assert!(stdout.contains("@@BEGIN per_cpu"));
 }

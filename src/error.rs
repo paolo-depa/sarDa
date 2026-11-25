@@ -8,6 +8,7 @@ pub enum Kind {
     NoRuntime,
     MissingImage,
     NoData,
+    IncompatibleFile,
     GrafanaFailed,
     PortUnavailable,
 }
@@ -20,6 +21,7 @@ impl Kind {
             Kind::NoRuntime => 3,
             Kind::MissingImage => 4,
             Kind::NoData => 5,
+            Kind::IncompatibleFile => 8,
             Kind::GrafanaFailed => 6,
             Kind::PortUnavailable => 7,
         }
@@ -32,6 +34,7 @@ impl Kind {
             Kind::NoRuntime => "no_runtime",
             Kind::MissingImage => "missing_image",
             Kind::NoData => "no_data",
+            Kind::IncompatibleFile => "incompatible_file",
             Kind::GrafanaFailed => "grafana_failed",
             Kind::PortUnavailable => "port_unavailable",
         }

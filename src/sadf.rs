@@ -42,6 +42,78 @@ pub struct RawActivity {
     pub stderr: Vec<String>,
 }
 
+/// A sysstat version, ordered so that incompatibility can be tested with `>`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Version {
+    pub major: u8,
+    pub minor: u8,
+    pub patch: u8,
+}
+
+impl Version {
+    /// Finds the first `N.N[.N]` in a string such as `sysstat version 12.7.9`.
+    pub fn parse(text: &str) -> Option<Version> {
+        for token in text.split_whitespace() {
+            let token = token.trim_matches(|c: char| !c.is_ascii_digit() && c != '.');
+            let mut parts = token.split('.');
+            let (Some(major), Some(minor)) = (parts.next(), parts.next()) else {
+                continue;
+            };
+            let (Ok(major), Ok(minor)) = (major.parse(), minor.parse()) else {
+                continue;
+            };
+            let patch = parts.next().and_then(|p| p.parse().ok()).unwrap_or(0);
+            return Some(Version {
+                major,
+                minor,
+                patch,
+            });
+        }
+        None
+    }
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+const SYSSTAT_MAGIC: u16 = 0xd596;
+const FORMAT_MAGIC: u16 = 0x2175;
+
+/// Reads the sysstat version a system activity file was written with, from
+/// its magic header. Errors when the file is not an SA file, or when it is in
+/// a format older than the one whose layout is known here.
+pub fn read_sa_version(path: &Path) -> std::result::Result<Version, String> {
+    use std::io::Read;
+    let mut buf = [0u8; 8];
+    std::fs::File::open(path)
+        .and_then(|mut f| f.read_exact(&mut buf))
+        .map_err(|_| "file is too short to be a system activity file".to_string())?;
+    let little = u16::from_le_bytes([buf[0], buf[1]]) == SYSSTAT_MAGIC;
+    let big = u16::from_be_bytes([buf[0], buf[1]]) == SYSSTAT_MAGIC;
+    if !little && !big {
+        return Err("not a system activity file".into());
+    }
+    let short = |i: usize| {
+        let pair = [buf[i], buf[i + 1]];
+        if little {
+            u16::from_le_bytes(pair)
+        } else {
+            u16::from_be_bytes(pair)
+        }
+    };
+    match short(2) {
+        FORMAT_MAGIC => Ok(Version {
+            major: buf[4],
+            minor: buf[5],
+            patch: buf[6],
+        }),
+        _ => Err("old system activity file format".into()),
+    }
+}
+
 /// What the header probe of one input file found.
 #[derive(Debug, Clone, Default)]
 pub struct FileProbe {
@@ -83,6 +155,8 @@ impl FileProbe {
 pub struct SadfOutput {
     pub files: Vec<Vec<RawActivity>>,
     pub probes: Vec<FileProbe>,
+    /// Version of the `sadf` that produced this stream.
+    pub sadf_version: Option<Version>,
 }
 
 impl SadfOutput {
@@ -125,6 +199,7 @@ C="$T.c"
 SB="__SB__"
 SA="__SA__"
 shift 2
+echo "@@VERSION $(sadf -V 2>/dev/null | head -n 1)"
 i=0
 emit() { while IFS= read -r l || [ -n "$l" ]; do printf '%s %s\n' "$2" "$l"; done <"$1"; }
 for f in "$@"; do
@@ -169,7 +244,9 @@ pub fn parse_stream<R: BufRead>(reader: R) -> Result<SadfOutput> {
     let mut probe: Option<usize> = None;
     for line in reader.lines() {
         let line = line.map_err(|e| Error::other(format!("reading sadf output: {e}")))?;
-        if let Some(rest) = line.strip_prefix("@@FILE ") {
+        if let Some(rest) = line.strip_prefix("@@VERSION ") {
+            out.sadf_version = Version::parse(rest);
+        } else if let Some(rest) = line.strip_prefix("@@FILE ") {
             let idx: usize = rest
                 .trim()
                 .parse()
@@ -365,6 +442,7 @@ mod tests {
         assert!(s.contains("sadf -j -H \"$f\""));
         assert!(s.contains("sadf -c \"$f\""));
         assert!(s.contains("@@CONVERTED $i"));
+        assert!(s.contains("@@VERSION $(sadf -V"));
         assert!(s.contains("@@SKIP $i"));
         assert!(s.contains("SB=\"2026-01-01\""));
         assert!(s.contains("SA=\"2026-12-31\""));
@@ -414,6 +492,85 @@ mod tests {
             out.probes[2].stderr,
             ["Invalid system activity file: /in/2"]
         );
+    }
+
+    #[test]
+    fn version_parsing_and_ordering() {
+        let v = Version::parse("sysstat version 12.7.9").expect("version");
+        assert_eq!((v.major, v.minor, v.patch), (12, 7, 9));
+        assert_eq!(
+            Version::parse("12.7").unwrap(),
+            Version {
+                major: 12,
+                minor: 7,
+                patch: 0
+            }
+        );
+        assert!(Version::parse("(C) Sebastien Godard").is_none());
+        assert!(
+            v < Version {
+                major: 12,
+                minor: 8,
+                patch: 0
+            }
+        );
+        assert!(
+            v > Version {
+                major: 12,
+                minor: 7,
+                patch: 5
+            }
+        );
+        assert!(
+            v > Version {
+                major: 11,
+                minor: 9,
+                patch: 9
+            }
+        );
+    }
+
+    #[test]
+    fn reads_the_version_from_the_file_header() {
+        let dir = std::env::temp_dir().join(format!("sarda-hdr-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let header = |magic: fn(u16) -> [u8; 2], version: [u8; 3]| {
+            let mut b = Vec::new();
+            b.extend_from_slice(&magic(0xd596));
+            b.extend_from_slice(&magic(0x2175));
+            b.extend_from_slice(&version);
+            b.extend_from_slice(&[0, 0, 0, 0]);
+            b
+        };
+        let le = dir.join("le");
+        std::fs::write(&le, header(u16::to_le_bytes, [12, 8, 1])).unwrap();
+        assert_eq!(
+            read_sa_version(&le).unwrap(),
+            Version {
+                major: 12,
+                minor: 8,
+                patch: 1
+            }
+        );
+
+        let be = dir.join("be");
+        std::fs::write(&be, header(u16::to_be_bytes, [12, 7, 9])).unwrap();
+        assert_eq!(
+            read_sa_version(&be).unwrap(),
+            Version {
+                major: 12,
+                minor: 7,
+                patch: 9
+            }
+        );
+
+        let junk = dir.join("junk");
+        std::fs::write(&junk, b"not an sa file at all").unwrap();
+        assert!(read_sa_version(&junk).is_err());
+        let short = dir.join("short");
+        std::fs::write(&short, b"abc").unwrap();
+        assert!(read_sa_version(&short).is_err());
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

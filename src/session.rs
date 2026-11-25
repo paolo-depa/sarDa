@@ -40,6 +40,45 @@ fn skip_bounds(start: Option<i64>, end: Option<i64>) -> (Option<String>, Option<
     (start.map(|t| fmt(t - day)), end.map(|t| fmt(t + day)))
 }
 
+/// Files the installed sysstat cannot read. An SA file written by a newer
+/// sysstat may still have a readable header while every record is silently
+/// dropped, so the file's own version is compared too. Any entry here aborts
+/// the run: partial data would be misleading.
+fn compatibility_errors(files: &[PathBuf], names: &[String], output: &SadfOutput) -> Vec<String> {
+    let mut errors = Vec::new();
+    for (i, path) in files.iter().enumerate() {
+        let name = names.get(i).map_or("?", String::as_str);
+        let probe = output.probes.iter().find(|p| p.index == i);
+        if !probe.is_some_and(|p| p.ok) {
+            let mut seen: Vec<&str> = Vec::new();
+            if let Some(p) = probe {
+                for line in &p.stderr {
+                    if !seen.contains(&line.as_str()) {
+                        seen.push(line);
+                    }
+                }
+            }
+            let why = if seen.is_empty() {
+                String::new()
+            } else {
+                format!(": {}", seen.join("; "))
+            };
+            errors.push(format!("{name}: sadf cannot read this file{why}"));
+            continue;
+        }
+        if let (Some(installed), Ok(file_version)) =
+            (output.sadf_version, sadf::read_sa_version(path))
+        {
+            if file_version > installed {
+                errors.push(format!(
+                    "{name} was written by sysstat {file_version}, but the sysstat image provides {installed} and cannot read it"
+                ));
+            }
+        }
+    }
+    errors
+}
+
 /// Human-readable notes about the input files, from their header probes.
 fn probe_notes(output: &sadf::SadfOutput, names: &[String]) -> (Vec<String>, Vec<String>) {
     let mut notes = Vec::new();
@@ -286,6 +325,16 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
             )
         })
         .collect();
+    let incompatible = compatibility_errors(&files, &names, &output);
+    if !incompatible.is_empty() {
+        return Err(Error::new(
+            Kind::IncompatibleFile,
+            format!(
+                "{}\nUse an image whose sysstat is at least as new as the files (--sadf-image), or SA files written by an older sysstat.",
+                incompatible.join("\n")
+            ),
+        ));
+    }
     let (notes, details) = probe_notes(&output, &names);
     for d in &details {
         rep.debug(d);

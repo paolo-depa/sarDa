@@ -168,7 +168,7 @@ fn export_csv_runs_the_whole_pipeline_with_a_fake_runtime() {
     let stdout = String::from_utf8_lossy(&out.stdout);
     let event: serde_json::Value = serde_json::from_str(stdout.lines().last().unwrap()).unwrap();
     assert_eq!(event["event"], "exported");
-    assert_eq!(event["files"], 69);
+    assert_eq!(event["files"], 67);
 }
 
 /// Builds a stream where the first file cannot be read and the second one is
@@ -182,7 +182,7 @@ fn stream_with_first_file_unreadable(dir: &Path) -> PathBuf {
     std::fs::write(
         &stream,
         format!(
-            "@@FILE 0\n@@PROBE 0 3\n@@PERR Invalid system activity file: /in/0\n@@SKIP 0\n{tail}"
+            "@@VERSION sysstat version 12.7.9\n@@FILE 0\n@@PROBE 0 3\n@@PERR Invalid system activity file: /in/0\n@@SKIP 0\n{tail}"
         ),
     )
     .unwrap();
@@ -190,7 +190,7 @@ fn stream_with_first_file_unreadable(dir: &Path) -> PathBuf {
 }
 
 #[test]
-fn an_unreadable_file_is_a_warning_not_a_failure() {
+fn an_unreadable_file_aborts_the_run() {
     let dir = scratch("onebad");
     let stream = stream_with_first_file_unreadable(&dir);
     runtime_with_stream(&dir, "podman", &stream);
@@ -201,30 +201,23 @@ fn an_unreadable_file_is_a_warning_not_a_failure() {
         .args(sa_files())
         .output()
         .unwrap();
-    assert!(
-        out.status.success(),
-        "{}",
-        String::from_utf8_lossy(&out.stderr)
-    );
+    assert_eq!(out.status.code(), Some(8));
     let err = String::from_utf8_lossy(&out.stderr);
     assert!(
-        err.contains("sa20261125: not a readable system activity file"),
+        err.contains("sa20261125: sadf cannot read this file"),
         "{err}"
     );
     assert!(err.contains("Invalid system activity file"), "{err}");
-    assert!(
-        csv.join("queue.csv").is_file(),
-        "the readable file still produced output"
-    );
+    assert!(!csv.exists(), "nothing is exported from an aborted run");
 }
 
 #[test]
-fn unreadable_files_only_exit_5_naming_the_cause() {
+fn every_unreadable_file_is_named() {
     let dir = scratch("allbad");
     let stream = dir.join("stream");
     std::fs::write(
         &stream,
-        "@@FILE 0\n@@PROBE 0 3\n@@PERR Invalid system activity file: /in/0\n@@SKIP 0\n\
+        "@@VERSION sysstat version 12.7.9\n@@FILE 0\n@@PROBE 0 3\n@@PERR Invalid system activity file: /in/0\n@@SKIP 0\n\
          @@FILE 1\n@@PROBE 1 3\n@@PERR Invalid system activity file: /in/1\n@@SKIP 1\n",
     )
     .unwrap();
@@ -234,17 +227,37 @@ fn unreadable_files_only_exit_5_naming_the_cause() {
         .args(sa_files())
         .output()
         .unwrap();
-    assert_eq!(out.status.code(), Some(5));
+    assert_eq!(out.status.code(), Some(8));
     let err = String::from_utf8_lossy(&out.stderr);
-    assert!(err.contains("no usable data"), "{err}");
     assert!(
-        err.contains("sa20261125: not a readable system activity file"),
+        err.contains("sa20261125: sadf cannot read this file"),
         "{err}"
     );
     assert!(
-        err.contains("sa20261126: not a readable system activity file"),
+        err.contains("sa20261126: sadf cannot read this file"),
         "{err}"
     );
+}
+
+#[test]
+fn a_file_from_a_newer_sysstat_is_refused() {
+    let dir = scratch("newer");
+    // Same SA file, but claiming sysstat 12.9.0 (the stream offers 12.7.9).
+    let newer = dir.join("sa-newer");
+    let mut bytes = std::fs::read(fixtures().join("sa/sa20261125")).unwrap();
+    bytes[4..7].copy_from_slice(&[12, 9, 0]);
+    std::fs::write(&newer, bytes).unwrap();
+    working_podman(&dir);
+    let out = sarda(&dir)
+        .args(["--no-grafana"])
+        .arg(&newer)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(8));
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(err.contains("written by sysstat 12.9.0"), "{err}");
+    assert!(err.contains("provides 12.7.9"), "{err}");
+    assert!(err.contains("--sadf-image"), "{err}");
 }
 
 #[test]
