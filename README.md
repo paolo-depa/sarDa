@@ -1,13 +1,197 @@
 # sarDa
 
-## Project Overview
-sarDa (SAR Dashboard) is a project aimed at creating a Grafana dashboard for sa1 data series.
+<img src="logo.png" alt="sarDa" width="160" align="right">
 
-## Data Conversion Tool
-We provide a binary tool for data conversion. For more details, please refer to the [bin tool README](bin/README.md).
+**sarDa** (SAR Dashboard) turns sysstat `sa` files into an interactive Grafana dashboard with one command, on machines that have no internet access.
 
-## SAR Dashboard
-For more information about the SAR Dashboard, please refer to the [SAR Dashboard README](dashboard/README.md).
+```sh
+sarda /var/log/sa/sa20261125 /var/log/sa/sa20261126
+# ...
+# Grafana is ready. Open: http://127.0.0.1:3000/d/sarda/sarda?orgId=1&from=...&to=...
+# Press Ctrl-C to stop and clean up.
+```
+
+It converts the files, starts a preconfigured Grafana container, loads your data into it and prints the URL. Ctrl-C removes the container and every temporary file.
+
+## What you need
+
+| Requirement | Why |
+|---|---|
+| `podman` or `docker` (detected automatically, podman first) | runs `sadf` and Grafana |
+| a **sysstat image** | provides `sadf`; build it once, see below |
+| a **Grafana image** (default `docker.io/grafana/grafana-oss:12.4.3`) | the viewer |
+| Linux | the viewer uses host networking |
+
+Nothing else: no Python, no sysstat on the host, no Grafana plugins, no network access while running.
+
+## Prepare the images (once)
+
+sarda never installs or downloads anything at run time. If an image is missing it tries one `pull` and then stops with instructions (use `--no-pull` to skip the attempt).
+
+On a machine **with** network access:
+
+```sh
+sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .
+podman pull docker.io/grafana/grafana-oss:12.4.3
+podman save -o sarda-images.tar localhost/sarda-sysstat:latest docker.io/grafana/grafana-oss:12.4.3
+```
+
+On the **air-gapped** machine:
+
+```sh
+podman load -i sarda-images.tar
+```
+
+Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` / `SARDA_GRAFANA_IMAGE`), for example from an internal registry. The sysstat inside the sysstat image must be at least as new as the one that wrote your SA files.
+
+## Usage
+
+```text
+sarda [OPTIONS] <SA_FILE>...
+```
+
+| Option | Meaning |
+|---|---|
+| `--start TIME`, `--end TIME` | keep only this window. RFC 3339, e.g. `2026-11-25T08:00:00+01:00`; **no offset means UTC** |
+| `--port PORT` | Grafana port on 127.0.0.1 (default 3000, or any free port if 3000 is taken; `0` = any free port) |
+| `--runtime auto\|podman\|docker` | container runtime (default `auto`) |
+| `--grafana-image IMAGE`, `--sadf-image IMAGE` | override the images |
+| `--sadf-timeout SECONDS` | give up on the conversion (default 600) |
+| `--no-pull` | never try to pull a missing image |
+| `--export-csv DIR` | also write the per-activity CSV files (the format of the former Python tool) |
+| `--no-grafana` | do not start Grafana: only serve the API, or with `--export-csv` just export and exit |
+| `--json` | machine-readable events on stdout (see below) |
+| `-v`, `--verbose` | debug details on stderr |
+| `--print-containerfile`, `--print-catalog` | print the sysstat Containerfile / the table below and exit |
+
+Examples:
+
+```sh
+# a single day, only the morning (UTC), on a fixed port
+sarda --start 2026-11-25T06:00:00Z --end 2026-11-25T12:00:00Z --port 3100 /var/log/sa/sa20261125
+
+# CSV only, no containers besides the conversion
+sarda --no-grafana --export-csv ./csv /var/log/sa/sa2026112*
+
+# use your own Grafana or Prometheus-compatible client
+sarda --no-grafana /var/log/sa/sa20261125     # prints http://127.0.0.1:<port>
+curl 'http://127.0.0.1:<port>/api/v1/query?query=avg(sarda_per_cpu_pct_idle)'
+```
+
+stdout carries only the result (the URL, or JSON events with `--json`); progress and warnings go to stderr.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | success, or clean shutdown after Ctrl-C / SIGTERM |
+| 1 | unexpected error |
+| 2 | invalid command line (no files, bad time, `--start` after `--end`) |
+| 3 | no working container runtime |
+| 4 | a required image is missing |
+| 5 | no usable data in the SA files or in the `--start`/`--end` window |
+| 6 | Grafana failed to start or cannot reach the data |
+| 7 | a network port is unavailable |
+
+### JSON events (`--json`)
+
+One JSON object per line on stdout:
+
+| `event` | When | Main fields |
+|---|---|---|
+| `ready` | Grafana is up | `url`, `grafana_port`, `api_url`, `container`, `runtime`, `data` |
+| `api_ready` | `--no-grafana` API is up | `api_url`, `data` |
+| `exported` | `--export-csv` finished | `dir`, `files` |
+| `stopped` | clean shutdown | |
+| `error` | failure | `kind`, `exit_code`, `message` |
+
+`data` has `hosts`, `from`, `to`, `series`, `metrics`, `activities` and `warnings`.
+
+## How it works
+
+1. One throwaway container (the sysstat image, no network) runs `sadf` for every file and activity.
+2. sarda merges the files, drops `RESTART` markers and bad rows, and keeps the requested window (all UTC).
+3. It serves the result on `127.0.0.1` through a small Prometheus-compatible API (the **Sarda API**).
+4. It starts Grafana with `--network=host` on `127.0.0.1`, provisioned with a datasource pointing at that API and a dashboard generated from what your files actually contain. Anonymous Admin access is enabled, which is safe only because everything listens on loopback.
+
+Panels exist only for activities found in your files. Per-CPU, per-disk, per-interface, ... panels use dashboard variables, so any host works. Rows below the first three start collapsed.
+
+### Metrics and labels
+
+Every SA column becomes a metric `sarda_<activity>_<column>` (`%util` → `pct_util`, `rkB/s` → `rkB_s`) with labels `host` and, for per-entity activities, the dimension label below. CPU `-1` (all CPUs) is labelled `all`.
+
+### Query language
+
+The Sarda API understands a subset of PromQL: selectors with `=`, `!=`, `=~`, `!~`; `sum`, `avg`, `min`, `max`, `count` with `by (...)` / `without (...)`; and arithmetic on numbers. Anything else (`rate()`, `topk`, range vectors, operators between series) fails with an explicit error. SA values are already rates or gauges, so nothing needs `rate()`. A sample stays valid for the larger of 5 minutes and twice the sampling interval.
+
+### Supported activities
+
+<!-- catalog:start -->
+| Dashboard row | Activity | `sadf` options | Dimension label | Metric prefix |
+|---|---|---|---|---|
+| IO | Overall I/O transfer rates | `-b` | - | `sarda_io_` |
+| Paging | Paging statistics | `-B` | - | `sarda_paging_` |
+| Power | CPU instantaneous clock frequency | `-m CPU` | `cpu` | `sarda_power_cpu_` |
+| Power | Fan speed | `-m FAN` | `fan` | `sarda_power_fan_` |
+| Power | CPU average clock frequency | `-m FREQ` | `cpu` | `sarda_power_freq_` |
+| Power | Voltage inputs | `-m IN` | `input` | `sarda_power_in_` |
+| Power | Device temperatures | `-m TEMP` | `sensor` | `sarda_power_temp_` |
+| Power | USB devices power | `-m USB` | `bus` | `sarda_power_USB_` |
+| Disks | Block device activity | `-d` | `dev` | `sarda_disk_` |
+| Filesystems | Mounted filesystem usage | `-F` | `filesystem` | `sarda_filesystem_` |
+| Hugepages | Hugepages utilization | `-H` | - | `sarda_hugepages_` |
+| Interrupts | Interrupts per second, per interrupt source | `-I ALL` | `intr` | `sarda_interrupts_` |
+| Network devices | Network interface traffic | `-n DEV` | `iface` | `sarda_network_dev_` |
+| Network devices | Network interface errors | `-n EDEV` | `iface` | `sarda_network_edev_` |
+| Network FC | Fibre Channel traffic | `-n FC` | `fchost` | `sarda_network_fc_` |
+| Network ICMP | IPv4 ICMP traffic | `-n ICMP` | - | `sarda_network_icmp_` |
+| Network ICMP | IPv4 ICMP errors | `-n EICMP` | - | `sarda_network_eicmp_` |
+| Network ICMP | IPv6 ICMP traffic | `-n ICMP6` | - | `sarda_network_icmp6_` |
+| Network ICMP | IPv6 ICMP errors | `-n EICMP6` | - | `sarda_network_eicmp6_` |
+| Network IP | IPv4 traffic | `-n IP` | - | `sarda_network_ip_` |
+| Network IP | IPv4 errors | `-n EIP` | - | `sarda_network_eip_` |
+| Network IP | IPv6 traffic | `-n IP6` | - | `sarda_network_ip6_` |
+| Network IP | IPv6 errors | `-n EIP6` | - | `sarda_network_eip6_` |
+| Network NFS | NFS client activity | `-n NFS` | - | `sarda_network_nfs_` |
+| Network NFS | NFS server activity | `-n NFSD` | - | `sarda_network_nfsd_` |
+| Network TCP/UDP | IPv4 socket usage | `-n SOCK` | - | `sarda_network_sock_` |
+| Network TCP/UDP | IPv6 socket usage | `-n SOCK6` | - | `sarda_network_sock6_` |
+| Network software processing | Software-based network processing, per CPU | `-n SOFT` | `cpu` | `sarda_network_soft_` |
+| Network TCP/UDP | TCP traffic | `-n TCP` | - | `sarda_network_tcp_` |
+| Network TCP/UDP | TCP errors | `-n ETCP` | - | `sarda_network_etcp_` |
+| Network TCP/UDP | IPv4 UDP traffic | `-n UDP` | - | `sarda_network_udp_` |
+| Network TCP/UDP | IPv6 UDP traffic | `-n UDP6` | - | `sarda_network_udp6_` |
+| CPU | CPU utilization, per CPU | `-P ALL` | `cpu` | `sarda_per_cpu_` |
+| Queue and load | Run queue length and load average | `-q` | - | `sarda_queue_` |
+| Memory | Memory utilization | `-r ALL` | - | `sarda_memory_` |
+| Swap | Swap space utilization | `-S` | - | `sarda_swap_util_` |
+| Inodes | Inode, file and pseudo-terminal tables | `-v` | - | `sarda_inode_` |
+| Swap | Swap paging | `-W` | - | `sarda_swap_` |
+| Task | Context switches and process creation | `-w` | - | `sarda_task_` |
+| TTY | Serial line activity | `-y` | `tty` | `sarda_tty_` |
+<!-- catalog:end -->
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `no working container runtime` | `podman info` (or `docker info`) must succeed for your user |
+| `image ... is not available locally` | follow the printed instructions; names are overridable with the options above |
+| `sadf` errors such as "Invalid system activity file" | the sysstat image is older than the one that wrote the files; rebuild it from a newer base |
+| `no usable data` with `--start/--end` | times without an offset are **UTC**; add one, e.g. `+01:00` |
+| Grafana cannot reach the data | something blocks loopback connections; check `-v` output and local firewall/proxy settings |
+| port 3000 busy | sarda picks a free port automatically; pass `--port` to choose |
+| leftover containers after a crash | the next run removes stale `sarda-<pid>` containers whose process is gone |
+
+## Building
+
+```sh
+cargo build --release          # target/release/sarda
+cargo test                     # hermetic: uses fake container runtimes
+```
+
+Offline builds: `scripts/dist.sh` writes `dist/sarda-vendor-<version>.tar.xz`; extract it at the repository root of the offline machine and run `cargo build --release --offline`. See [AGENTS.md](AGENTS.md) for development notes, [GLOSSARY.md](GLOSSARY.md) for the vocabulary and [docs/adr](docs/adr) for design decisions.
 
 ## Curiosity
+
 If you are just curious of what a SARDA is in italian language, have a look at this [Wikipedia page](https://it.wikipedia.org/wiki/Sarda_\(zoologia\)).
