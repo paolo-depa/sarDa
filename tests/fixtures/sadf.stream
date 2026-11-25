@@ -1,4 +1,6 @@
 @@FILE 0
+@@PROBE 0 0
+@@HDR {"sysstat": {"hosts": [{"nodename": "suse-laptop","sysname": "Linux","release": "7.3.4-1-default","machine": "x86_64","number-of-cpus": 16,"file-date": "2026-11-25","file-utc-time": "11:51:55","timezone": "CET"}]}}
 @@BEGIN io
 # hostname;interval;timestamp;tps;rtps;wtps;dtps;bread/s;bwrtn/s;bdscd/s
 suse-laptop;1;2026-11-25 11:51:56 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00
@@ -1036,6 +1038,8 @@ suse-laptop;1;2026-11-25 11:51:59 UTC;1.00;103827.00
 @@ERR Requested activities not available in file tests/fixtures/sa/sa20261125
 @@END
 @@FILE 1
+@@PROBE 1 0
+@@HDR {"sysstat": {"hosts": [{"nodename": "suse-laptop","sysname": "Linux","release": "7.3.4-1-default","machine": "x86_64","number-of-cpus": 16,"file-date": "2026-11-25","file-utc-time": "11:52:01","timezone": "CET"}]}}
 @@BEGIN io
 # hostname;interval;timestamp;tps;rtps;wtps;dtps;bread/s;bwrtn/s;bdscd/s
 suse-laptop;1;2026-11-25 11:52:02 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00

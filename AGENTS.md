@@ -10,10 +10,11 @@ One Rust executable: SA files in, Grafana URL out. It converts with `sadf` in a 
 
 ## Data path
 
-`sadf.rs` (marker stream from the container) → `dataset.rs` (merge, window; one `Table` per Activity) → `store.rs` (labelled Series) → `api.rs` + `promql.rs` (Grafana reads here), `dashboard.rs` (generated JSON), `csvexport.rs` (`--export-csv`). `session.rs` orchestrates; `viewer.rs` owns the Grafana container and its cleanup.
+`sadf.rs` (header probe per file, then a marker stream of `sadf -d` output) → `dataset.rs` (merge, window; one `Table` per Activity) → `store.rs` (labelled Series) → `api.rs` + `promql.rs` (Grafana reads here), `dashboard.rs` (generated JSON), `csvexport.rs` (`--export-csv`). `session.rs` orchestrates; `viewer.rs` owns the Grafana container and its cleanup.
 
 ## Rules that are not visible in the code
 
+- **The probe decides what is skippable, not the file name.** `sadf -j -H` gives a file's host and `file-date`; `session::skip_bounds` keeps one day of slack around the window so a file is only skipped when its own timezone cannot bring it inside. Activities are skipped in the shell script (`tests/script.rs` covers it); never re-add a filename-based guess.
 - **The catalog is the only place that knows Activities.** Add or change one in `src/catalog.rs`; parsing, metric names, panels and docs follow. Then refresh the README table: `cargo run -q -- --print-catalog` (a test fails while it is stale). Panel titles come from `description`, so keep descriptions unique.
 - **Air-gapped.** No run-time network use beyond the single `pull` attempt in `session::ensure_image`. No plugin installs, update checks or telemetry; the Grafana `GF_*` variables in `viewer.rs` switch those off.
 - **Loopback only.** Everything binds `127.0.0.1`. Anonymous Admin in Grafana is only acceptable because of that (ADR 0005); never combine it with another bind address.

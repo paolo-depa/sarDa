@@ -21,7 +21,7 @@ fn main() -> ExitCode {
         } else if cli.print_catalog {
             print!("{}", catalog::markdown_table());
         } else {
-            print!("{}", sadf::build_script());
+            print!("{}", sadf::build_script(None, None));
         }
         return ExitCode::SUCCESS;
     }

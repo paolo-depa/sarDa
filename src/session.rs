@@ -30,6 +30,57 @@ pub fn containerfile() -> &'static str {
     CONTAINERFILE
 }
 
+/// Inclusive date bounds of files that can be skipped without reading them.
+/// One day of slack on each side keeps the decision safe across the file's own
+/// timezone: a file is only skipped when it cannot contribute a sample to the
+/// Observation window.
+fn skip_bounds(start: Option<i64>, end: Option<i64>) -> (Option<String>, Option<String>) {
+    let day = 86_400;
+    let fmt = |t: i64| timeutil::format_rfc3339(t)[..10].to_string();
+    (start.map(|t| fmt(t - day)), end.map(|t| fmt(t + day)))
+}
+
+/// Human-readable notes about the input files, from their header probes.
+fn probe_notes(output: &sadf::SadfOutput, names: &[String]) -> (Vec<String>, Vec<String>) {
+    let mut notes = Vec::new();
+    let mut details = Vec::new();
+    for probe in &output.probes {
+        let name = names.get(probe.index).map_or("?", String::as_str);
+        if !probe.ok {
+            let mut seen: Vec<&str> = Vec::new();
+            for line in &probe.stderr {
+                if !seen.contains(&line.as_str()) {
+                    seen.push(line);
+                }
+            }
+            let why = seen.join("; ");
+            notes.push(format!(
+                "{name}: not a readable system activity file ({why})"
+            ));
+            continue;
+        }
+        if probe.converted {
+            notes.push(format!(
+                "{name}: old sysstat file format, converted with sadf -c"
+            ));
+        }
+        let host = probe.nodename().unwrap_or("?");
+        let date = probe.file_date().unwrap_or("?");
+        if probe.skipped {
+            details.push(format!(
+                "{name}: outside the observation window ({date}), skipped"
+            ));
+        } else {
+            let cpus = probe
+                .cpus()
+                .map(|c| format!(", {c} CPUs"))
+                .unwrap_or_default();
+            details.push(format!("{name}: {host}, {date}{cpus}"));
+        }
+    }
+    (notes, details)
+}
+
 /// Progress goes to stderr; structured events go to stdout with `--json`.
 pub struct Reporter {
     pub json: bool,
@@ -213,13 +264,16 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
         "Converting {} SA file(s) with sadf ...",
         files.len()
     ));
+    let bounds = skip_bounds(start, end);
+    let skip = (bounds.0.as_deref(), bounds.1.as_deref());
     let output: SadfOutput = if host_sadf {
-        sadf::run_on_host(&files)?
+        sadf::run_on_host(&files, skip)?
     } else {
         sadf::run_in_container(
             rt.as_ref().expect("runtime detected"),
             &cli.sadf_image,
             &files,
+            skip,
             Duration::from_secs(cli.sadf_timeout),
         )?
     };
@@ -232,7 +286,25 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
             )
         })
         .collect();
-    let ds = dataset::assemble(&output, &names, start, end)?;
+    let (notes, details) = probe_notes(&output, &names);
+    for d in &details {
+        rep.debug(d);
+    }
+    let ds = match dataset::assemble(&output, &names, start, end) {
+        Ok(ds) => ds,
+        Err(mut e) => {
+            // Skipped files explain "no data" as much as unreadable ones do.
+            let mut explained: Vec<String> = notes.clone();
+            explained.extend(details.iter().cloned());
+            for note in explained.iter().take(10) {
+                e.message.push_str(&format!("\n  - {note}"));
+            }
+            return Err(e);
+        }
+    };
+    for note in &notes {
+        rep.warn(note);
+    }
     for w in &ds.warnings {
         rep.warn(w);
     }

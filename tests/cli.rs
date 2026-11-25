@@ -26,16 +26,21 @@ fn fake_runtime(dir: &Path, name: &str, body: &str) {
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
 }
 
-/// A fake runtime whose `run` prints the recorded sadf stream.
-fn working_runtime(dir: &Path, name: &str) {
+/// A fake runtime whose `run` prints the given sadf stream.
+fn runtime_with_stream(dir: &Path, name: &str, stream: &Path) {
     fake_runtime(
         dir,
         name,
         &format!(
             "case \"$1\" in\n info|image|ps|rm|container) exit 0;;\n run) cat '{}';;\n *) exit 0;;\nesac",
-            fixtures().join("sadf.stream").display()
+            stream.display()
         ),
     );
+}
+
+/// A fake runtime whose `run` prints the recorded sadf stream.
+fn working_runtime(dir: &Path, name: &str) {
+    runtime_with_stream(dir, name, &fixtures().join("sadf.stream"));
 }
 
 fn working_podman(dir: &Path) {
@@ -164,6 +169,82 @@ fn export_csv_runs_the_whole_pipeline_with_a_fake_runtime() {
     let event: serde_json::Value = serde_json::from_str(stdout.lines().last().unwrap()).unwrap();
     assert_eq!(event["event"], "exported");
     assert_eq!(event["files"], 69);
+}
+
+/// Builds a stream where the first file cannot be read and the second one is
+/// the recorded fixture's second file.
+fn stream_with_first_file_unreadable(dir: &Path) -> PathBuf {
+    let fixture = std::fs::read_to_string(fixtures().join("sadf.stream")).unwrap();
+    let tail = &fixture[fixture
+        .find("@@FILE 1")
+        .expect("second file in the fixture")..];
+    let stream = dir.join("stream");
+    std::fs::write(
+        &stream,
+        format!(
+            "@@FILE 0\n@@PROBE 0 3\n@@PERR Invalid system activity file: /in/0\n@@SKIP 0\n{tail}"
+        ),
+    )
+    .unwrap();
+    stream
+}
+
+#[test]
+fn an_unreadable_file_is_a_warning_not_a_failure() {
+    let dir = scratch("onebad");
+    let stream = stream_with_first_file_unreadable(&dir);
+    runtime_with_stream(&dir, "podman", &stream);
+    let csv = dir.join("csv");
+    let out = sarda(&dir)
+        .args(["--no-grafana", "--export-csv"])
+        .arg(&csv)
+        .args(sa_files())
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        err.contains("sa20261125: not a readable system activity file"),
+        "{err}"
+    );
+    assert!(err.contains("Invalid system activity file"), "{err}");
+    assert!(
+        csv.join("queue.csv").is_file(),
+        "the readable file still produced output"
+    );
+}
+
+#[test]
+fn unreadable_files_only_exit_5_naming_the_cause() {
+    let dir = scratch("allbad");
+    let stream = dir.join("stream");
+    std::fs::write(
+        &stream,
+        "@@FILE 0\n@@PROBE 0 3\n@@PERR Invalid system activity file: /in/0\n@@SKIP 0\n\
+         @@FILE 1\n@@PROBE 1 3\n@@PERR Invalid system activity file: /in/1\n@@SKIP 1\n",
+    )
+    .unwrap();
+    runtime_with_stream(&dir, "podman", &stream);
+    let out = sarda(&dir)
+        .args(["--no-grafana"])
+        .args(sa_files())
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(5));
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(err.contains("no usable data"), "{err}");
+    assert!(
+        err.contains("sa20261125: not a readable system activity file"),
+        "{err}"
+    );
+    assert!(
+        err.contains("sa20261126: not a readable system activity file"),
+        "{err}"
+    );
 }
 
 #[test]

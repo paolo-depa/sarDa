@@ -4,4 +4,6 @@
 
 ## Consequences
 
+Each file is first probed with `sadf -j -H`, which also yields its host and day, so sarda can skip files outside the Observation window without reading their data. When the probe fails, `sadf -c` is tried once to convert a datafile in the old (9.1.6+) format, and only the converted file is used if it probes cleanly.
+
 Timestamps come out in UTC (container timezone), so the Observation window is filtered in Rust on parsed timestamps rather than with `sadf -s/-e`. SA files written by a newer sysstat than the image provides may fail to parse; the error must name both versions.

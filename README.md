@@ -109,7 +109,7 @@ One JSON object per line on stdout:
 
 ## How it works
 
-1. One throwaway container (the sysstat image, no network) runs `sadf` for every file and activity.
+1. One throwaway container (the sysstat image, no network) reads each file's header with `sadf -j -H`. A file it cannot read is reported and skipped; a datafile in the old binary format is converted in place with `sadf -c`; a file whose day (from the header, not the file name) cannot overlap `--start`/`--end` is skipped without reading its data. Everything else is converted activity by activity.
 2. sarda merges the files, drops `RESTART` markers and bad rows, and keeps the requested window (all UTC).
 3. It serves the result on `127.0.0.1` through a small Prometheus-compatible API (the **Sarda API**).
 4. It starts Grafana with `--network=host` on `127.0.0.1`, provisioned with a datasource pointing at that API and a dashboard generated from what your files actually contain. Anonymous Admin access is enabled, which is safe only because everything listens on loopback.
@@ -175,9 +175,10 @@ The Sarda API understands a subset of PromQL: selectors with `=`, `!=`, `=~`, `!
 
 | Symptom | Fix |
 |---|---|
+| a panel, or a whole dashboard row, is empty | the host did not collect that activity. `sadc` collects only some by default: add `SADC_OPTIONS="-S XALL"` (or the keywords you need, see `man sadc`) to `/etc/sysconfig/sysstat`, restart `sysstat-collect.timer`, and collect again |
 | `no working container runtime` | `podman info` (or `docker info`) must succeed for your user |
 | `image ... is not available locally` | follow the printed instructions; names are overridable with the options above |
-| `sadf` errors such as "Invalid system activity file" | the sysstat image is older than the one that wrote the files; rebuild it from a newer base |
+| `not a readable system activity file` | the file is corrupt, or the sysstat image is older than the one that wrote it; rebuild the image from a newer base. Datafiles in the old format are converted automatically, but files older than sysstat 9.1.6 cannot be |
 | `no usable data` with `--start/--end` | times without an offset are **UTC**; add one, e.g. `+01:00` |
 | Grafana cannot reach the data | something blocks loopback connections; check `-v` output and local firewall/proxy settings |
 | port 3000 busy | sarda picks a free port automatically; pass `--port` to choose |
