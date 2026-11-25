@@ -1,6 +1,5 @@
 //! One sarDa run: convert, serve, start the Grafana, wait, clean up.
 
-use std::path::PathBuf;
 use std::sync::mpsc::{self, RecvTimeoutError};
 use std::sync::Arc;
 use std::time::Duration;
@@ -14,7 +13,7 @@ use crate::error::{Error, Kind, Result};
 use crate::grafana::{self, Grafana, GrafanaSpec};
 use crate::resources::{Handle, Resources};
 use crate::runtime::{missing_image_help, Runtime};
-use crate::sadf::{self, SadfOutput};
+use crate::sadf::{self, Input, SadfOutput, Verdict};
 use crate::store::Store;
 use crate::timeutil;
 use crate::{api, csvexport};
@@ -35,86 +34,6 @@ fn skip_bounds(start: Option<i64>, end: Option<i64>) -> (Option<String>, Option<
     let day = 86_400;
     let fmt = |t: i64| timeutil::format_rfc3339(t)[..10].to_string();
     (start.map(|t| fmt(t - day)), end.map(|t| fmt(t + day)))
-}
-
-/// Files the installed sysstat cannot read. An SA file written by a newer
-/// sysstat may still have a readable header while every record is silently
-/// dropped, so the file's own version is compared too. Any entry here aborts
-/// the run: partial data would be misleading.
-fn compatibility_errors(files: &[PathBuf], names: &[String], output: &SadfOutput) -> Vec<String> {
-    let mut errors = Vec::new();
-    for (i, path) in files.iter().enumerate() {
-        let name = names.get(i).map_or("?", String::as_str);
-        let probe = output.probes.iter().find(|p| p.index == i);
-        if !probe.is_some_and(|p| p.ok) {
-            let mut seen: Vec<&str> = Vec::new();
-            if let Some(p) = probe {
-                for line in &p.stderr {
-                    if !seen.contains(&line.as_str()) {
-                        seen.push(line);
-                    }
-                }
-            }
-            let why = if seen.is_empty() {
-                String::new()
-            } else {
-                format!(": {}", seen.join("; "))
-            };
-            errors.push(format!("{name}: sadf cannot read this file{why}"));
-            continue;
-        }
-        if let (Some(installed), Ok(file_version)) =
-            (output.sadf_version, sadf::read_sa_version(path))
-        {
-            if file_version > installed {
-                errors.push(format!(
-                    "{name} was written by sysstat {file_version}, but the sysstat image provides {installed} and cannot read it"
-                ));
-            }
-        }
-    }
-    errors
-}
-
-/// Human-readable notes about the input files, from their header probes.
-fn probe_notes(output: &sadf::SadfOutput, names: &[String]) -> (Vec<String>, Vec<String>) {
-    let mut notes = Vec::new();
-    let mut details = Vec::new();
-    for probe in &output.probes {
-        let name = names.get(probe.index).map_or("?", String::as_str);
-        if !probe.ok {
-            let mut seen: Vec<&str> = Vec::new();
-            for line in &probe.stderr {
-                if !seen.contains(&line.as_str()) {
-                    seen.push(line);
-                }
-            }
-            let why = seen.join("; ");
-            notes.push(format!(
-                "{name}: not a readable system activity file ({why})"
-            ));
-            continue;
-        }
-        if probe.converted {
-            notes.push(format!(
-                "{name}: old sysstat file format, converted with sadf -c"
-            ));
-        }
-        let host = probe.nodename().unwrap_or("?");
-        let date = probe.file_date().unwrap_or("?");
-        if probe.skipped {
-            details.push(format!(
-                "{name}: outside the observation window ({date}), skipped"
-            ));
-        } else {
-            let cpus = probe
-                .cpus()
-                .map(|c| format!(", {c} CPUs"))
-                .unwrap_or_default();
-            details.push(format!("{name}: {host}, {date}{cpus}"));
-        }
-    }
-    (notes, details)
 }
 
 /// Progress goes to stderr; structured events go to stdout with `--json`.
@@ -191,14 +110,14 @@ fn parse_window(cli: &Cli) -> Result<(Option<i64>, Option<i64>)> {
     Ok((start, end))
 }
 
-fn existing_files(cli: &Cli, rep: &Reporter) -> Result<Vec<PathBuf>> {
+fn existing_inputs(cli: &Cli, rep: &Reporter) -> Result<Vec<Input>> {
     if cli.files.is_empty() {
         return Err(Error::new(Kind::Usage, "no SA files given (see --help)"));
     }
     let mut files = Vec::new();
     for f in &cli.files {
         if f.is_file() {
-            files.push(f.clone());
+            files.push(Input::new(f));
         } else {
             rep.warn(format!("{} is not a file; skipping", f.display()));
         }
@@ -209,7 +128,7 @@ fn existing_files(cli: &Cli, rep: &Reporter) -> Result<Vec<PathBuf>> {
     Ok(files)
 }
 
-fn summary(ds: &Dataset, store: &Store) -> Value {
+fn summary(ds: &Dataset, store: &Store, warnings: &[String]) -> Value {
     json!({
         "hosts": store.hosts(),
         "from": timeutil::format_rfc3339(store.min_ts_ms / 1000),
@@ -217,7 +136,7 @@ fn summary(ds: &Dataset, store: &Store) -> Value {
         "series": store.series.len(),
         "metrics": store.metric_names().len(),
         "activities": ds.tables.iter().map(|(a, _)| a.label).collect::<Vec<_>>(),
-        "warnings": ds.warnings,
+        "warnings": warnings,
     })
 }
 
@@ -246,7 +165,7 @@ fn wait_for_shutdown(
 
 pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
     let (start, end) = parse_window(cli)?;
-    let files = existing_files(cli, rep)?;
+    let inputs = existing_inputs(cli, rep)?;
     let host_sadf = std::env::var_os("SARDA_SADF_HOST").is_some();
     let export_only = cli.no_grafana && cli.export_csv.is_some();
     let rt = if !host_sadf || !cli.no_grafana {
@@ -289,65 +208,55 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
 
     rep.info(format!(
         "Converting {} SA file(s) with sadf ...",
-        files.len()
+        inputs.len()
     ));
     let bounds = skip_bounds(start, end);
     let skip = (bounds.0.as_deref(), bounds.1.as_deref());
     let output: SadfOutput = if host_sadf {
-        sadf::run_on_host(&files, skip)?
+        sadf::run_on_host(&inputs, skip)?
     } else {
         sadf::run_in_container(
             rt.as_ref().expect("runtime detected"),
             &cli.sadf_image,
-            &files,
+            &inputs,
             skip,
             Duration::from_secs(cli.sadf_timeout),
             &resources,
         )?
     };
-    let names: Vec<String> = files
-        .iter()
-        .map(|f| {
-            f.file_name().map_or_else(
-                || f.display().to_string(),
-                |n| n.to_string_lossy().into_owned(),
-            )
-        })
-        .collect();
-    let incompatible = compatibility_errors(&files, &names, &output);
-    if !incompatible.is_empty() {
+
+    let verdicts = output.verdicts();
+    let problems: Vec<String> = verdicts.iter().filter_map(Verdict::problem).collect();
+    if !problems.is_empty() {
         return Err(Error::new(
             Kind::IncompatibleFile,
             format!(
                 "{}\nUse an image whose sysstat is at least as new as the files (--sadf-image), or SA files written by an older sysstat.",
-                incompatible.join("\n")
+                problems.join("\n")
             ),
         ));
     }
-    let (notes, details) = probe_notes(&output, &names);
+    let mut warnings: Vec<String> = verdicts.iter().filter_map(Verdict::warning).collect();
+    let details: Vec<String> = verdicts.iter().filter_map(Verdict::detail).collect();
     for d in &details {
         rep.debug(d);
     }
-    let ds = match dataset::assemble(&output, &names, start, end) {
+    let ds = match dataset::assemble(&output, start, end) {
         Ok(ds) => ds,
         Err(mut e) => {
-            // Skipped files explain "no data" as much as unreadable ones do.
-            let mut explained: Vec<String> = notes.clone();
-            explained.extend(details.iter().cloned());
-            for note in explained.iter().take(10) {
+            // Skipped files explain "no data" as much as warnings do.
+            for note in warnings.iter().chain(&details).take(10) {
                 e.message.push_str(&format!("\n  - {note}"));
             }
             return Err(e);
         }
     };
-    for note in &notes {
-        rep.warn(note);
-    }
-    for w in &ds.warnings {
+    warnings.extend(ds.warnings.iter().cloned());
+    for w in &warnings {
         rep.warn(w);
     }
     let store = Arc::new(Store::from_dataset(&ds));
-    let info = summary(&ds, &store);
+    let info = summary(&ds, &store, &warnings);
     rep.info(format!(
         "Loaded {} series ({} metrics) from {} activities, {} .. {}",
         info["series"],

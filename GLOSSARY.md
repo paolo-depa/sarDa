@@ -32,6 +32,10 @@ _Avoid_: point, row, datapoint, record
 The single source of truth listing every Activity, its Dimension, its Metrics, units and dashboard grouping. It drives parsing, the Sarda API, the generated dashboard and the panel reference.
 _Avoid_: aggregators, config table
 
+**File verdict**:
+The outcome of checking one SA file before any of its data is read: read as is, read after conversion from an old format, skipped because its day lies outside the Observation window, or incompatible with the parser image's sysstat (unreadable, or written by a newer sysstat). An incompatible file stops the Session.
+_Avoid_: probe result, file status, validation
+
 **Observation window**:
 The time range kept after parsing, bounded by optional `--start`/`--end`, in UTC.
 _Avoid_: time filter, date range

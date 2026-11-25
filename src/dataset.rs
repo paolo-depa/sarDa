@@ -21,13 +21,7 @@ pub struct Dataset {
     pub warnings: Vec<String>,
 }
 
-/// `names[i]` is the display name of input file `i`, used in warnings.
-pub fn assemble(
-    output: &SadfOutput,
-    names: &[String],
-    start: Option<i64>,
-    end: Option<i64>,
-) -> Result<Dataset> {
+pub fn assemble(output: &SadfOutput, start: Option<i64>, end: Option<i64>) -> Result<Dataset> {
     let mut warnings: Vec<String> = Vec::new();
     let mut seen_stderr: BTreeSet<(usize, String)> = BTreeSet::new();
     let mut tables = Vec::new();
@@ -37,7 +31,7 @@ pub fn assemble(
         let mut report = MergeReport::default();
 
         for (idx, file) in output.files.iter().enumerate() {
-            let name = names.get(idx).map_or("?", String::as_str);
+            let name = output.name(idx);
             let Some(raw) = file.iter().find(|r| r.label == activity.label) else {
                 continue;
             };

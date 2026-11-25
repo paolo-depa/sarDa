@@ -396,6 +396,38 @@ fn http_get(port: u16, path: &str) -> String {
 }
 
 #[test]
+fn file_warnings_reach_stderr_and_the_json_events() {
+    let dir = scratch("verdict-warning");
+    // The recorded stream, but as if the first file had needed `sadf -c`.
+    let fixture = std::fs::read_to_string(fixtures().join("sadf.stream")).unwrap();
+    let stream = dir.join("stream");
+    std::fs::write(
+        &stream,
+        fixture.replacen("@@FILE 0\n", "@@FILE 0\n@@CONVERTED 0\n", 1),
+    )
+    .unwrap();
+    runtime_with_stream(&dir, "podman", &stream);
+    let stderr = dir.join("stderr");
+    let mut child = sarda(&dir)
+        .args(["--no-grafana", "--json"])
+        .args(sa_files())
+        .stdout(Stdio::piped())
+        .stderr(std::fs::File::create(&stderr).unwrap())
+        .spawn()
+        .unwrap();
+    let mut lines = BufReader::new(child.stdout.take().unwrap()).lines();
+    let ready: serde_json::Value = serde_json::from_str(&lines.next().unwrap().unwrap()).unwrap();
+    assert_eq!(terminate(&mut child), Some(0));
+
+    let note = "sa20261125: old sysstat file format, converted with sadf -c";
+    assert_eq!(ready["event"], "api_ready");
+    assert_eq!(ready["data"]["warnings"][0], note, "{ready}");
+    assert!(std::fs::read_to_string(&stderr)
+        .unwrap()
+        .contains(&format!("warning: {note}")));
+}
+
+#[test]
 fn api_mode_serves_queries_and_stops_cleanly_on_sigterm() {
     let dir = scratch("api");
     working_podman(&dir);

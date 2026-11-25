@@ -7,7 +7,7 @@ use sarda::csvexport;
 use sarda::dashboard;
 use sarda::dataset::{self, Dataset};
 use sarda::promql::{self, Value};
-use sarda::sadf;
+use sarda::sadf::{self, Input, SadfOutput, State};
 use sarda::store::Store;
 use sarda::timeutil;
 
@@ -15,13 +15,19 @@ fn fixtures() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures")
 }
 
-fn names() -> Vec<String> {
-    vec!["sa20261125".into(), "sa20261126".into()]
+/// The recorded `sadf` stream, together with the SA files it was made from.
+fn fixture_output() -> SadfOutput {
+    let inputs = [
+        Input::new(fixtures().join("sa/sa20261125")),
+        Input::new(fixtures().join("sa/sa20261126")),
+    ];
+    sadf::read_stream_file(&fixtures().join("sadf.stream"))
+        .unwrap()
+        .with_inputs(&inputs)
 }
 
 fn load(start: Option<i64>, end: Option<i64>) -> Dataset {
-    let out = sadf::read_stream_file(&fixtures().join("sadf.stream")).unwrap();
-    dataset::assemble(&out, &names(), start, end).unwrap()
+    dataset::assemble(&fixture_output(), start, end).unwrap()
 }
 
 fn scratch(name: &str) -> PathBuf {
@@ -89,11 +95,25 @@ fn time_window_is_applied_in_utc() {
     assert!(nstore.max_ts_ms / 1000 < last);
     assert!(nstore.series.len() <= store.series.len());
 
-    let out = sadf::read_stream_file(&fixtures().join("sadf.stream")).unwrap();
     let nothing = timeutil::parse_user("2000-01-01T00:00:00Z").unwrap();
-    let err = dataset::assemble(&out, &names(), None, Some(nothing)).unwrap_err();
+    let err = dataset::assemble(&fixture_output(), None, Some(nothing)).unwrap_err();
     assert_eq!(err.kind, sarda::error::Kind::NoData);
     assert!(err.message.contains("--start/--end"));
+}
+
+#[test]
+fn the_recorded_files_are_readable_by_the_recorded_sadf() {
+    let verdicts = fixture_output().verdicts();
+    assert_eq!(verdicts.len(), 2);
+    for (v, name) in verdicts.iter().zip(["sa20261125", "sa20261126"]) {
+        assert_eq!(v.name, name);
+        assert_eq!(v.state, State::Read, "{v:?}");
+        assert!(!v.converted);
+        assert_eq!(v.cpus, Some(16));
+        assert_eq!(v.date.as_deref(), Some("2026-11-25"));
+        assert!(v.problem().is_none() && v.warning().is_none());
+        assert!(v.detail().unwrap().contains("16 CPUs"));
+    }
 }
 
 #[test]
