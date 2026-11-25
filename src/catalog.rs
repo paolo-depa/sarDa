@@ -40,6 +40,20 @@ pub struct Activity {
     pub panels: &'static [PanelSpec],
 }
 
+impl Dimension {
+    /// The label value for an entity as `sadf` prints it: trimmed, with CPU
+    /// `-1` (all CPUs together) called `all`. The CSV export keeps the raw
+    /// text instead, as the legacy files did.
+    pub fn label_value(&self, raw: &str) -> String {
+        let raw = raw.trim();
+        if self.column == "CPU" && raw == "-1" {
+            "all".to_string()
+        } else {
+            raw.to_string()
+        }
+    }
+}
+
 const fn dim(column: &'static str, label: &'static str) -> Option<Dimension> {
     Some(Dimension { column, label })
 }
@@ -459,7 +473,7 @@ pub fn activity(label: &str) -> Option<&'static Activity> {
 }
 
 impl Activity {
-    pub fn is_meta_column(&self, column: &str) -> bool {
+    pub(crate) fn is_meta_column(&self, column: &str) -> bool {
         column == HOST_COLUMN
             || column == INTERVAL_COLUMN
             || column == TIMESTAMP_COLUMN
@@ -536,6 +550,16 @@ pub fn markdown_table() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn entity_labels_are_trimmed_and_all_cpus_are_called_all() {
+        let cpu = activity("per_cpu").unwrap().dimension.as_ref().unwrap();
+        assert_eq!(cpu.label_value("-1"), "all");
+        assert_eq!(cpu.label_value(" 3 "), "3");
+        let iface = activity("network_dev").unwrap().dimension.as_ref().unwrap();
+        assert_eq!(iface.label_value("-1"), "-1", "only CPUs have an aggregate");
+        assert_eq!(iface.label_value("eth0"), "eth0");
+    }
 
     #[test]
     fn labels_are_unique() {

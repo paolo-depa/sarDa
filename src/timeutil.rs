@@ -86,6 +86,12 @@ pub fn parse_user(input: &str) -> Result<i64, String> {
     Ok(base - offset)
 }
 
+/// Formats an instant the way `sadf -d` prints it: `2026-11-25 11:51:56 UTC`.
+pub fn format_sadf(epoch: i64) -> String {
+    let rfc = format_rfc3339(epoch);
+    format!("{} {} UTC", &rfc[..10], &rfc[11..19])
+}
+
 pub fn format_rfc3339(epoch: i64) -> String {
     let days = epoch.div_euclid(86400);
     let secs = epoch.rem_euclid(86400);
@@ -106,6 +112,17 @@ mod tests {
     fn sadf_timestamp_round_trips() {
         let t = parse_sadf("2026-11-25 11:51:56 UTC").unwrap();
         assert_eq!(format_rfc3339(t), "2026-11-25T11:51:56Z");
+    }
+
+    #[test]
+    fn sadf_formatting_round_trips_with_parsing() {
+        for text in [
+            "2026-11-25 11:51:56 UTC",
+            "1970-01-01 00:00:00 UTC",
+            "2024-02-29 23:59:59 UTC",
+        ] {
+            assert_eq!(format_sadf(parse_sadf(text).unwrap()), text);
+        }
     }
 
     #[test]

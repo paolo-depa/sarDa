@@ -168,7 +168,7 @@ fn every_dashboard_query_parses_and_returns_data() {
         .iter()
         .map(|e| e.split('{').next().unwrap().to_string())
         .collect();
-    let present: BTreeSet<&str> = ds.tables.iter().map(|(a, _)| a.label).collect();
+    let present: BTreeSet<&str> = ds.tables.iter().map(|t| t.activity.label).collect();
     for activity in sarda::catalog::ACTIVITIES {
         let prefix = format!("sarda_{}_", activity.label);
         let recorded = metrics.iter().any(|m| m.starts_with(&prefix));

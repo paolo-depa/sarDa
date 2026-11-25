@@ -9,9 +9,10 @@ use std::collections::BTreeSet;
 
 use serde_json::{json, Value};
 
-use crate::catalog::{metric_name, unit_for, Activity, HOST_COLUMN};
+use crate::catalog::{metric_name, unit_for};
 use crate::dataset::Dataset;
 use crate::store::Store;
+use crate::table::Table;
 use crate::timeutil;
 
 pub const DASHBOARD_UID: &str = "sarda";
@@ -113,31 +114,22 @@ fn timeseries(
     })
 }
 
-/// Metric columns of `activity` that produced at least one series, in header
+/// Metric columns of `table` that produced at least one series, in header
 /// order (text columns such as `DEVICE` are skipped).
-fn value_columns<'a>(activity: &Activity, header: &'a [String], store: &Store) -> Vec<&'a str> {
-    header
+fn value_columns<'a>(table: &'a Table, store: &Store) -> Vec<&'a str> {
+    table
+        .layout()
+        .metrics
         .iter()
-        .map(String::as_str)
-        .filter(|h| !activity.is_meta_column(h) && *h != HOST_COLUMN)
-        .filter(|h| {
-            store
-                .by_name(&metric_name(activity.label, h))
-                .next()
-                .is_some()
-        })
+        .filter(|&&c| store.by_name(&table.metric_name(c)).next().is_some())
+        .map(|&c| table.column_name(c))
         .collect()
 }
 
 /// Panels (without `gridPos`) for one Activity.
-fn activity_panels(
-    activity: &Activity,
-    header: &[String],
-    store: &Store,
-    ids: &mut Ids,
-    ctx: &Ctx,
-) -> Vec<Value> {
-    let columns = value_columns(activity, header, store);
+fn activity_panels(table: &Table, store: &Store, ids: &mut Ids, ctx: &Ctx) -> Vec<Value> {
+    let activity = table.activity;
+    let columns = value_columns(table, store);
     let mut panels = Vec::new();
 
     if let Some(dim) = &activity.dimension {
@@ -265,11 +257,11 @@ pub fn generate(ds: &Dataset, store: &Store) -> Value {
     };
     let mut ids = Ids { next: 0 };
 
-    let mut groups: Vec<(&str, Vec<&(&Activity, crate::table::Table)>)> = Vec::new();
-    for entry in &ds.tables {
-        match groups.iter_mut().find(|(g, _)| *g == entry.0.group) {
-            Some((_, v)) => v.push(entry),
-            None => groups.push((entry.0.group, vec![entry])),
+    let mut groups: Vec<(&str, Vec<&Table>)> = Vec::new();
+    for table in &ds.tables {
+        match groups.iter_mut().find(|(g, _)| *g == table.activity.group) {
+            Some((_, v)) => v.push(table),
+            None => groups.push((table.activity.group, vec![table])),
         }
     }
     groups.sort_by_key(|(g, _)| {
@@ -290,14 +282,15 @@ pub fn generate(ds: &Dataset, store: &Store) -> Value {
 
     for (group, entries) in groups.iter() {
         let mut group_panels: Vec<Value> = Vec::new();
-        for (activity, table) in entries {
-            let panels = activity_panels(activity, &table.header, store, &mut ids, &ctx);
+        for table in entries {
+            let activity = table.activity;
+            let panels = activity_panels(table, store, &mut ids, &ctx);
             if panels.is_empty() {
                 continue;
             }
             if let Some(dim) = &activity.dimension {
                 if seen_dims.insert(dim.label) {
-                    let first = value_columns(activity, &table.header, store)[0];
+                    let first = value_columns(table, store)[0];
                     let metric = metric_name(activity.label, first);
                     variables.push(variable(
                         dim.label,
@@ -371,27 +364,25 @@ pub fn generate(ds: &Dataset, store: &Store) -> Value {
 mod tests {
     use super::*;
     use crate::catalog::activity;
-    use crate::table::Table;
+
+    fn table(label: &str, text: &str) -> Table {
+        Table::parse(text, activity(label).unwrap()).unwrap().0
+    }
 
     fn dataset() -> Dataset {
-        let cpu = Table::parse(
+        let cpu = table(
+            "per_cpu",
             "# hostname;interval;timestamp;CPU;%user;%idle\n\
              h;60;2026-11-25 10:00:00 UTC;-1;10.00;90.00\n\
              h;60;2026-11-25 10:00:00 UTC;0;10.00;90.00\n",
-        )
-        .unwrap()
-        .0;
-        let mem = Table::parse(
+        );
+        let mem = table(
+            "memory",
             "# hostname;interval;timestamp;kbmemfree;kbmemused;%memused;brandnew\n\
              h;60;2026-11-25 10:00:00 UTC;1;2;3;4\n",
-        )
-        .unwrap()
-        .0;
+        );
         Dataset {
-            tables: vec![
-                (activity("per_cpu").unwrap(), cpu),
-                (activity("memory").unwrap(), mem),
-            ],
+            tables: vec![cpu, mem],
             warnings: vec![],
         }
     }
@@ -434,15 +425,12 @@ mod tests {
     }
 
     fn dataset_with_swap() -> Dataset {
-        use crate::table::Table;
         let mut ds = dataset();
-        let swap = Table::parse(
+        ds.tables.push(table(
+            "swap",
             "# hostname;interval;timestamp;pswpin/s;pswpout/s\n\
              h;60;2026-11-25 10:00:00 UTC;0.00;0.00\n",
-        )
-        .unwrap()
-        .0;
-        ds.tables.push((activity("swap").unwrap(), swap));
+        ));
         ds
     }
 

@@ -135,7 +135,7 @@ fn summary(ds: &Dataset, store: &Store, warnings: &[String]) -> Value {
         "to": timeutil::format_rfc3339(store.max_ts_ms / 1000),
         "series": store.series.len(),
         "metrics": store.metric_names().len(),
-        "activities": ds.tables.iter().map(|(a, _)| a.label).collect::<Vec<_>>(),
+        "activities": ds.tables.iter().map(|t| t.activity.label).collect::<Vec<_>>(),
         "warnings": warnings,
     })
 }

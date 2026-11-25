@@ -4,7 +4,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
-use crate::catalog::{Activity, HOST_COLUMN, INTERVAL_COLUMN, TIMESTAMP_COLUMN};
+use crate::catalog::TIMESTAMP_COLUMN;
 use crate::dataset::Dataset;
 use crate::error::{Error, Result};
 use crate::table::{Table, SEPARATOR};
@@ -43,20 +43,21 @@ fn sort_dimension_values(values: &mut [String]) {
     }
 }
 
-/// Pivoted CSV files for `table`: `(file name, content)` per metric.
-pub fn pivot(activity: &Activity, table: &Table) -> Vec<(String, String)> {
-    let Some(dim) = &activity.dimension else {
+/// Pivoted CSV files for `table`: `(file name, content)` per metric. Rows are
+/// timestamps, columns are the entities of the Dimension, and a missing or
+/// non-finite value is `0.0`, as the legacy tool wrote it. A metric without a
+/// single number gets no file.
+pub fn pivot(table: &Table) -> Vec<(String, String)> {
+    let layout = table.layout();
+    if layout.dimension.is_none() {
         return Vec::new();
-    };
-    let (Some(ts_idx), Some(dim_idx)) = (table.column(TIMESTAMP_COLUMN), table.column(dim.column))
-    else {
-        return Vec::new();
-    };
+    }
+    let entity = |r| table.dimension(r).unwrap_or_default();
 
     let mut dims: Vec<String> = table
-        .rows
+        .records
         .iter()
-        .map(|r| r[dim_idx].clone())
+        .map(|r| entity(r).to_string())
         .collect::<BTreeSet<_>>()
         .into_iter()
         .collect();
@@ -66,48 +67,38 @@ pub fn pivot(activity: &Activity, table: &Table) -> Vec<(String, String)> {
         .enumerate()
         .map(|(i, d)| (d.as_str(), i))
         .collect();
+    let stamps: BTreeSet<i64> = table.records.iter().map(|r| r.ts).collect();
 
-    let mut stamps: BTreeMap<i64, String> = BTreeMap::new();
-    for r in &table.rows {
-        if let Some(t) = timeutil::parse_sadf(&r[ts_idx]) {
-            stamps.entry(t).or_insert_with(|| r[ts_idx].clone());
-        }
-    }
-
+    let sep = SEPARATOR.to_string();
     let mut files = Vec::new();
-    for (c, name) in table.header.iter().enumerate() {
-        if c == ts_idx || c == dim_idx || name == HOST_COLUMN || name == INTERVAL_COLUMN {
-            continue;
-        }
+    for &c in &layout.metrics {
         let mut grid: BTreeMap<i64, Vec<f64>> =
-            stamps.keys().map(|t| (*t, vec![0.0; dims.len()])).collect();
-        let mut numeric = true;
-        for r in &table.rows {
-            let Some(t) = timeutil::parse_sadf(&r[ts_idx]) else {
-                continue;
-            };
-            match r[c].trim().parse::<f64>() {
-                Ok(v) => grid.get_mut(&t).unwrap()[dim_pos[r[dim_idx].as_str()]] = v,
-                Err(_) => {
-                    numeric = false;
-                    break;
-                }
+            stamps.iter().map(|t| (*t, vec![0.0; dims.len()])).collect();
+        let mut any = false;
+        for r in &table.records {
+            if let Some(v) = r.number(c) {
+                any = true;
+                grid.get_mut(&r.ts).unwrap()[dim_pos[entity(r)]] = v;
             }
         }
-        if !numeric {
+        if !any {
             continue;
         }
-        let sep = SEPARATOR.to_string();
         let mut out = format!("{TIMESTAMP_COLUMN}{sep}{}\n", dims.join(&sep));
         for (t, vals) in &grid {
-            out.push_str(&stamps[t]);
+            out.push_str(&timeutil::format_sadf(*t));
             for v in vals {
                 out.push(SEPARATOR);
                 out.push_str(&format_value(*v));
             }
             out.push('\n');
         }
-        files.push((format!("{}_{}.csv", activity.label, file_suffix(name)), out));
+        let name = format!(
+            "{}_{}.csv",
+            table.activity.label,
+            file_suffix(table.column_name(c))
+        );
+        files.push((name, out));
     }
     files
 }
@@ -121,11 +112,11 @@ pub fn export(ds: &Dataset, dir: &Path) -> Result<usize> {
         std::fs::write(dir.join(name), content)
             .map_err(|e| Error::other(format!("writing {name}: {e}")))
     };
-    for (activity, table) in &ds.tables {
-        write(&format!("{}.csv", activity.label), &table.to_csv())?;
+    for table in &ds.tables {
+        write(&format!("{}.csv", table.activity.label), &table.to_csv())?;
         count += 1;
-        if activity.csv_pivot {
-            for (name, content) in pivot(activity, table) {
+        if table.activity.csv_pivot {
+            for (name, content) in pivot(table) {
                 write(&name, &content)?;
                 count += 1;
             }
@@ -139,30 +130,65 @@ mod tests {
     use super::*;
     use crate::catalog::activity;
 
-    fn table() -> Table {
-        Table::parse(
+    fn table(label: &str, text: &str) -> Table {
+        Table::parse(text, activity(label).unwrap()).unwrap().0
+    }
+
+    fn cpu() -> Table {
+        table(
+            "per_cpu",
             "# hostname;interval;timestamp;CPU;%user;%idle\n\
              h;1;2026-11-25 10:00:00 UTC;-1;10.00;90.00\n\
              h;1;2026-11-25 10:00:00 UTC;10;5.00;95.00\n\
              h;1;2026-11-25 10:00:00 UTC;2;20.00;80.00\n\
              h;1;2026-11-25 10:00:01 UTC;2;21.50;78.50\n",
         )
-        .unwrap()
-        .0
+    }
+
+    fn file<'a>(files: &'a [(String, String)], name: &str) -> &'a str {
+        &files.iter().find(|(n, _)| n == name).unwrap().1
     }
 
     #[test]
     fn pivot_orders_numeric_dimensions_and_zero_fills() {
-        let files = pivot(activity("per_cpu").unwrap(), &table());
-        let user = &files
-            .iter()
-            .find(|(n, _)| n == "per_cpu__user.csv")
-            .unwrap()
-            .1;
-        let lines: Vec<&str> = user.lines().collect();
+        let files = pivot(&cpu());
+        let lines: Vec<&str> = file(&files, "per_cpu__user.csv").lines().collect();
         assert_eq!(lines[0], "timestamp;-1;2;10");
         assert_eq!(lines[1], "2026-11-25 10:00:00 UTC;10.0;20.0;5.0");
         assert_eq!(lines[2], "2026-11-25 10:00:01 UTC;0.0;21.5;0.0");
+    }
+
+    #[test]
+    fn non_finite_values_are_zero_like_in_the_legacy_files() {
+        let t = table(
+            "disk",
+            "# hostname;interval;timestamp;DEV;tps;await\n\
+             h;1;2026-11-25 10:00:00 UTC;sda;1.00;-nan\n\
+             h;1;2026-11-25 10:00:00 UTC;sdb;2.00;4.00\n\
+             h;1;2026-11-25 10:00:01 UTC;sda;3.00;inf\n\
+             h;1;2026-11-25 10:00:01 UTC;sdb;4.00;6.00\n",
+        );
+        let files = pivot(&t);
+        assert_eq!(
+            file(&files, "disk_await.csv"),
+            "timestamp;sda;sdb\n2026-11-25 10:00:00 UTC;0.0;4.0\n2026-11-25 10:00:01 UTC;0.0;6.0\n"
+        );
+        // The plain export is still sadf's text, -nan included.
+        assert!(t.to_csv().contains("sda;1.00;-nan"));
+    }
+
+    #[test]
+    fn a_metric_without_any_number_gets_no_file_but_a_partly_numeric_one_does() {
+        let t = table(
+            "per_cpu",
+            "# hostname;interval;timestamp;CPU;%user;%idle;%steal\n\
+             h;1;2026-11-25 10:00:00 UTC;0;1.0;text;7.0\n\
+             h;1;2026-11-25 10:00:00 UTC;1;2.0;more;oops\n",
+        );
+        let files = pivot(&t);
+        let names: Vec<&str> = files.iter().map(|(n, _)| n.as_str()).collect();
+        assert_eq!(names, ["per_cpu__user.csv", "per_cpu__steal.csv"]);
+        assert!(file(&files, "per_cpu__steal.csv").contains("2026-11-25 10:00:00 UTC;7.0;0.0"));
     }
 
     #[test]
@@ -175,6 +201,10 @@ mod tests {
 
     #[test]
     fn activities_without_dimension_do_not_pivot() {
-        assert!(pivot(activity("queue").unwrap(), &table()).is_empty());
+        let queue = table(
+            "queue",
+            "# hostname;interval;timestamp;runq-sz\nh;1;2026-11-25 10:00:00 UTC;1\n",
+        );
+        assert!(pivot(&queue).is_empty());
     }
 }

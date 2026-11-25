@@ -24,8 +24,12 @@ _Avoid_: value column, statistic, field, counter
 All Samples of one Metric for one combination of label values (for example `rxkB_s` of interface `eth0`).
 _Avoid_: timeseries, curve, line
 
+**Record**:
+One line of `sadf -d` output for one Activity: a timestamp, the host, optionally the entity of the Dimension, and one value for each Metric. sysstat's man pages use the same word.
+_Avoid_: row (a Row is a band of Panels), line, entry
+
 **Sample**:
-A single timestamped value of a Series.
+A single timestamped value of one Metric for one Series, taken from a Record.
 _Avoid_: point, row, datapoint, record
 
 **Metric catalog**:

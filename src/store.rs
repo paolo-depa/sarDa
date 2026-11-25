@@ -2,9 +2,7 @@
 
 use std::collections::{BTreeMap, HashMap};
 
-use crate::catalog::{metric_name, HOST_COLUMN, INTERVAL_COLUMN, TIMESTAMP_COLUMN};
 use crate::dataset::Dataset;
-use crate::timeutil;
 
 pub type Labels = BTreeMap<String, String>;
 
@@ -32,50 +30,26 @@ impl Store {
         let mut intervals: Vec<i64> = Vec::new();
         let (mut min_ts, mut max_ts) = (i64::MAX, i64::MIN);
 
-        for (activity, table) in &ds.tables {
-            let Some(ts_idx) = table.column(TIMESTAMP_COLUMN) else {
-                continue;
-            };
-            let host_idx = table.column(HOST_COLUMN);
-            let int_idx = table.column(INTERVAL_COLUMN);
-            let dim_idx = activity
-                .dimension
-                .as_ref()
-                .and_then(|d| table.column(d.column));
-            let value_cols: Vec<usize> = table
-                .header
-                .iter()
-                .enumerate()
-                .filter(|(_, h)| !activity.is_meta_column(h))
-                .map(|(i, _)| i)
-                .collect();
-
+        for table in &ds.tables {
+            let (activity, layout) = (table.activity, table.layout());
             let mut acc: HashMap<(usize, String, String), Vec<(i64, f64)>> = HashMap::new();
-            for row in &table.rows {
-                let Some(ts) = timeutil::parse_sadf(&row[ts_idx]) else {
-                    continue;
-                };
-                let ts_ms = ts * 1000;
+            for rec in &table.records {
+                let ts_ms = rec.ts * 1000;
                 min_ts = min_ts.min(ts_ms);
                 max_ts = max_ts.max(ts_ms);
-                if let Some(i) = int_idx {
-                    if let Ok(v) = row[i].trim().parse::<f64>() {
-                        if v > 0.0 {
-                            intervals.push((v * 1000.0) as i64);
-                        }
-                    }
+                if let Some(secs) = table.interval(rec) {
+                    intervals.push((secs * 1000.0) as i64);
                 }
-                let host = host_idx.map_or(String::new(), |i| row[i].clone());
-                let dim = dim_idx.map_or(String::new(), |i| {
-                    dimension_value(activity.dimension.as_ref().unwrap().column, &row[i])
-                });
-                for &c in &value_cols {
-                    if let Ok(v) = row[c].trim().parse::<f64>() {
-                        if v.is_finite() {
-                            acc.entry((c, host.clone(), dim.clone()))
-                                .or_default()
-                                .push((ts_ms, v));
-                        }
+                let host = table.host(rec).to_string();
+                let dim = match (&activity.dimension, table.dimension(rec)) {
+                    (Some(d), Some(raw)) => d.label_value(raw),
+                    _ => String::new(),
+                };
+                for &c in &layout.metrics {
+                    if let Some(v) = rec.number(c) {
+                        acc.entry((c, host.clone(), dim.clone()))
+                            .or_default()
+                            .push((ts_ms, v));
                     }
                 }
             }
@@ -95,16 +69,14 @@ impl Store {
                 });
                 let (c, host, dim) = key;
                 let mut labels = Labels::new();
-                if host_idx.is_some() {
+                if layout.host.is_some() {
                     labels.insert("host".into(), host);
                 }
-                if let Some(d) = &activity.dimension {
-                    if dim_idx.is_some() {
-                        labels.insert(d.label.into(), dim);
-                    }
+                if let (Some(d), Some(_)) = (&activity.dimension, layout.dimension) {
+                    labels.insert(d.label.into(), dim);
                 }
                 series.push(Series {
-                    name: metric_name(activity.label, &table.header[c]),
+                    name: table.metric_name(c),
                     labels,
                     samples,
                 });
@@ -174,10 +146,71 @@ impl Store {
     }
 }
 
-fn dimension_value(column: &str, raw: &str) -> String {
-    if column == "CPU" && raw.trim() == "-1" {
-        "all".to_string()
-    } else {
-        raw.trim().to_string()
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::catalog::activity;
+    use crate::table::Table;
+
+    fn store(label: &str, text: &str) -> Store {
+        let table = Table::parse(text, activity(label).unwrap()).unwrap().0;
+        Store::from_dataset(&Dataset {
+            tables: vec![table],
+            warnings: vec![],
+        })
+    }
+
+    fn samples(store: &Store, metric: &str, label: (&str, &str)) -> Vec<(i64, f64)> {
+        store
+            .by_name(metric)
+            .find(|s| s.labels.get(label.0).map(String::as_str) == Some(label.1))
+            .unwrap_or_else(|| panic!("no series {metric} {label:?}"))
+            .samples
+            .clone()
+    }
+
+    #[test]
+    fn non_finite_values_leave_a_gap_in_the_series() {
+        let s = store(
+            "disk",
+            "# hostname;interval;timestamp;DEV;await\n\
+             h;1;2026-11-25 10:00:00 UTC;sda;-nan\n\
+             h;1;2026-11-25 10:00:01 UTC;sda;5.0\n\
+             h;1;2026-11-25 10:00:02 UTC;sda;inf\n",
+        );
+        let got = samples(&s, "sarda_disk_await", ("dev", "sda"));
+        assert_eq!(got.len(), 1);
+        assert_eq!(got[0].1, 5.0);
+    }
+
+    #[test]
+    fn labels_carry_host_and_entity_and_all_cpus_are_all() {
+        let s = store(
+            "per_cpu",
+            "# hostname;interval;timestamp;CPU;%user\n\
+             h;60;2026-11-25 10:00:00 UTC;-1;1.0\n\
+             h;60;2026-11-25 10:00:00 UTC; 3 ;2.0\n",
+        );
+        let all = samples(&s, "sarda_per_cpu_pct_user", ("cpu", "all"));
+        assert_eq!(all[0].1, 1.0);
+        let third = s
+            .by_name("sarda_per_cpu_pct_user")
+            .find(|x| x.labels["cpu"] == "3")
+            .unwrap();
+        assert_eq!(third.labels["host"], "h");
+        assert_eq!(s.interval_ms, 60_000);
+    }
+
+    #[test]
+    fn the_last_record_wins_for_a_repeated_timestamp() {
+        let s = store(
+            "io",
+            "# hostname;interval;timestamp;tps\n\
+             h;1;2026-11-25 10:00:00 UTC;1\n\
+             h;1;2026-11-25 10:00:00 UTC;9\n",
+        );
+        let series = s.by_name("sarda_io_tps").next().unwrap();
+        assert_eq!(series.samples.len(), 1);
+        assert_eq!(series.samples[0].1, 9.0);
     }
 }
