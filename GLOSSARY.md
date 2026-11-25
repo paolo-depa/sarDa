@@ -5,11 +5,11 @@ sarDa turns binary `sa` files produced by sysstat into an interactive Grafana da
 ## Language
 
 **SA file**:
-A binary system-activity file written by `sa1`/`sadc` (typically `saYYYYMMDD`), covering one day of one host.
-_Avoid_: sar data, sar file, sa1 file, binary
+A binary file covering one day of one host's activity, written by `sadc` (usually through `sa1`); sysstat's man pages call it the *standard system activity daily data file* and name it `saDD` or `saYYYYMMDD`.
+_Avoid_: sar data, sar file, sa1 file, binary, data file
 
 **Activity**:
-One kind of statistic that `sadf` can extract from an SA file, selected by a sar option such as `-n DEV` or `-r ALL` (for example network devices, memory, disks).
+One group of statistics that sar can collect and report, selected with one of sar's activity flags such as `-n DEV` or `-r ALL` (for example network devices, memory, disks).
 _Avoid_: aggregator, metric label, sar_param
 
 **Dimension**:
@@ -18,7 +18,7 @@ _Avoid_: pivot column, key
 
 **Metric**:
 One numeric column of an Activity, exposed under a stable name such as `sarda_network_dev_rxkB_s`.
-_Avoid_: value column, counter
+_Avoid_: value column, statistic, field, counter
 
 **Series**:
 All Samples of one Metric for one combination of label values (for example `rxkB_s` of interface `eth0`).
@@ -26,7 +26,7 @@ _Avoid_: timeseries, curve, line
 
 **Sample**:
 A single timestamped value of a Series.
-_Avoid_: point, row, datapoint
+_Avoid_: point, row, datapoint, record
 
 **Metric catalog**:
 The single source of truth listing every Activity, its Dimension, its Metrics, units and dashboard grouping. It drives parsing, the Sarda API, the generated dashboard and the panel reference.
