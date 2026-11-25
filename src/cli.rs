@@ -16,7 +16,7 @@ EXIT CODES:
   3  no working container runtime (podman or docker)
   4  a required container image is missing
   5  no usable data in the SA files (or in the --start/--end window)
-  6  the Grafana grafana failed to start
+  6  Grafana failed to start or cannot reach the data
   7  a network port is unavailable
   8  an SA file cannot be read by the image's sysstat (newer sysstat, or not a system activity file)
 
