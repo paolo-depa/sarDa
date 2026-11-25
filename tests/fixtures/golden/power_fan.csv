@@ -1,0 +1,15 @@
+# hostname;interval;timestamp;FAN;DEVICE;rpm;drpm
+suse-laptop;1;2026-11-25 11:51:56 UTC;1;thinkpad-isa-0000;2599.00;2599.00
+suse-laptop;1;2026-11-25 11:51:56 UTC;2;thinkpad-isa-0000;2327.00;2327.00
+suse-laptop;1;2026-11-25 11:51:57 UTC;1;thinkpad-isa-0000;2508.00;2508.00
+suse-laptop;1;2026-11-25 11:51:57 UTC;2;thinkpad-isa-0000;2232.00;2232.00
+suse-laptop;1;2026-11-25 11:51:58 UTC;1;thinkpad-isa-0000;2411.00;2411.00
+suse-laptop;1;2026-11-25 11:51:58 UTC;2;thinkpad-isa-0000;2136.00;2136.00
+suse-laptop;1;2026-11-25 11:51:59 UTC;1;thinkpad-isa-0000;2351.00;2351.00
+suse-laptop;1;2026-11-25 11:51:59 UTC;2;thinkpad-isa-0000;2049.00;2049.00
+suse-laptop;1;2026-11-25 11:52:02 UTC;1;thinkpad-isa-0000;2360.00;2360.00
+suse-laptop;1;2026-11-25 11:52:02 UTC;2;thinkpad-isa-0000;1873.00;1873.00
+suse-laptop;1;2026-11-25 11:52:03 UTC;1;thinkpad-isa-0000;2361.00;2361.00
+suse-laptop;1;2026-11-25 11:52:03 UTC;2;thinkpad-isa-0000;1873.00;1873.00
+suse-laptop;1;2026-11-25 11:52:04 UTC;1;thinkpad-isa-0000;2360.00;2360.00
+suse-laptop;1;2026-11-25 11:52:04 UTC;2;thinkpad-isa-0000;1872.00;1872.00

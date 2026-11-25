@@ -1,0 +1,14 @@
+# Parser image for sarDa: provides `sadf` (sysstat) and a POSIX shell.
+#
+# Build once on a machine with network access, then move it to the air-gapped
+# host with `podman save` / `podman load`:
+#
+#   sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .
+#   podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest
+#   podman load -i sarda-sysstat.tar
+#
+# Pick a base whose sysstat is at least as new as the one that wrote your SA
+# files: sadf cannot read files produced by a newer sysstat.
+FROM registry.opensuse.org/opensuse/tumbleweed:latest
+RUN zypper --non-interactive install --no-recommends sysstat \
+    && zypper clean --all
