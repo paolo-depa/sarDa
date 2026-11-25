@@ -8,7 +8,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;14.00;0.00;14.00;0.00;0.00;296.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;1.00;0.00;1.00;0.00;0.00;8.00;0.00
-@@RC 0
 @@END
 @@BEGIN paging
 # hostname;interval;timestamp;pgpgin/s;pgpgout/s;fault/s;majflt/s;pgfree/s;pgscank/s;pgscand/s;pgsteal/s;pgprom/s;pgdem/s
@@ -16,7 +15,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;148.00;1178.00;0.00;3570.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;521.00;0.00;2833.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;4.00;3406.00;0.00;10560.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN power_cpu
 # hostname;interval;timestamp;CPU;MHz
@@ -24,7 +22,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;-1;3987.34
 8151ca926baa;1;2026-11-25 15:03:53 UTC;-1;4386.15
 8151ca926baa;1;2026-11-25 15:03:54 UTC;-1;2953.72
-@@RC 0
 @@END
 @@BEGIN power_fan
 # hostname;interval;timestamp;FAN;DEVICE;rpm;drpm
@@ -36,10 +33,8 @@
 8151ca926baa;1;2026-11-25 15:03:53 UTC;2;thinkpad-isa-0000;2065.00;2065.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;1;thinkpad-isa-0000;2554.00;2554.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;2;thinkpad-isa-0000;2066.00;2066.00
-@@RC 0
 @@END
 @@BEGIN power_freq
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261125
 @@END
 @@BEGIN power_in
@@ -56,7 +51,6 @@
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0;ucsi_source_psy_USB;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;1;BAT0-acpi-0;12.15;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;2;ucsi_source_psy_USB;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN power_temp
 # hostname;interval;timestamp;TEMP;DEVICE;degC;%temp
@@ -152,7 +146,6 @@
 8151ca926baa;1;2026-11-25 15:03:54 UTC;21;nvme-pci-5500;40.85;48.24
 8151ca926baa;1;2026-11-25 15:03:54 UTC;22;nvme-pci-5500;40.85;0.48
 8151ca926baa;1;2026-11-25 15:03:54 UTC;23;nvme-pci-5500;52.85;0.50
-@@RC 0
 @@END
 @@BEGIN power_USB
 # hostname;interval;timestamp;manufact;product;BUS;idvendor;idprod;maxpower
@@ -172,7 +165,6 @@
 8151ca926baa;1;2026-11-25 15:03:54 UTC;1;8087;26;200;;
 8151ca926baa;1;2026-11-25 15:03:54 UTC;1;145f;340;200;;Trust Gaming Mouse
 8151ca926baa;1;2026-11-25 15:03:54 UTC;1;13d3;56fb;1000;Azurewave;Integrated Camera
-@@RC 0
 @@END
 @@BEGIN disk
 # hostname;interval;timestamp;DEV;tps;rkB/s;wkB/s;dkB/s;areq-sz;aqu-sz;await;%util
@@ -312,7 +304,6 @@
 8151ca926baa;1;2026-11-25 15:03:54 UTC;loop24;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;loop25;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;loop26;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN filesystem
 # hostname;interval;timestamp;FILESYSTEM;MBfsfree;MBfsused;%fsused;%ufsused;Ifree;Iused;%Iused
@@ -320,7 +311,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;/dev/nvme0n1p5;139253;239176;63.20;65.00;0;0;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;/dev/nvme0n1p5;139253;239176;63.20;65.00;0;0;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;/dev/nvme0n1p5;139253;239176;63.20;65.00;0;0;0.00
-@@RC 0
 @@END
 @@BEGIN hugepages
 # hostname;interval;timestamp;kbhugfree;kbhugused;%hugused;kbhugrsvd;kbhugsurp
@@ -328,10 +318,8 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0;0;0.00;0;0
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0;0;0.00;0;0
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0;0;0.00;0;0
-@@RC 0
 @@END
 @@BEGIN interrupts
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261125
 @@END
 @@BEGIN network_dev
@@ -344,7 +332,6 @@
 8151ca926baa;1;2026-11-25 15:03:53 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;lo;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_edev
 # hostname;interval;timestamp;IFACE;rxerr/s;txerr/s;coll/s;rxdrop/s;txdrop/s;txcarr/s;rxfram/s;rxfifo/s;txfifo/s
@@ -356,10 +343,8 @@
 8151ca926baa;1;2026-11-25 15:03:53 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;lo;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_fc
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261125
 @@END
 @@BEGIN network_icmp
@@ -368,7 +353,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eicmp
 # hostname;interval;timestamp;ierr/s;oerr/s;idstunr/s;odstunr/s;itmex/s;otmex/s;iparmpb/s;oparmpb/s;isrcq/s;osrcq/s;iredir/s;oredir/s
@@ -376,7 +360,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_icmp6
 # hostname;interval;timestamp;imsg6/s;omsg6/s;iech6/s;iechr6/s;oechr6/s;igmbq6/s;igmbr6/s;ogmbr6/s;igmbrd6/s;ogmbrd6/s;irtsol6/s;ortsol6/s;irtad6/s;inbsol6/s;onbsol6/s;inbad6/s;onbad6/s
@@ -384,7 +367,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eicmp6
 # hostname;interval;timestamp;ierr6/s;idtunr6/s;odtunr6/s;itmex6/s;otmex6/s;iprmpb6/s;oprmpb6/s;iredir6/s;oredir6/s;ipck2b6/s;opck2b6/s
@@ -392,7 +374,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_ip
 # hostname;interval;timestamp;irec/s;fwddgm/s;idel/s;orq/s;asmrq/s;asmok/s;fragok/s;fragcrt/s
@@ -400,7 +381,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eip
 # hostname;interval;timestamp;ihdrerr/s;iadrerr/s;iukwnpr/s;idisc/s;odisc/s;onort/s;asmf/s;fragf/s
@@ -408,7 +388,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_ip6
 # hostname;interval;timestamp;irec6/s;fwddgm6/s;idel6/s;orq6/s;asmrq6/s;asmok6/s;imcpck6/s;omcpck6/s;fragok6/s;fragcr6/s
@@ -416,7 +395,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eip6
 # hostname;interval;timestamp;ihdrer6/s;iadrer6/s;iukwnp6/s;i2big6/s;idisc6/s;odisc6/s;inort6/s;onort6/s;asmf6/s;fragf6/s;itrpck6/s
@@ -424,7 +402,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_nfs
 # hostname;interval;timestamp;call/s;retrans/s;read/s;write/s;access/s;getatt/s
@@ -432,7 +409,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_nfsd
 # hostname;interval;timestamp;scall/s;badcall/s;packet/s;udp/s;tcp/s;hit/s;miss/s;sread/s;swrite/s;saccess/s;sgetatt/s
@@ -440,7 +416,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_sock
 # hostname;interval;timestamp;totsck;tcpsck;udpsck;rawsck;ip-frag;tcp-tw
@@ -448,7 +423,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;66;0;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:53 UTC;66;0;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:54 UTC;66;0;0;0;0;0
-@@RC 0
 @@END
 @@BEGIN network_sock6
 # hostname;interval;timestamp;tcp6sck;udp6sck;raw6sck;ip6-frag
@@ -456,7 +430,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0;0;0;0
-@@RC 0
 @@END
 @@BEGIN network_soft
 # hostname;interval;timestamp;CPU;total/s;dropd/s;squeezd/s;rx_rps/s;flw_lim/s;blg_len
@@ -464,7 +437,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;-1;95.00;0.00;0.00;0.00;0.00;0
 8151ca926baa;1;2026-11-25 15:03:53 UTC;-1;293.00;0.00;0.00;0.00;0.00;0
 8151ca926baa;1;2026-11-25 15:03:54 UTC;-1;85.00;0.00;0.00;0.00;0.00;0
-@@RC 0
 @@END
 @@BEGIN network_tcp
 # hostname;interval;timestamp;active/s;passive/s;iseg/s;oseg/s
@@ -472,7 +444,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_etcp
 # hostname;interval;timestamp;atmptf/s;estres/s;retrseg/s;isegerr/s;orsts/s
@@ -480,7 +451,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_udp
 # hostname;interval;timestamp;idgm/s;odgm/s;noport/s;idgmerr/s
@@ -488,7 +458,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_udp6
 # hostname;interval;timestamp;idgm6/s;odgm6/s;noport6/s;idgmer6/s
@@ -496,7 +465,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN per_cpu
 # hostname;interval;timestamp;CPU;%user;%nice;%system;%iowait;%steal;%idle
@@ -568,7 +536,6 @@
 8151ca926baa;1;2026-11-25 15:03:54 UTC;13;3.00;0.00;1.00;0.00;0.00;96.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;14;4.90;0.00;0.98;0.00;0.00;94.12
 8151ca926baa;1;2026-11-25 15:03:54 UTC;15;3.92;0.00;0.98;0.00;0.00;95.10
-@@RC 0
 @@END
 @@BEGIN queue
 # hostname;interval;timestamp;runq-sz;plist-sz;ldavg-1;ldavg-5;ldavg-15;blocked
@@ -576,7 +543,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;1;2447;0.91;0.72;0.72;0
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0;2447;0.91;0.72;0.72;0
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0;2447;0.91;0.72;0.72;0
-@@RC 0
 @@END
 @@BEGIN memory
 # hostname;interval;timestamp;kbmemfree;kbavail;kbmemused;%memused;kbbuffers;kbcached;kbcommit;%commit;kbactive;kbinact;kbdirty;kbshmem;kbanonpg;kbslab;kbkstack;kbpgtbl;kbvmused
@@ -584,7 +550,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;1710204;21855132;10618748;32.70;26168;21255388;50991532;147.50;10185856;16555624;156432;2166756;6689188;2100372;39376;124324;127788
 8151ca926baa;1;2026-11-25 15:03:53 UTC;1717900;21862844;10611036;32.68;26168;21249048;50985224;147.48;10185856;16548376;156456;2160404;6688860;2100372;39408;124300;127788
 8151ca926baa;1;2026-11-25 15:03:54 UTC;1729236;21874220;10599660;32.64;26168;21238812;50974984;147.45;10185864;16536060;156464;2150160;6676596;2100356;39408;124300;127788
-@@RC 0
 @@END
 @@BEGIN swap_util
 # hostname;interval;timestamp;kbswpfree;kbswpused;%swpused;kbswpcad;%swpcad
@@ -592,7 +557,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;2097148;0;0.00;0;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;2097148;0;0.00;0;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;2097148;0;0.00;0;0.00
-@@RC 0
 @@END
 @@BEGIN inode
 # hostname;interval;timestamp;dentunusd;file-nr;inode-nr;pty-nr
@@ -600,7 +564,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;2053557;18771;1209234;3
 8151ca926baa;1;2026-11-25 15:03:53 UTC;2053557;18770;1209233;3
 8151ca926baa;1;2026-11-25 15:03:54 UTC;2053557;18767;1209230;3
-@@RC 0
 @@END
 @@BEGIN swap
 # hostname;interval;timestamp;pswpin/s;pswpout/s
@@ -608,7 +571,6 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN task
 # hostname;interval;timestamp;proc/s;cswch/s
@@ -616,10 +578,8 @@
 8151ca926baa;1;2026-11-25 15:03:52 UTC;2.00;158595.00
 8151ca926baa;1;2026-11-25 15:03:53 UTC;2.00;29202.00
 8151ca926baa;1;2026-11-25 15:03:54 UTC;2.00;21209.00
-@@RC 0
 @@END
 @@BEGIN tty
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261125
 @@END
 @@FILE 1
@@ -630,21 +590,18 @@
 8151ca926baa;1;2026-11-25 15:03:57 UTC;26.00;0.00;26.00;0.00;0.00;2216.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;1.00;0.00;1.00;0.00;0.00;88.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN paging
 # hostname;interval;timestamp;pgpgin/s;pgpgout/s;fault/s;majflt/s;pgfree/s;pgscank/s;pgscand/s;pgsteal/s;pgprom/s;pgdem/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;1108.00;2222.00;0.00;2984.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;44.00;2959.00;0.00;2708.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;3197.00;0.00;8931.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN power_cpu
 # hostname;interval;timestamp;CPU;MHz
 8151ca926baa;1;2026-11-25 15:03:57 UTC;-1;4255.13
 8151ca926baa;1;2026-11-25 15:03:58 UTC;-1;4246.32
 8151ca926baa;1;2026-11-25 15:03:59 UTC;-1;4453.49
-@@RC 0
 @@END
 @@BEGIN power_fan
 # hostname;interval;timestamp;FAN;DEVICE;rpm;drpm
@@ -654,10 +611,8 @@
 8151ca926baa;1;2026-11-25 15:03:58 UTC;2;thinkpad-isa-0000;2064.00;2064.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;1;thinkpad-isa-0000;2551.00;2551.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;2;thinkpad-isa-0000;2063.00;2063.00
-@@RC 0
 @@END
 @@BEGIN power_freq
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261126
 @@END
 @@BEGIN power_in
@@ -671,7 +626,6 @@
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0;ucsi_source_psy_USB;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;1;BAT0-acpi-0;12.15;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;2;ucsi_source_psy_USB;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN power_temp
 # hostname;interval;timestamp;TEMP;DEVICE;degC;%temp
@@ -744,7 +698,6 @@
 8151ca926baa;1;2026-11-25 15:03:59 UTC;21;nvme-pci-5500;40.85;48.24
 8151ca926baa;1;2026-11-25 15:03:59 UTC;22;nvme-pci-5500;40.85;0.48
 8151ca926baa;1;2026-11-25 15:03:59 UTC;23;nvme-pci-5500;50.85;0.49
-@@RC 0
 @@END
 @@BEGIN power_USB
 # hostname;interval;timestamp;manufact;product;BUS;idvendor;idprod;maxpower
@@ -760,7 +713,6 @@
 8151ca926baa;1;2026-11-25 15:03:59 UTC;1;8087;26;200;;
 8151ca926baa;1;2026-11-25 15:03:59 UTC;1;145f;340;200;;Trust Gaming Mouse
 8151ca926baa;1;2026-11-25 15:03:59 UTC;1;13d3;56fb;1000;Azurewave;Integrated Camera
-@@RC 0
 @@END
 @@BEGIN disk
 # hostname;interval;timestamp;DEV;tps;rkB/s;wkB/s;dkB/s;areq-sz;aqu-sz;await;%util
@@ -866,24 +818,20 @@
 8151ca926baa;1;2026-11-25 15:03:59 UTC;loop24;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;loop25;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;loop26;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN filesystem
 # hostname;interval;timestamp;FILESYSTEM;MBfsfree;MBfsused;%fsused;%ufsused;Ifree;Iused;%Iused
 8151ca926baa;1;2026-11-25 15:03:57 UTC;/dev/nvme0n1p5;139253;239176;63.20;65.00;0;0;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;/dev/nvme0n1p5;139253;239176;63.20;65.00;0;0;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;/dev/nvme0n1p5;139253;239176;63.20;65.00;0;0;0.00
-@@RC 0
 @@END
 @@BEGIN hugepages
 # hostname;interval;timestamp;kbhugfree;kbhugused;%hugused;kbhugrsvd;kbhugsurp
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0;0;0.00;0;0
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0;0;0.00;0;0
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0;0;0.00;0;0
-@@RC 0
 @@END
 @@BEGIN interrupts
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261126
 @@END
 @@BEGIN network_dev
@@ -894,7 +842,6 @@
 8151ca926baa;1;2026-11-25 15:03:58 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;lo;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_edev
 # hostname;interval;timestamp;IFACE;rxerr/s;txerr/s;coll/s;rxdrop/s;txdrop/s;txcarr/s;rxfram/s;rxfifo/s;txfifo/s
@@ -904,10 +851,8 @@
 8151ca926baa;1;2026-11-25 15:03:58 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;lo;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;wlp0s20f3;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_fc
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261126
 @@END
 @@BEGIN network_icmp
@@ -915,119 +860,102 @@
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eicmp
 # hostname;interval;timestamp;ierr/s;oerr/s;idstunr/s;odstunr/s;itmex/s;otmex/s;iparmpb/s;oparmpb/s;isrcq/s;osrcq/s;iredir/s;oredir/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_icmp6
 # hostname;interval;timestamp;imsg6/s;omsg6/s;iech6/s;iechr6/s;oechr6/s;igmbq6/s;igmbr6/s;ogmbr6/s;igmbrd6/s;ogmbrd6/s;irtsol6/s;ortsol6/s;irtad6/s;inbsol6/s;onbsol6/s;inbad6/s;onbad6/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eicmp6
 # hostname;interval;timestamp;ierr6/s;idtunr6/s;odtunr6/s;itmex6/s;otmex6/s;iprmpb6/s;oprmpb6/s;iredir6/s;oredir6/s;ipck2b6/s;opck2b6/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_ip
 # hostname;interval;timestamp;irec/s;fwddgm/s;idel/s;orq/s;asmrq/s;asmok/s;fragok/s;fragcrt/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eip
 # hostname;interval;timestamp;ihdrerr/s;iadrerr/s;iukwnpr/s;idisc/s;odisc/s;onort/s;asmf/s;fragf/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_ip6
 # hostname;interval;timestamp;irec6/s;fwddgm6/s;idel6/s;orq6/s;asmrq6/s;asmok6/s;imcpck6/s;omcpck6/s;fragok6/s;fragcr6/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_eip6
 # hostname;interval;timestamp;ihdrer6/s;iadrer6/s;iukwnp6/s;i2big6/s;idisc6/s;odisc6/s;inort6/s;onort6/s;asmf6/s;fragf6/s;itrpck6/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_nfs
 # hostname;interval;timestamp;call/s;retrans/s;read/s;write/s;access/s;getatt/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_nfsd
 # hostname;interval;timestamp;scall/s;badcall/s;packet/s;udp/s;tcp/s;hit/s;miss/s;sread/s;swrite/s;saccess/s;sgetatt/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_sock
 # hostname;interval;timestamp;totsck;tcpsck;udpsck;rawsck;ip-frag;tcp-tw
 8151ca926baa;1;2026-11-25 15:03:57 UTC;66;0;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:58 UTC;66;0;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:59 UTC;66;0;0;0;0;0
-@@RC 0
 @@END
 @@BEGIN network_sock6
 # hostname;interval;timestamp;tcp6sck;udp6sck;raw6sck;ip6-frag
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0;0;0;0
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0;0;0;0
-@@RC 0
 @@END
 @@BEGIN network_soft
 # hostname;interval;timestamp;CPU;total/s;dropd/s;squeezd/s;rx_rps/s;flw_lim/s;blg_len
 8151ca926baa;1;2026-11-25 15:03:57 UTC;-1;258.00;0.00;0.00;0.00;0.00;0
 8151ca926baa;1;2026-11-25 15:03:58 UTC;-1;105.00;0.00;0.00;0.00;0.00;0
 8151ca926baa;1;2026-11-25 15:03:59 UTC;-1;257.00;0.00;0.00;0.00;0.00;0
-@@RC 0
 @@END
 @@BEGIN network_tcp
 # hostname;interval;timestamp;active/s;passive/s;iseg/s;oseg/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_etcp
 # hostname;interval;timestamp;atmptf/s;estres/s;retrseg/s;isegerr/s;orsts/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_udp
 # hostname;interval;timestamp;idgm/s;odgm/s;noport/s;idgmerr/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN network_udp6
 # hostname;interval;timestamp;idgm6/s;odgm6/s;noport6/s;idgmer6/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN per_cpu
 # hostname;interval;timestamp;CPU;%user;%nice;%system;%iowait;%steal;%idle
@@ -1082,51 +1010,43 @@
 8151ca926baa;1;2026-11-25 15:03:59 UTC;13;2.00;0.00;1.00;0.00;0.00;97.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;14;6.86;0.00;0.98;0.00;0.00;92.16
 8151ca926baa;1;2026-11-25 15:03:59 UTC;15;1.98;0.00;0.00;0.00;0.00;98.02
-@@RC 0
 @@END
 @@BEGIN queue
 # hostname;interval;timestamp;runq-sz;plist-sz;ldavg-1;ldavg-5;ldavg-15;blocked
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0;2446;0.83;0.71;0.72;0
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0;2446;0.83;0.71;0.72;0
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0;2447;0.83;0.71;0.72;0
-@@RC 0
 @@END
 @@BEGIN memory
 # hostname;interval;timestamp;kbmemfree;kbavail;kbmemused;%memused;kbbuffers;kbcached;kbcommit;%commit;kbactive;kbinact;kbdirty;kbshmem;kbanonpg;kbslab;kbkstack;kbpgtbl;kbvmused
 8151ca926baa;1;2026-11-25 15:03:57 UTC;1719708;21868376;10605504;32.66;26168;21240568;50974844;147.45;10187960;16552184;160200;2148232;6690988;2100356;39376;124232;127804
 8151ca926baa;1;2026-11-25 15:03:58 UTC;1719176;21867852;10606028;32.66;26168;21238428;50972980;147.44;10187972;16560288;160304;2146084;6698856;2100356;39392;124236;127836
 8151ca926baa;1;2026-11-25 15:03:59 UTC;1733356;21882048;10591832;32.62;26168;21234356;50969668;147.43;10187972;16550512;160316;2142000;6688468;2100356;39392;124236;127820
-@@RC 0
 @@END
 @@BEGIN swap_util
 # hostname;interval;timestamp;kbswpfree;kbswpused;%swpused;kbswpcad;%swpcad
 8151ca926baa;1;2026-11-25 15:03:57 UTC;2097148;0;0.00;0;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;2097148;0;0.00;0;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;2097148;0;0.00;0;0.00
-@@RC 0
 @@END
 @@BEGIN inode
 # hostname;interval;timestamp;dentunusd;file-nr;inode-nr;pty-nr
 8151ca926baa;1;2026-11-25 15:03:57 UTC;2053570;18753;1209230;3
 8151ca926baa;1;2026-11-25 15:03:58 UTC;2053570;18752;1209229;3
 8151ca926baa;1;2026-11-25 15:03:59 UTC;2053572;18753;1209232;3
-@@RC 0
 @@END
 @@BEGIN swap
 # hostname;interval;timestamp;pswpin/s;pswpout/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;0.00;0.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;0.00;0.00
-@@RC 0
 @@END
 @@BEGIN task
 # hostname;interval;timestamp;proc/s;cswch/s
 8151ca926baa;1;2026-11-25 15:03:57 UTC;2.00;11148.00
 8151ca926baa;1;2026-11-25 15:03:58 UTC;2.00;21136.00
 8151ca926baa;1;2026-11-25 15:03:59 UTC;3.00;20662.00
-@@RC 0
 @@END
 @@BEGIN tty
-@@RC 1
 @@ERR Requested activities not available in file /in/sa20261126
 @@END

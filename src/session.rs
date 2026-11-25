@@ -1,4 +1,4 @@
-//! One sarDa run: convert, serve, start the Grafana, wait, clean up.
+//! One sarDa run: convert, serve, start Grafana, wait, clean up.
 
 use std::sync::mpsc::{self, RecvTimeoutError};
 use std::sync::Arc;

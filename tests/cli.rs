@@ -8,17 +8,18 @@ use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::time::Duration;
 
+#[path = "../src/testutil.rs"]
+mod testutil;
+use testutil::Scratch;
+
 const BIN: &str = env!("CARGO_BIN_EXE_sarda");
 
 fn fixtures() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures")
 }
 
-fn scratch(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("sarda-cli-{}-{name}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).unwrap();
-    dir
+fn scratch(name: &str) -> Scratch {
+    Scratch::new(name)
 }
 
 fn fake_runtime(dir: &Path, name: &str, body: &str) {

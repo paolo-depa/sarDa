@@ -32,3 +32,6 @@ pub mod session;
 pub mod store;
 pub mod table;
 pub mod timeutil;
+
+#[cfg(test)]
+mod testutil;

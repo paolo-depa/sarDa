@@ -3,14 +3,17 @@
 //! old-format conversion and the date-based skipping are exercised without a
 //! container.
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::Command;
 
 use sarda::sadf::{build_script, parse_stream};
 
-fn scratch(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("sarda-script-{}-{name}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
+#[path = "../src/testutil.rs"]
+mod testutil;
+use testutil::Scratch;
+
+fn scratch(name: &str) -> Scratch {
+    let dir = Scratch::new(name);
     std::fs::create_dir_all(dir.join("bin")).unwrap();
     dir
 }

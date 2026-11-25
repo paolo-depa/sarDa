@@ -11,6 +11,10 @@ use sarda::sadf::{self, Input, SadfOutput, State};
 use sarda::store::Store;
 use sarda::timeutil;
 
+#[path = "../src/testutil.rs"]
+mod testutil;
+use testutil::Scratch;
+
 fn fixtures() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures")
 }
@@ -21,7 +25,8 @@ fn fixture_output() -> SadfOutput {
         Input::new(fixtures().join("sa/sa20261125")),
         Input::new(fixtures().join("sa/sa20261126")),
     ];
-    sadf::read_stream_file(&fixtures().join("sadf.stream"))
+    let stream = std::fs::File::open(fixtures().join("sadf.stream")).unwrap();
+    sadf::parse_stream(std::io::BufReader::new(stream))
         .unwrap()
         .with_inputs(&inputs)
 }
@@ -30,10 +35,8 @@ fn load(start: Option<i64>, end: Option<i64>) -> Dataset {
     dataset::assemble(&fixture_output(), start, end).unwrap()
 }
 
-fn scratch(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("sarda-test-{}-{name}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    dir
+fn scratch(name: &str) -> Scratch {
+    Scratch::new(name)
 }
 
 fn cells_equal(a: &str, b: &str) -> bool {
@@ -78,7 +81,6 @@ fn csv_export_matches_the_python_golden_files() {
             }
         }
     }
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[test]

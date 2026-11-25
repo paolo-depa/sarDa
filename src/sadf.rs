@@ -4,18 +4,19 @@
 //! script inside prints a marker-delimited stream on stdout:
 //!
 //! ```text
+//! @@VERSION sysstat version 12.7.9
 //! @@FILE 0
 //! @@PROBE 0 0
 //! @@HDR {"sysstat": {"hosts": [{"nodename": "h", "file-date": "2026-11-25"}]}}
 //! @@PERR <a sadf stderr line>
 //! @@BEGIN per_cpu
 //! <sadf -d output>
-//! @@RC 0
 //! @@ERR <a sadf stderr line>
 //! @@END
 //! ```
 //!
-//! Per file it first probes the header with `sadf -j -H` (falling back to
+//! `@@VERSION` comes once, first: the version of the `sadf` that ran. Per file
+//! the script first probes the header with `sadf -j -H` (falling back to
 //! `sadf -c` for datafiles in an old format), reports `@@CONVERTED` when the
 //! fallback worked, and skips the file with `@@SKIP` when it cannot be read or
 //! when its day lies outside the Observation window. The same stream format is
@@ -38,7 +39,6 @@ use crate::runtime::Runtime;
 #[derive(Debug, Clone, Default)]
 pub struct RawActivity {
     pub label: String,
-    pub rc: i32,
     pub stdout: String,
     pub stderr: Vec<String>,
 }
@@ -351,7 +351,7 @@ pub fn build_script(skip_before: Option<&str>, skip_after: Option<&str>) -> Stri
         .replace("__SA__", skip_after.unwrap_or(""));
     for a in ACTIVITIES {
         s.push_str(&format!(
-            "echo \"@@BEGIN {l}\"; sadf -d \"$f\" -- {o} 2>\"$T\"; echo \"@@RC $?\"; emit \"$T\" \"@@ERR\"; echo \"@@END\"\n",
+            "echo \"@@BEGIN {l}\"; sadf -d \"$f\" -- {o} 2>\"$T\"; emit \"$T\" \"@@ERR\"; echo \"@@END\"\n",
             l = a.label,
             o = a.sadf_opts
         ));
@@ -455,10 +455,6 @@ pub fn parse_stream<R: BufRead>(reader: R) -> Result<SadfOutput> {
                 label: label.trim().to_string(),
                 ..Default::default()
             });
-        } else if let Some(rc) = line.strip_prefix("@@RC ") {
-            if let Some(c) = current.as_mut() {
-                c.rc = rc.trim().parse().unwrap_or(-1);
-            }
         } else if let Some(err) = line.strip_prefix("@@ERR ") {
             if let Some(c) = current.as_mut() {
                 c.stderr.push(err.to_string());
@@ -568,15 +564,10 @@ pub fn run_in_container(
     Ok(output.with_inputs(inputs))
 }
 
-pub fn read_stream_file(path: &Path) -> Result<SadfOutput> {
-    let f =
-        std::fs::File::open(path).map_err(|e| Error::other(format!("{}: {e}", path.display())))?;
-    parse_stream(BufReader::new(f))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::testutil::Scratch;
 
     #[test]
     fn script_mentions_every_activity() {
@@ -618,15 +609,14 @@ mod tests {
     #[test]
     fn stream_round_trip() {
         let text = "@@FILE 0\n@@PROBE 0 0\n@@HDR {\"sysstat\":{\"hosts\":[{\"nodename\":\"h\",\"file-date\":\"2026-11-25\",\"number-of-cpus\":16}]}}\n\
-                    @@BEGIN io\nheader\nrow\n@@RC 0\n@@END\n\
-                    @@BEGIN queue\n@@RC 1\n@@ERR bad file\n@@END\n\
+                    @@BEGIN io\nheader\nrow\n@@END\n\
+                    @@BEGIN queue\n@@ERR bad file\n@@END\n\
                     @@FILE 1\n@@PROBE 1 0\n@@CONVERTED 1\n@@SKIP 1\n\
                     @@FILE 2\n@@PROBE 2 3\n@@PERR Invalid system activity file: /in/2\n@@SKIP 2\n";
         let out = parse_stream(text.as_bytes()).unwrap();
         assert_eq!(out.files.len(), 3);
         assert_eq!(out.files[0].len(), 2);
         assert_eq!(out.files[0][0].stdout, "header\nrow\n");
-        assert_eq!(out.files[0][1].rc, 1);
         assert_eq!(out.files[0][1].stderr, ["bad file"]);
         assert!(out.files[1].is_empty());
 
@@ -683,8 +673,7 @@ mod tests {
 
     #[test]
     fn reads_the_version_from_the_file_header() {
-        let dir = std::env::temp_dir().join(format!("sarda-hdr-{}", std::process::id()));
-        std::fs::create_dir_all(&dir).unwrap();
+        let dir = Scratch::new("sadf-header");
         let header = |magic: fn(u16) -> [u8; 2], version: [u8; 3]| {
             let mut b = Vec::new();
             b.extend_from_slice(&magic(0xd596));
@@ -721,7 +710,6 @@ mod tests {
         let short = dir.join("short");
         std::fs::write(&short, b"abc").unwrap();
         assert!(read_sa_version(&short).is_err());
-        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // ---- verdicts -------------------------------------------------------
@@ -738,9 +726,7 @@ mod tests {
     }
 
     /// An SA file whose magic header claims `version` (`None`: old format).
-    fn sa_file(tag: &str, name: &str, version: Option<[u8; 3]>) -> Input {
-        let dir = std::env::temp_dir().join(format!("sarda-verdict-{}-{tag}", std::process::id()));
-        std::fs::create_dir_all(&dir).unwrap();
+    fn sa_file(dir: &Scratch, name: &str, version: Option<[u8; 3]>) -> Input {
         let mut bytes = Vec::new();
         bytes.extend_from_slice(&SYSSTAT_MAGIC.to_le_bytes());
         bytes.extend_from_slice(&version.map_or(0x2171, |_| FORMAT_MAGIC).to_le_bytes());
@@ -760,7 +746,8 @@ mod tests {
 
     #[test]
     fn a_readable_file_is_read() {
-        let input = sa_file("read", "a", Some([12, 7, 9]));
+        let dir = Scratch::new("a_readable_file_is_read");
+        let input = sa_file(&dir, "a", Some([12, 7, 9]));
         let got = &verdicts(&format!("{IMAGE}@@FILE 0\n@@PROBE 0 0\n{HDR}\n"), &[input])[0];
         assert_eq!(got.state, State::Read);
         assert_eq!(got.host.as_deref(), Some("h"));
@@ -772,8 +759,11 @@ mod tests {
 
     #[test]
     fn a_converted_file_is_read_with_a_warning_and_is_not_judged_by_its_version() {
+        let dir = Scratch::new(
+            "a_converted_file_is_read_with_a_warning_and_is_not_judged_by_its_version",
+        );
         // An old-format file has no version we can compare.
-        let input = sa_file("conv", "a", None);
+        let input = sa_file(&dir, "a", None);
         let stream = format!("{IMAGE}@@FILE 0\n@@CONVERTED 0\n@@PROBE 0 0\n{HDR}\n");
         let got = &verdicts(&stream, &[input])[0];
         assert_eq!(got.state, State::Read);
@@ -787,7 +777,8 @@ mod tests {
 
     #[test]
     fn a_file_outside_the_window_is_skipped_not_rejected() {
-        let input = sa_file("outside", "a", Some([12, 7, 9]));
+        let dir = Scratch::new("a_file_outside_the_window_is_skipped_not_rejected");
+        let input = sa_file(&dir, "a", Some([12, 7, 9]));
         let stream = format!("{IMAGE}@@FILE 0\n@@PROBE 0 0\n{HDR}\n@@SKIP 0\n");
         let got = &verdicts(&stream, &[input])[0];
         assert_eq!(got.state, State::OutsideWindow);
@@ -800,7 +791,8 @@ mod tests {
 
     #[test]
     fn an_unreadable_file_reports_each_stderr_line_once() {
-        let input = sa_file("unreadable", "a", Some([12, 7, 9]));
+        let dir = Scratch::new("an_unreadable_file_reports_each_stderr_line_once");
+        let input = sa_file(&dir, "a", Some([12, 7, 9]));
         let stream = format!(
             "{IMAGE}@@FILE 0\n@@PROBE 0 3\n@@PERR Invalid system activity file: /in/0\n\
              @@PERR Invalid system activity file: /in/0\n@@PERR second line\n@@SKIP 0\n"
@@ -820,7 +812,8 @@ mod tests {
 
     #[test]
     fn a_file_from_a_newer_sysstat_is_incompatible() {
-        let input = sa_file("newer", "a", Some([12, 9, 0]));
+        let dir = Scratch::new("a_file_from_a_newer_sysstat_is_incompatible");
+        let input = sa_file(&dir, "a", Some([12, 9, 0]));
         let got = &verdicts(&format!("{IMAGE}@@FILE 0\n@@PROBE 0 0\n{HDR}\n"), &[input])[0];
         assert_eq!(
             got.state,
@@ -838,12 +831,13 @@ mod tests {
 
     #[test]
     fn equal_or_older_files_are_compatible() {
+        let dir = Scratch::new("equal_or_older_files_are_compatible");
         for (tag, version) in [
             ("eq", [12, 7, 9]),
             ("older", [12, 7, 5]),
             ("old", [11, 6, 1]),
         ] {
-            let input = sa_file(tag, "a", Some(version));
+            let input = sa_file(&dir, tag, Some(version));
             let stream = format!("{IMAGE}@@FILE 0\n@@PROBE 0 0\n{HDR}\n");
             assert_eq!(verdicts(&stream, &[input])[0].state, State::Read, "{tag}");
         }
@@ -851,24 +845,27 @@ mod tests {
 
     #[test]
     fn without_a_known_image_version_nothing_is_compared() {
-        let input = sa_file("noimage", "a", Some([99, 0, 0]));
+        let dir = Scratch::new("without_a_known_image_version_nothing_is_compared");
+        let input = sa_file(&dir, "a", Some([99, 0, 0]));
         let got = &verdicts(&format!("@@FILE 0\n@@PROBE 0 0\n{HDR}\n"), &[input])[0];
         assert_eq!(got.state, State::Read);
     }
 
     #[test]
     fn an_input_without_a_probe_is_unreadable() {
-        let input = sa_file("noprobe", "a", Some([12, 7, 9]));
+        let dir = Scratch::new("an_input_without_a_probe_is_unreadable");
+        let input = sa_file(&dir, "a", Some([12, 7, 9]));
         let got = &verdicts(IMAGE, &[input])[0];
         assert_eq!(got.problem().unwrap(), "a: sadf cannot read this file");
     }
 
     #[test]
     fn verdicts_follow_the_order_of_the_inputs() {
+        let dir = Scratch::new("verdicts_follow_the_order_of_the_inputs");
         let inputs = [
-            sa_file("mixed", "good", Some([12, 7, 9])),
-            sa_file("mixed", "junk", Some([12, 7, 9])),
-            sa_file("mixed", "newer", Some([13, 0, 0])),
+            sa_file(&dir, "good", Some([12, 7, 9])),
+            sa_file(&dir, "junk", Some([12, 7, 9])),
+            sa_file(&dir, "newer", Some([13, 0, 0])),
         ];
         let stream = format!(
             "{IMAGE}@@FILE 0\n@@PROBE 0 0\n{HDR}\n@@FILE 1\n@@PROBE 1 3\n@@PERR bad\n@@SKIP 1\n\

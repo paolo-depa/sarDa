@@ -102,7 +102,7 @@ mod tests {
     fn records_with_a_bad_timestamp_are_reported_not_silently_dropped() {
         let out = output(
             "@@FILE 0\n@@BEGIN io\n# hostname;interval;timestamp;tps\n\
-             h;1;2026-11-25 10:00:00 UTC;1\nh;1;garbage;2\n@@RC 0\n@@END\n",
+             h;1;2026-11-25 10:00:00 UTC;1\nh;1;garbage;2\n@@END\n",
         );
         let ds = assemble(&out, None, None).unwrap();
         assert_eq!(ds.tables[0].records.len(), 1);
@@ -113,7 +113,7 @@ mod tests {
     fn benign_stderr_is_not_a_warning_but_other_stderr_is() {
         let out = output(
             "@@FILE 0\n@@BEGIN io\n# hostname;interval;timestamp;tps\n\
-             h;1;2026-11-25 10:00:00 UTC;1\n@@RC 0\n@@ERR Requested activities not available\n\
+             h;1;2026-11-25 10:00:00 UTC;1\n@@ERR Requested activities not available\n\
              @@ERR something odd\n@@ERR something odd\n@@END\n",
         );
         let ds = assemble(&out, None, None).unwrap();
@@ -124,7 +124,7 @@ mod tests {
     fn nothing_usable_is_a_no_data_error_that_mentions_the_window() {
         let out = output(
             "@@FILE 0\n@@BEGIN io\n# hostname;interval;timestamp;tps\n\
-             h;1;2026-11-25 10:00:00 UTC;1\n@@RC 0\n@@END\n",
+             h;1;2026-11-25 10:00:00 UTC;1\n@@END\n",
         );
         let err = assemble(&out, Some(i64::MAX), None).unwrap_err();
         assert_eq!(err.kind, Kind::NoData);

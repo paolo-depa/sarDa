@@ -468,6 +468,7 @@ pub static ACTIVITIES: &[Activity] = &[
     },
 ];
 
+#[cfg(test)]
 pub fn activity(label: &str) -> Option<&'static Activity> {
     ACTIVITIES.iter().find(|a| a.label == label)
 }

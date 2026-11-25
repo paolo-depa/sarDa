@@ -40,4 +40,4 @@ description: Run sarda to inspect sysstat SA files (saYYYYMMDD, /var/log/sa) as 
 
 ## Exit codes
 
-`3` no container runtime · `4` image missing · `5` no usable data (check `--start/--end` and the offset; check the sysstat image is not older than the files) · `6` Grafana failed to start · `7` port unavailable (retry without `--port`). Details and the full table are in the README.
+`3` no container runtime · `4` image missing · `5` no usable data (check `--start/--end` and the offset; check the sysstat image is not older than the files) · `6` Grafana failed to start · `7` port unavailable (retry without `--port`) · `8` an SA file the image's sysstat cannot read (written by a newer sysstat, or not an SA file): use `--sadf-image` with a newer sysstat, or older files. Details and the full table are in the README.
