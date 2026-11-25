@@ -59,6 +59,7 @@ sarda [OPTIONS] <SA_FILE>...
 | `--sadf-timeout SECONDS` | give up on the conversion (default 600) |
 | `--no-pull` | never try to pull a missing image |
 | `--export-csv DIR` | also write the per-activity CSV files (the format of the former Python tool) |
+| `--include-empty` | also show panels whose values are zero throughout (by default they are hidden, like `sadf -O skipempty`) |
 | `--no-grafana` | do not start Grafana: only serve the API, or with `--export-csv` just export and exit |
 | `--json` | machine-readable events on stdout (see below) |
 | `-v`, `--verbose` | debug details on stderr |
@@ -114,7 +115,7 @@ One JSON object per line on stdout:
 3. It serves the result on `127.0.0.1` through a small Prometheus-compatible API (the **Sarda API**).
 4. It starts Grafana with `--network=host` on `127.0.0.1`, provisioned with a datasource pointing at that API and a dashboard generated from what your files actually contain. Anonymous Admin access is enabled, which is safe only because everything listens on loopback.
 
-Panels exist only for activities found in your files. Per-CPU, per-disk, per-interface, ... panels use dashboard variables, so any host works. Rows below the first three start collapsed.
+The dashboard follows the data: an activity your files do not contain gets no row, a metric that produced no samples gets no panel, and a metric that is zero throughout (an idle device, or an activity the host never collected) is hidden too, as `sadf -O skipempty` does for its SVG views. `--include-empty` keeps those panels when "nothing happened" is the finding. Per-CPU, per-disk, per-interface, ... panels use dashboard variables, so any host works. Rows below the first three shown start collapsed.
 
 ### Metrics and labels
 

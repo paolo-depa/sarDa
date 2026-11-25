@@ -19,6 +19,7 @@ One Rust executable: SA files in, Grafana URL out. It converts with `sadf` in a 
 - **Air-gapped.** No run-time network use beyond the single `pull` attempt in `session::ensure_image`. No plugin installs, update checks or telemetry; the Grafana `GF_*` variables in `viewer.rs` switch those off.
 - **Loopback only.** Everything binds `127.0.0.1`. Anonymous Admin in Grafana is only acceptable because of that (ADR 0005); never combine it with another bind address.
 - **Unsupported PromQL must error, never approximate.** `promql.rs` rejects what it cannot evaluate with an explanatory message; Grafana shows it in the panel.
+- **The dashboard shows only what the data has.** `store::is_active` (any non-zero sample in the Observation window) gates panels and rows unless `--include-empty`; per-activity presence alone is not enough. `tests/golden.rs` fails if a panel references an all-zero metric or an active metric loses its panel.
 - **stdout is the result channel**: the URL, or JSON events with `--json`. Everything else goes to stderr through `Reporter`. Never `println!` elsewhere.
 - **Exit codes are a contract**: `error::Kind` maps to the table in the README, and a test checks they agree. Add a `Kind` and a README row together.
 - **Time is UTC end to end.** `sadf -d` emits UTC; `--start/--end` without an offset mean UTC.

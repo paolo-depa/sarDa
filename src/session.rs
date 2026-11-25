@@ -345,7 +345,7 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
 
     let rt = rt.expect("runtime detected");
     let port = viewer::pick_port(cli.port.or(Some(DEFAULT_PORT)), cli.port.is_some())?;
-    let dashboard = dashboard::generate(&ds, &store);
+    let dashboard = dashboard::generate(&ds, &store, cli.include_empty);
     rep.info(format!("Starting Grafana ({}) ...", cli.grafana_image));
     let viewer = Viewer::start(
         &rt,
