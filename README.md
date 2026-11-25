@@ -18,7 +18,7 @@ It converts the files, starts a preconfigured Grafana container, loads your data
 | Requirement | Why |
 |---|---|
 | `podman` or `docker` (detected automatically, podman first) | runs `sadf` and Grafana |
-| a **sysstat image** | provides `sadf`; build it once, see below |
+| a **sysstat image** | provides `sadf`; build it once (~20 MB, SUSE BCI base), see below |
 | a **Grafana image** (default `docker.io/grafana/grafana-oss:12.4.3`) | the dashboard server |
 | Linux | Grafana uses host networking |
 
@@ -42,7 +42,9 @@ On the **air-gapped** machine:
 podman load -i sarda-images.tar
 ```
 
-Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` / `SARDA_GRAFANA_IMAGE`), for example from an internal registry. The sysstat inside the sysstat image must be at least as new as the one that wrote your SA files.
+The sysstat image is a SUSE Base Container Image (`bci-micro`, about 20 MB) plus a single binary; sysstat itself is compiled in a build stage from a checksummed release tarball. That matters: a *newer* SA file than the image's sysstat yields no data, sometimes without an error, and an older sysstat silently drops counters it does not know. To move to a newer sysstat release, rebuild with `--build-arg SYSSTAT_VERSION=... --build-arg SYSSTAT_SHA256=...` (and `SYSSTAT_URL` for a mirror).
+
+Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` / `SARDA_GRAFANA_IMAGE`), for example from an internal registry, and `podman build --arch <arch>` for other architectures. The sysstat inside the sysstat image must be at least as new as the one that wrote your SA files.
 
 ## Usage
 

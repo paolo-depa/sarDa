@@ -24,6 +24,8 @@ One Rust executable: SA files in, Grafana URL out. It converts with `sadf` in a 
 - **Exit codes are a contract**: `error::Kind` maps to the table in the README, and a test checks they agree. Add a `Kind` and a README row together.
 - **Time is UTC end to end.** `sadf -d` emits UTC; `--start/--end` without an offset mean UTC.
 - **Cleanup must survive SIGTERM and Ctrl-C** in every phase (`session::install_signal_handler`). A new container or temp path needs a matching removal there and in `Grafana::cleanup`.
+- **The sysstat image compiles sysstat itself** (ADR 0007). Do not replace it with the distro package: SLE 15.7's 12.0.2 silently drops newer counters, SLE 16.0's 12.7.5 silently returns nothing for 12.8 files. Bump `ARG SYSSTAT_VERSION`/`SYSSTAT_SHA256` in `container/Containerfile.sysstat` instead.
+- **The parser script runs in a BCI micro image**: `sh`, `sadf`, `mktemp`, `tr`, `cat`, `rm` only. No `sed`, `grep` or `awk` (a unit test enforces it); `tests/script.rs` executes it with a fake `sadf`.
 - **No async runtime.** New crates must be vendorable: check with `scripts/dist.sh` (ADR 0004).
 
 ## Fixtures

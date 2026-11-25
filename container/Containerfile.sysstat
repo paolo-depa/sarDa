@@ -1,14 +1,42 @@
-# Parser image for sarDa: provides `sadf` (sysstat) and a POSIX shell.
+# Parser image for sarDa: sysstat's `sadf` and a POSIX shell, nothing else.
+#
+# sysstat is compiled here, in a build stage, rather than installed from the
+# base image's repository. Reason: sadf silently returns nothing for SA files
+# written by a NEWER sysstat (12.7.5 refuses 12.8 files, with no error), while
+# an older sadf only understands the counters it knows (12.0.2 reads 12.8
+# files but drops the discard and NUMA columns). Building the latest release
+# keeps SARDA_SYSSTAT_VERSION controllable and up to date.
+#
+# The final image is a SUSE BCI micro image (a few MB, glibc plus coreutils)
+# with one static-ish binary on top; sadf links only libc.
 #
 # Build once on a machine with network access, then move it to the air-gapped
-# host with `podman save` / `podman load`:
+# host:
 #
 #   sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .
 #   podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest
 #   podman load -i sarda-sysstat.tar
 #
-# Pick a base whose sysstat is at least as new as the one that wrote your SA
-# files: sadf cannot read files produced by a newer sysstat.
-FROM registry.opensuse.org/opensuse/tumbleweed:latest
-RUN zypper --non-interactive install --no-recommends sysstat \
+# Point SYSSTAT_URL at an internal mirror when GitHub is not reachable.
+FROM registry.suse.com/bci/bci-base:16.0 AS build
+ARG SYSSTAT_VERSION=12.8.1
+ARG SYSSTAT_SHA256=d118a925f53633dbb7cbbefa1ea6a0cdcb1d961ee45617fa2179aa4119c33a40
+ARG SYSSTAT_URL=https://github.com/sysstat/sysstat/archive/refs/tags/v${SYSSTAT_VERSION}.tar.gz
+RUN zypper --non-interactive install --no-recommends gcc make curl tar gzip gawk \
     && zypper clean --all
+RUN mkdir -p /src \
+    && curl -fsSL -o /tmp/sysstat.tar.gz "$SYSSTAT_URL" \
+    && if [ -n "$SYSSTAT_SHA256" ]; then \
+         echo "$SYSSTAT_SHA256  /tmp/sysstat.tar.gz" | sha256sum -c -; \
+       fi \
+    && tar -xzf /tmp/sysstat.tar.gz -C /src --strip-components=1
+WORKDIR /src
+# No PCP, sensors, NLS or documentation: sadf ends up linking only libc.
+RUN ./configure --disable-pcp --disable-sensors --disable-nls \
+        --disable-documentation --disable-install-cron \
+    && make -j"$(nproc)" \
+    && strip sadf \
+    && install -D -m 0755 sadf /opt/sysstat/sadf
+
+FROM registry.suse.com/bci/bci-micro:16.0
+COPY --from=build /opt/sysstat/sadf /usr/bin/sadf

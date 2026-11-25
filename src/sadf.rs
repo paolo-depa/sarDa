@@ -102,40 +102,14 @@ impl SadfOutput {
 /// inclusive date bounds of files to skip (`YYYY-MM-DD`, empty for none), and
 /// the remaining positional parameters are the SA file paths.
 pub fn build_script(skip_before: Option<&str>, skip_after: Option<&str>) -> String {
-    let mut s = format!(
-        "T=$(mktemp 2>/dev/null || echo /tmp/sarda.$$)\n\
-         H=\"$T.h\"\n\
-         C=\"$T.c\"\n\
-         SB=\"{}\"\n\
-         SA=\"{}\"\n\
-         shift 2\n\
-         i=0\n\
-         for f in \"$@\"; do\n\
-         echo \"@@FILE $i\"\n\
-         : >\"$T\"\n\
-         p=1\n\
-         if sadf -j -H \"$f\" >\"$H\" 2>\"$T\"; then\n\
-         p=0\n\
-         elif sadf -c \"$f\" >\"$C\" 2>>\"$T\" && sadf -j -H \"$C\" >\"$H\" 2>>\"$T\"; then\n\
-         p=0\n\
-         f=\"$C\"\n\
-         echo \"@@CONVERTED $i\"\n\
-         fi\n\
-         echo \"@@PROBE $i $p\"\n\
-         if [ -s \"$H\" ]; then echo \"@@HDR $(tr -d '\\n\\r\\t' <\"$H\")\"; fi\n\
-         sed 's/^/@@PERR /' \"$T\"\n\
-         d=$(sed -n 's/.*\"file-date\":[ ]*\"\\([0-9][0-9]*-[0-9][0-9]*-[0-9][0-9]*\\)\".*/\\1/p' \"$H\" | head -n 1)\n\
-         skip=0\n\
-         if [ \"$p\" != 0 ]; then skip=1; fi\n\
-         if [ -n \"$d\" ] && [ -n \"$SB\" ] && expr \"$d\" \"<\" \"$SB\" >/dev/null 2>&1; then skip=1; fi\n\
-         if [ -n \"$d\" ] && [ -n \"$SA\" ] && expr \"$d\" \">\" \"$SA\" >/dev/null 2>&1; then skip=1; fi\n\
-         if [ \"$skip\" = 1 ]; then echo \"@@SKIP $i\"; i=$((i+1)); continue; fi\n",
-        skip_before.unwrap_or(""),
-        skip_after.unwrap_or("")
-    );
+    // Uses only what a SUSE BCI micro image provides: sh, sadf, mktemp, tr,
+    // cat and rm. No sed, grep or awk.
+    let mut s = SCRIPT
+        .replace("__SB__", skip_before.unwrap_or(""))
+        .replace("__SA__", skip_after.unwrap_or(""));
     for a in ACTIVITIES {
         s.push_str(&format!(
-            "echo \"@@BEGIN {l}\"; sadf -d \"$f\" -- {o} 2>\"$T\"; echo \"@@RC $?\"; sed 's/^/@@ERR /' \"$T\"; echo \"@@END\"\n",
+            "echo \"@@BEGIN {l}\"; sadf -d \"$f\" -- {o} 2>\"$T\"; echo \"@@RC $?\"; emit \"$T\" \"@@ERR\"; echo \"@@END\"\n",
             l = a.label,
             o = a.sadf_opts
         ));
@@ -143,6 +117,51 @@ pub fn build_script(skip_before: Option<&str>, skip_after: Option<&str>) -> Stri
     s.push_str("i=$((i+1))\ndone\nrm -f \"$T\" \"$H\" \"$C\"\n");
     s
 }
+
+/// Prologue of the script: `$1`/`$2` are the skip bounds, the rest are files.
+const SCRIPT: &str = r##"T=$(mktemp 2>/dev/null || echo /tmp/sarda.$$)
+H="$T.h"
+C="$T.c"
+SB="__SB__"
+SA="__SA__"
+shift 2
+i=0
+emit() { while IFS= read -r l || [ -n "$l" ]; do printf '%s %s\n' "$2" "$l"; done <"$1"; }
+for f in "$@"; do
+echo "@@FILE $i"
+: >"$T"
+p=1
+if sadf -j -H "$f" >"$H" 2>"$T"; then
+p=0
+elif sadf -c "$f" >"$C" 2>>"$T" && sadf -j -H "$C" >"$H" 2>>"$T"; then
+p=0
+f="$C"
+echo "@@CONVERTED $i"
+fi
+echo "@@PROBE $i $p"
+HDR=""
+if [ -s "$H" ]; then HDR=$(tr -d '\n\r\t' <"$H"); echo "@@HDR $HDR"; fi
+emit "$T" "@@PERR"
+d=""
+case "$HDR" in
+*'"file-date"'*)
+rest=${HDR#*'"file-date"'}
+rest=${rest#:}
+rest=${rest# }
+rest=${rest#'"'}
+d=${rest%%'"'*}
+case "$d" in
+????-??-??) ;;
+*) d="" ;;
+esac
+;;
+esac
+skip=0
+if [ "$p" != 0 ]; then skip=1; fi
+if [ -n "$d" ] && [ -n "$SB" ] && expr "$d" "<" "$SB" >/dev/null 2>&1; then skip=1; fi
+if [ -n "$d" ] && [ -n "$SA" ] && expr "$d" ">" "$SA" >/dev/null 2>&1; then skip=1; fi
+if [ "$skip" = 1 ]; then echo "@@SKIP $i"; i=$((i+1)); continue; fi
+"##;
 
 pub fn parse_stream<R: BufRead>(reader: R) -> Result<SadfOutput> {
     let mut out = SadfOutput::default();
@@ -353,6 +372,18 @@ mod tests {
         let plain = build_script(None, None);
         assert!(plain.contains("SB=\"\""));
         assert!(plain.contains("SA=\"\""));
+        for legacy in ["sed", "grep", "awk"] {
+            assert!(
+                !s.contains(legacy) && !plain.contains(legacy),
+                "the script must run in a BCI micro image (no {legacy})"
+            );
+        }
+        for legacy in ["sed", "grep", "awk"] {
+            assert!(
+                !s.contains(legacy) && !plain.contains(legacy),
+                "the script must run in a BCI micro image (no {legacy})"
+            );
+        }
     }
 
     #[test]
