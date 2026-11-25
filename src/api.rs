@@ -1,5 +1,5 @@
 //! The Sarda API: the slice of the Prometheus HTTP API that Grafana's
-//! built-in Prometheus datasource needs, served from an in-memory [`Store`].
+//! built-in Prometheus data source needs, served from an in-memory [`Store`].
 //!
 //! [`handle`] is a pure function from request to response so it can be tested
 //! without sockets; [`serve`] wraps it in a small multi-threaded HTTP server.

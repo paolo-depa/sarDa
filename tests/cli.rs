@@ -285,7 +285,7 @@ fn missing_sa_files_are_skipped_but_not_all() {
 }
 
 fn http_get(port: u16, path: &str) -> String {
-    sarda::viewer::http_get(port, path, std::time::Duration::from_secs(5))
+    sarda::grafana::http_get(port, path, std::time::Duration::from_secs(5))
         .map(|(_, body)| body)
         .unwrap_or_default()
 }

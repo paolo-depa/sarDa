@@ -1,4 +1,4 @@
-//! One sarDa run: convert, serve, start the Viewer, wait, clean up.
+//! One sarDa run: convert, serve, start the Grafana, wait, clean up.
 
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -12,11 +12,11 @@ use crate::cli::{Cli, DEFAULT_PORT};
 use crate::dashboard::{self, DASHBOARD_UID};
 use crate::dataset::{self, Dataset};
 use crate::error::{Error, Kind, Result};
+use crate::grafana::{self, Grafana, GrafanaSpec, NAME_PREFIX};
 use crate::runtime::{missing_image_help, Runtime};
 use crate::sadf::{self, SadfOutput};
 use crate::store::Store;
 use crate::timeutil;
-use crate::viewer::{self, Viewer, ViewerSpec, NAME_PREFIX};
 use crate::{api, csvexport};
 
 const CONTAINERFILE: &str = include_str!("../container/Containerfile.sysstat");
@@ -201,16 +201,16 @@ fn summary(ds: &Dataset, store: &Store) -> Value {
     })
 }
 
-fn wait_for_shutdown(rx: &mpsc::Receiver<()>, viewer: Option<&Viewer>) -> Result<()> {
+fn wait_for_shutdown(rx: &mpsc::Receiver<()>, grafana: Option<&Grafana>) -> Result<()> {
     SERVING.store(true, Ordering::SeqCst);
     loop {
         match rx.recv_timeout(Duration::from_secs(2)) {
             Ok(()) | Err(RecvTimeoutError::Disconnected) => return Ok(()),
             Err(RecvTimeoutError::Timeout) => {
-                if let Some(v) = viewer {
+                if let Some(v) = grafana {
                     if !v.is_running() {
                         return Err(Error::new(
-                            Kind::ViewerFailed,
+                            Kind::GrafanaFailed,
                             "the Grafana container stopped unexpectedly",
                         ));
                     }
@@ -344,12 +344,12 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
     }
 
     let rt = rt.expect("runtime detected");
-    let port = viewer::pick_port(cli.port.or(Some(DEFAULT_PORT)), cli.port.is_some())?;
+    let port = grafana::pick_port(cli.port.or(Some(DEFAULT_PORT)), cli.port.is_some())?;
     let dashboard = dashboard::generate(&ds, &store);
     rep.info(format!("Starting Grafana ({}) ...", cli.grafana_image));
-    let viewer = Viewer::start(
+    let grafana = Grafana::start(
         &rt,
-        &ViewerSpec {
+        &GrafanaSpec {
             image: &cli.grafana_image,
             port,
             api_addr: api.addr,
@@ -357,7 +357,7 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
             dashboard: &dashboard,
         },
     )?;
-    viewer.wait_ready(READY_TIMEOUT)?;
+    grafana.wait_ready(READY_TIMEOUT)?;
 
     let url = format!(
         "http://127.0.0.1:{port}/d/{DASHBOARD_UID}/sarda?orgId=1&from={}&to={}",
@@ -374,13 +374,13 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
         "grafana_port": port,
         "api_url": api_url,
         "runtime": rt.bin,
-        "container": viewer.container_name(),
+        "container": grafana.container_name(),
         "data": info,
     }));
 
-    let result = wait_for_shutdown(&rx, Some(&viewer));
+    let result = wait_for_shutdown(&rx, Some(&grafana));
     rep.info("Stopping Grafana and cleaning up ...");
-    drop(viewer);
+    drop(grafana);
     rep.event(json!({"event": "stopped"}));
     result
 }

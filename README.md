@@ -19,8 +19,8 @@ It converts the files, starts a preconfigured Grafana container, loads your data
 |---|---|
 | `podman` or `docker` (detected automatically, podman first) | runs `sadf` and Grafana |
 | a **sysstat image** | provides `sadf`; build it once, see below |
-| a **Grafana image** (default `docker.io/grafana/grafana-oss:12.4.3`) | the viewer |
-| Linux | the viewer uses host networking |
+| a **Grafana image** (default `docker.io/grafana/grafana-oss:12.4.3`) | the dashboard server |
+| Linux | Grafana uses host networking |
 
 Nothing else: no Python, no sysstat on the host, no Grafana plugins, no network access while running.
 
@@ -112,7 +112,7 @@ One JSON object per line on stdout:
 1. One throwaway container (the sysstat image, no network) reads each file's header with `sadf -j -H`. A file it cannot read is reported and skipped; a datafile in the old binary format is converted in place with `sadf -c`; a file whose day (from the header, not the file name) cannot overlap `--start`/`--end` is skipped without reading its data. Everything else is converted activity by activity.
 2. sarda merges the files, drops `RESTART` markers and bad rows, and keeps the requested window (all UTC).
 3. It serves the result on `127.0.0.1` through a small Prometheus-compatible API (the **Sarda API**).
-4. It starts Grafana with `--network=host` on `127.0.0.1`, provisioned with a datasource pointing at that API and a dashboard generated from what your files actually contain. Anonymous Admin access is enabled, which is safe only because everything listens on loopback.
+4. It starts Grafana with `--network=host` on `127.0.0.1`, provisioned with a data source pointing at that API and a dashboard generated from what your files actually contain. Anonymous Admin access is enabled, which is safe only because everything listens on loopback.
 
 The dashboard follows what was **collected**, not the values: every activity and metric recorded in your files gets its row and panels — an idle disk or a host that never swapped still shows a flat chart — while an activity your files do not contain gets neither. Per-CPU, per-disk, per-interface, ... panels use dashboard variables, so any host works. Rows below the first three start collapsed.
 

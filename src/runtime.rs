@@ -134,7 +134,7 @@ impl Runtime {
                 "ps",
                 "-a",
                 "--filter",
-                &format!("label={}", crate::viewer::LABEL),
+                &format!("label={}", crate::grafana::LABEL),
                 "--format",
                 "{{.Names}}",
             ])
@@ -145,7 +145,7 @@ impl Runtime {
         };
         for name in String::from_utf8_lossy(&out.stdout).lines() {
             let pid = name
-                .strip_prefix(crate::viewer::NAME_PREFIX)
+                .strip_prefix(crate::grafana::NAME_PREFIX)
                 .and_then(|p| p.parse::<u32>().ok());
             if let Some(pid) = pid {
                 if !std::path::Path::new(&format!("/proc/{pid}")).exists() {

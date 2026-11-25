@@ -15,7 +15,7 @@ use crate::store::Store;
 use crate::timeutil;
 
 pub const DASHBOARD_UID: &str = "sarda";
-pub const DATASOURCE_UID: &str = "sarda";
+pub const DATA_SOURCE_UID: &str = "sarda";
 
 /// Rows shown in this order; the first few start expanded, the rest are
 /// collapsed so Grafana does not fire hundreds of queries on load.
@@ -33,8 +33,8 @@ impl Ids {
     }
 }
 
-fn datasource() -> Value {
-    json!({"type": "prometheus", "uid": DATASOURCE_UID})
+fn data_source() -> Value {
+    json!({"type": "prometheus", "uid": DATA_SOURCE_UID})
 }
 
 struct Ctx {
@@ -52,7 +52,7 @@ fn selector(metric: &str, dim_label: Option<&str>) -> String {
 fn target(ref_id: usize, expr: String, legend: String, ctx: &Ctx) -> Value {
     json!({
         "refId": ref_id_letter(ref_id),
-        "datasource": datasource(),
+        "datasource": data_source(),
         "expr": expr,
         "legendFormat": legend,
         "range": true,
@@ -85,7 +85,7 @@ fn timeseries(
         "id": id,
         "type": "timeseries",
         "title": title,
-        "datasource": datasource(),
+        "datasource": data_source(),
         "interval": ctx.interval,
         "fieldConfig": {
             "defaults": {
@@ -232,7 +232,7 @@ fn variable(name: &str, query: &str) -> Value {
         "name": name,
         "label": name,
         "type": "query",
-        "datasource": datasource(),
+        "datasource": data_source(),
         "definition": query,
         "query": {
             "query": query,

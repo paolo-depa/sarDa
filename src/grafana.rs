@@ -1,4 +1,4 @@
-//! The Viewer: a preconfigured Grafana container that reads the Sarda API.
+//! The Grafana instance: a preconfigured Grafana container that reads the Sarda API.
 
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpListener, TcpStream};
@@ -8,7 +8,7 @@ use std::time::{Duration, Instant};
 
 use serde_json::Value;
 
-use crate::dashboard::{DASHBOARD_UID, DATASOURCE_UID};
+use crate::dashboard::{DASHBOARD_UID, DATA_SOURCE_UID};
 use crate::error::{Error, Kind, Result};
 use crate::runtime::Runtime;
 
@@ -17,14 +17,14 @@ pub const NAME_PREFIX: &str = "sarda-";
 const PROVISIONING_DIR: &str = "/etc/grafana/provisioning";
 const DASHBOARD_FILE: &str = "sarda.json";
 
-pub struct Viewer {
+pub struct Grafana {
     rt: Runtime,
     name: String,
     dir: PathBuf,
     pub port: u16,
 }
 
-pub struct ViewerSpec<'a> {
+pub struct GrafanaSpec<'a> {
     pub image: &'a str,
     pub port: u16,
     pub api_addr: SocketAddr,
@@ -77,9 +77,9 @@ fn set_mode(path: &Path, mode: u32) {
 #[cfg(not(unix))]
 fn set_mode(_path: &Path, _mode: u32) {}
 
-pub fn datasource_yaml(api_addr: SocketAddr, scrape_interval: &str) -> String {
+pub fn data_source_yaml(api_addr: SocketAddr, scrape_interval: &str) -> String {
     format!(
-        "apiVersion: 1\ndatasources:\n  - name: SAR\n    uid: {DATASOURCE_UID}\n    type: prometheus\n    access: proxy\n    url: http://{api_addr}\n    isDefault: true\n    editable: false\n    jsonData:\n      httpMethod: GET\n      timeInterval: \"{scrape_interval}\"\n"
+        "apiVersion: 1\ndatasources:\n  - name: SAR\n    uid: {DATA_SOURCE_UID}\n    type: prometheus\n    access: proxy\n    url: http://{api_addr}\n    isDefault: true\n    editable: false\n    jsonData:\n      httpMethod: GET\n      timeInterval: \"{scrape_interval}\"\n"
     )
 }
 
@@ -114,15 +114,15 @@ pub fn http_get(port: u16, path: &str, timeout: Duration) -> Option<(u16, String
     Some((status, body))
 }
 
-impl Viewer {
-    pub fn start(rt: &Runtime, spec: &ViewerSpec) -> Result<Viewer> {
+impl Grafana {
+    pub fn start(rt: &Runtime, spec: &GrafanaSpec) -> Result<Grafana> {
         let pid = std::process::id();
         let name = format!("{NAME_PREFIX}{pid}");
         let dir = std::env::temp_dir().join(format!("sarda-{pid}"));
         let prov = dir.join("provisioning");
         write_file(
             &prov.join("datasources/sarda.yaml"),
-            &datasource_yaml(spec.api_addr, &spec.scrape_interval),
+            &data_source_yaml(spec.api_addr, &spec.scrape_interval),
         )?;
         write_file(
             &prov.join("dashboards/sarda.yaml"),
@@ -133,7 +133,7 @@ impl Viewer {
             &serde_json::to_string_pretty(spec.dashboard).unwrap_or_default(),
         )?;
 
-        let mut viewer = Viewer {
+        let mut grafana = Grafana {
             rt: rt.clone(),
             name: name.clone(),
             dir,
@@ -168,18 +168,18 @@ impl Viewer {
             .stdout(Stdio::null())
             .stderr(Stdio::piped())
             .output()
-            .map_err(|e| Error::new(Kind::ViewerFailed, format!("starting {}: {e}", rt.bin)))?;
+            .map_err(|e| Error::new(Kind::GrafanaFailed, format!("starting {}: {e}", rt.bin)))?;
         if !out.status.success() {
-            viewer.cleanup();
+            grafana.cleanup();
             return Err(Error::new(
-                Kind::ViewerFailed,
+                Kind::GrafanaFailed,
                 format!(
                     "could not start the Grafana container: {}",
                     String::from_utf8_lossy(&out.stderr).trim()
                 ),
             ));
         }
-        Ok(viewer)
+        Ok(grafana)
     }
 
     fn logs(&self) -> String {
@@ -202,7 +202,7 @@ impl Viewer {
     }
 
     /// Waits until Grafana is up, the dashboard is provisioned and the
-    /// datasource can reach the Sarda API.
+    /// data source can reach the Sarda API.
     pub fn wait_ready(&self, timeout: Duration) -> Result<()> {
         let start = Instant::now();
         let probe = Duration::from_secs(2);
@@ -210,7 +210,7 @@ impl Viewer {
         while start.elapsed() < timeout {
             if !self.is_running() {
                 return Err(Error::new(
-                    Kind::ViewerFailed,
+                    Kind::GrafanaFailed,
                     format!(
                         "the Grafana container exited during start-up:\n{}",
                         self.logs().trim_end()
@@ -228,12 +228,12 @@ impl Viewer {
                     .is_some_and(|(s, _)| s == 200);
                 }
                 if dashboard_ready {
-                    return match http_get(self.port, &format!("/api/datasources/uid/{DATASOURCE_UID}/health"), Duration::from_secs(10)) {
+                    return match http_get(self.port, &format!("/api/datasources/uid/{DATA_SOURCE_UID}/health"), Duration::from_secs(10)) {
                         Some((200, _)) => Ok(()),
                         other => Err(Error::new(
-                            Kind::ViewerFailed,
+                            Kind::GrafanaFailed,
                             format!(
-                                "Grafana started but its datasource cannot reach the Sarda API (health check: {:?}). Is a firewall or proxy blocking loopback connections?",
+                                "Grafana started but its data source cannot reach the Sarda API (health check: {:?}). Is a firewall or proxy blocking loopback connections?",
                                 other.map(|(s, b)| format!("{s} {}", b.trim()))
                             ),
                         )),
@@ -243,7 +243,7 @@ impl Viewer {
             std::thread::sleep(Duration::from_millis(500));
         }
         Err(Error::new(
-            Kind::ViewerFailed,
+            Kind::GrafanaFailed,
             format!(
                 "Grafana did not become ready within {}s:\n{}",
                 timeout.as_secs(),
@@ -262,7 +262,7 @@ impl Viewer {
     }
 }
 
-impl Drop for Viewer {
+impl Drop for Grafana {
     fn drop(&mut self) {
         self.cleanup();
     }
@@ -273,8 +273,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn datasource_points_at_the_api() {
-        let y = datasource_yaml("127.0.0.1:9999".parse().unwrap(), "1m");
+    fn data_source_points_at_the_api() {
+        let y = data_source_yaml("127.0.0.1:9999".parse().unwrap(), "1m");
         assert!(y.contains("url: http://127.0.0.1:9999"));
         assert!(y.contains("type: prometheus"));
         assert!(y.contains("uid: sarda"));

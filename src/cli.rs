@@ -16,7 +16,7 @@ EXIT CODES:
   3  no working container runtime (podman or docker)
   4  a required container image is missing
   5  no usable data in the SA files (or in the --start/--end window)
-  6  the Grafana viewer failed to start
+  6  the Grafana grafana failed to start
   7  a network port is unavailable
 
 ENVIRONMENT:
@@ -56,7 +56,7 @@ pub struct Cli {
     #[arg(long, value_enum, default_value = "auto", env = "SARDA_RUNTIME")]
     pub runtime: RuntimeChoice,
 
-    /// Grafana image for the viewer.
+    /// Grafana image for the grafana.
     #[arg(long, value_name = "IMAGE", default_value = DEFAULT_GRAFANA_IMAGE, env = "SARDA_GRAFANA_IMAGE")]
     pub grafana_image: String,
 

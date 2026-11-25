@@ -39,16 +39,20 @@ _Avoid_: time filter, date range
 ## Serving
 
 **Session**:
-One run of the executable: parse, serve, start the Viewer, wait for Ctrl-C, clean up.
+One run of the executable: parse, serve, start the Grafana instance, wait for Ctrl-C, clean up.
 _Avoid_: job, run, instance
 
-**Viewer**:
-The Grafana container started for a Session, preconfigured and removed when the Session ends.
-_Avoid_: Grafana instance, dashboard container
+**Grafana instance**:
+The Grafana server started for a Session, provisioned with the SAR data source and the Dashboard, and removed when the Session ends.
+_Avoid_: viewer (Grafana's role for a read-only user, and the person opening dashboards), dashboard container
+
+**Data source**:
+The connection the Grafana instance reads its data through; sarDa provisions one, named SAR, pointing at the Sarda API. Grafana's JSON and provisioning files spell it `datasource`.
+_Avoid_: datasource (in prose), backend
 
 **Sarda API**:
-The Prometheus-compatible HTTP API served by the executable on loopback, from which the Viewer reads the Series.
-_Avoid_: backend, datasource server, exporter
+The Prometheus-compatible HTTP API served by the executable on loopback, from which the Grafana instance reads the Series.
+_Avoid_: exporter, metrics endpoint
 
 **Parser container**:
 The throwaway container, built from the sysstat image, that runs `sadf` against the SA files.
@@ -59,23 +63,27 @@ The container engine found on the host, either `podman` or `docker`.
 _Avoid_: engine, docker (when podman is meant)
 
 **CSV export**:
-The optional per-Metric CSV files written with `--export-csv`, kept for workflows that predate the Viewer.
+The optional per-Metric CSV files written with `--export-csv`, kept for workflows that predate the Grafana instance.
 _Avoid_: output dir, dump
 
-## Viewer layout
+## Dashboard layout
 
 **Dashboard**:
-The single page the Viewer opens: Rows of Panels for the data of one Session, preset to the Observation window.
+The single page the Grafana instance opens: Rows of Panels for the data of one Session, preset to the Observation window.
 _Avoid_: view, board, page
 
 **Row**:
-A collapsible band of Panels for one group of Activities (CPU, Disks, Network devices, ...).
-_Avoid_: section, category, tab
+A collapsible band of Panels for one group of Activities (CPU, Disks, Network devices, ...). Grafana's other layout unit is the tab, which sarDa does not use.
+_Avoid_: section, category
 
 **Panel**:
-One chart inside a Row, showing the Series of one Metric or of a few related Metrics of the same Activity. Every Metric recorded in the SA files gets a Panel, even when all its Samples are zero; an Activity the files do not contain gets none.
-_Avoid_: graph, chart, widget
+One Visualization inside a Row, querying one Metric or a few related Metrics of the same Activity. Every Metric recorded in the SA files gets a Panel, even when all its Samples are zero; an Activity the files do not contain gets none.
+_Avoid_: chart, graph, widget
+
+**Visualization**:
+What a Panel draws: the graphical representation of its query results; every sarDa Panel uses the time-series Visualization.
+_Avoid_: chart, graph
 
 **Variable**:
-A multi-select filter in the Dashboard header (host, cpu, dev, iface, ...) whose choices are the label values present in the data.
+A Dashboard placeholder (host, cpu, dev, iface, ...) whose values come from the labels in the data, shown as a multi-select drop-down at the top of the page. Grafana's *filters* are a separate variable type, which sarDa does not use.
 _Avoid_: filter, template variable, dropdown

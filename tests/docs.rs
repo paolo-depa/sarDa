@@ -29,7 +29,7 @@ fn readme_lists_every_exit_code() {
         Kind::NoRuntime,
         Kind::MissingImage,
         Kind::NoData,
-        Kind::ViewerFailed,
+        Kind::GrafanaFailed,
         Kind::PortUnavailable,
     ] {
         let row = format!("| {} |", kind.exit_code());
