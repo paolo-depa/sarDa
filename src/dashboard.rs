@@ -1,11 +1,9 @@
 //! Grafana dashboard generation from the Metric catalog and the data actually
-//! found: only Activities and metrics present in the SA files get panels, and
-//! per-entity panels use label variables so any host's devices work.
-//!
-//! A metric whose samples are all zero carries no information (the device or
-//! activity was idle or never collected), so it gets no panel either - the
-//! same rule as sadf's `-O skipempty` for its SVG views. `--include-empty`
-//! keeps those panels for cases where "nothing happened" is the finding.
+//! found. Panels follow what the SA files *collected*, not what the values
+//! happen to be: a recorded Activity gets its panels even when every sample
+//! is zero (an idle device, a host that never swapped), while an Activity the
+//! file does not contain gets no row and no panel. Per-entity panels use label
+//! variables so any host's devices work.
 
 use std::collections::BTreeSet;
 
@@ -117,23 +115,16 @@ fn timeseries(
 
 /// Metric columns of `activity` that produced at least one series, in header
 /// order (text columns such as `DEVICE` are skipped).
-fn value_columns<'a>(
-    activity: &Activity,
-    header: &'a [String],
-    store: &Store,
-    include_empty: bool,
-) -> Vec<&'a str> {
+fn value_columns<'a>(activity: &Activity, header: &'a [String], store: &Store) -> Vec<&'a str> {
     header
         .iter()
         .map(String::as_str)
         .filter(|h| !activity.is_meta_column(h) && *h != HOST_COLUMN)
         .filter(|h| {
-            let metric = metric_name(activity.label, h);
-            if include_empty {
-                store.by_name(&metric).next().is_some()
-            } else {
-                store.is_active(&metric)
-            }
+            store
+                .by_name(&metric_name(activity.label, h))
+                .next()
+                .is_some()
         })
         .collect()
 }
@@ -145,9 +136,8 @@ fn activity_panels(
     store: &Store,
     ids: &mut Ids,
     ctx: &Ctx,
-    include_empty: bool,
 ) -> Vec<Value> {
-    let columns = value_columns(activity, header, store, include_empty);
+    let columns = value_columns(activity, header, store);
     let mut panels = Vec::new();
 
     if let Some(dim) = &activity.dimension {
@@ -267,7 +257,7 @@ fn interval_text(interval_ms: i64) -> String {
     }
 }
 
-pub fn generate(ds: &Dataset, store: &Store, include_empty: bool) -> Value {
+pub fn generate(ds: &Dataset, store: &Store) -> Value {
     let hosts = store.hosts();
     let ctx = Ctx {
         multi_host: hosts.len() > 1,
@@ -301,20 +291,13 @@ pub fn generate(ds: &Dataset, store: &Store, include_empty: bool) -> Value {
     for (group, entries) in groups.iter() {
         let mut group_panels: Vec<Value> = Vec::new();
         for (activity, table) in entries {
-            let panels = activity_panels(
-                activity,
-                &table.header,
-                store,
-                &mut ids,
-                &ctx,
-                include_empty,
-            );
+            let panels = activity_panels(activity, &table.header, store, &mut ids, &ctx);
             if panels.is_empty() {
                 continue;
             }
             if let Some(dim) = &activity.dimension {
                 if seen_dims.insert(dim.label) {
-                    let first = value_columns(activity, &table.header, store, include_empty)[0];
+                    let first = value_columns(activity, &table.header, store)[0];
                     let metric = metric_name(activity.label, first);
                     variables.push(variable(
                         dim.label,
@@ -404,17 +387,10 @@ mod tests {
         )
         .unwrap()
         .0;
-        let swap = Table::parse(
-            "# hostname;interval;timestamp;pswpin/s;pswpout/s\n\
-             h;60;2026-11-25 10:00:00 UTC;0.00;0.00\n",
-        )
-        .unwrap()
-        .0;
         Dataset {
             tables: vec![
                 (activity("per_cpu").unwrap(), cpu),
                 (activity("memory").unwrap(), mem),
-                (activity("swap").unwrap(), swap),
             ],
             warnings: vec![],
         }
@@ -436,7 +412,7 @@ mod tests {
     fn generates_dimension_panels_with_variables() {
         let ds = dataset();
         let store = Store::from_dataset(&ds);
-        let d = generate(&ds, &store, false);
+        let d = generate(&ds, &store);
         let names: Vec<&str> = d["templating"]["list"]
             .as_array()
             .unwrap()
@@ -457,11 +433,77 @@ mod tests {
         assert_eq!(idle["interval"], "1m");
     }
 
+    fn dataset_with_swap() -> Dataset {
+        use crate::table::Table;
+        let mut ds = dataset();
+        let swap = Table::parse(
+            "# hostname;interval;timestamp;pswpin/s;pswpout/s\n\
+             h;60;2026-11-25 10:00:00 UTC;0.00;0.00\n",
+        )
+        .unwrap()
+        .0;
+        ds.tables.push((activity("swap").unwrap(), swap));
+        ds
+    }
+
+    #[test]
+    fn zero_valued_activities_keep_their_panels() {
+        let ds = dataset_with_swap();
+        let store = Store::from_dataset(&ds);
+        assert!(store.by_name("sarda_swap_pswpin_s").next().is_some());
+        let d = generate(&ds, &store);
+        let targets: Vec<&str> = all_panels(&d)
+            .iter()
+            .flat_map(|p| p["targets"].as_array().unwrap().iter())
+            .map(|t| t["expr"].as_str().unwrap())
+            .collect();
+        assert!(
+            targets.iter().any(|e| e.starts_with("sarda_swap_pswpin_s")),
+            "a recorded activity gets its panel even when every value is zero"
+        );
+        let rows: Vec<&str> = d["panels"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|p| p["type"] == "row")
+            .map(|p| p["title"].as_str().unwrap())
+            .collect();
+        assert!(rows.contains(&"Swap"));
+    }
+
+    #[test]
+    fn activities_missing_from_the_files_get_no_panels() {
+        // The fixture dataset has per_cpu and memory only.
+        let ds = dataset();
+        let store = Store::from_dataset(&ds);
+        let d = generate(&ds, &store);
+        let text = serde_json::to_string(&all_panels(&d)).unwrap();
+        for absent in [
+            "sarda_disk_",
+            "sarda_swap_",
+            "sarda_network_dev_",
+            "sarda_tty_",
+        ] {
+            assert!(
+                !text.contains(absent),
+                "panel for unrecorded activity: {absent}"
+            );
+        }
+        let rows: Vec<&str> = d["panels"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|p| p["type"] == "row")
+            .map(|p| p["title"].as_str().unwrap())
+            .collect();
+        assert_eq!(rows, ["CPU", "Memory"]);
+    }
+
     #[test]
     fn unknown_columns_are_not_dropped() {
         let ds = dataset();
         let store = Store::from_dataset(&ds);
-        let d = generate(&ds, &store, false);
+        let d = generate(&ds, &store);
         let other = all_panels(&d)
             .into_iter()
             .find(|p| p["title"] == "Other")
@@ -476,7 +518,7 @@ mod tests {
     fn rows_are_ordered_and_later_ones_collapsed() {
         let ds = dataset();
         let store = Store::from_dataset(&ds);
-        let d = generate(&ds, &store, false);
+        let d = generate(&ds, &store);
         let rows: Vec<&str> = d["panels"]
             .as_array()
             .unwrap()
@@ -492,64 +534,13 @@ mod tests {
     fn panel_ids_are_unique_including_nested_ones() {
         let ds = dataset();
         let store = Store::from_dataset(&ds);
-        let d = generate(&ds, &store, false);
+        let d = generate(&ds, &store);
         let mut ids = BTreeSet::new();
         for p in d["panels"].as_array().unwrap() {
             assert!(ids.insert(p["id"].as_u64().unwrap()));
             for nested in p["panels"].as_array().into_iter().flatten() {
                 assert!(ids.insert(nested["id"].as_u64().unwrap()));
             }
-        }
-    }
-
-    #[test]
-    fn all_zero_activities_get_no_panels_or_variables() {
-        let ds = dataset();
-        let store = Store::from_dataset(&ds);
-        let d = generate(&ds, &store, false);
-        let text = serde_json::to_string(&d).unwrap();
-        assert!(
-            !text.contains("sarda_swap_pswpin_s"),
-            "all-zero panel must be hidden"
-        );
-        let rows: Vec<&str> = d["panels"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .filter(|p| p["type"] == "row")
-            .map(|p| p["title"].as_str().unwrap())
-            .collect();
-        assert_eq!(rows, ["CPU", "Memory"], "the Swap row must be gone");
-
-        let shown = generate(&ds, &store, true);
-        let text = serde_json::to_string(&shown).unwrap();
-        assert!(
-            text.contains("sarda_swap_pswpin_s"),
-            "--include-empty keeps it"
-        );
-        assert!(text.contains("\"Swap\""));
-    }
-
-    #[test]
-    fn collapsing_counts_only_rows_that_exist() {
-        // CPU (expanded), Memory (expanded), Swap (all zero, dropped) and a
-        // fourth group after it: with three visible rows the first three stay
-        // expanded, so the fourth would be collapsed - here Swap is dropped and
-        // nothing is collapsed.
-        let ds = dataset();
-        let store = Store::from_dataset(&ds);
-        let d = generate(&ds, &store, false);
-        for p in d["panels"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .filter(|p| p["type"] == "row")
-        {
-            assert_eq!(
-                p["collapsed"], false,
-                "row {} should be expanded",
-                p["title"]
-            );
         }
     }
 
@@ -563,7 +554,7 @@ mod tests {
     fn time_range_matches_the_data() {
         let ds = dataset();
         let store = Store::from_dataset(&ds);
-        let d = generate(&ds, &store, false);
+        let d = generate(&ds, &store);
         assert_eq!(d["time"]["from"], "2026-11-25T10:00:00Z");
     }
 

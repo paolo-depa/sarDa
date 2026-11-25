@@ -155,14 +155,6 @@ impl Store {
             .flat_map(|idx| idx.iter().map(|&i| &self.series[i]))
     }
 
-    /// Whether any sample of this metric is non-zero, i.e. the metric carries
-    /// information for the Observation window. All-zero metrics come from
-    /// devices or activities that were idle or not collected.
-    pub fn is_active(&self, name: &str) -> bool {
-        self.by_name(name)
-            .any(|s| s.samples.iter().any(|(_, v)| *v != 0.0))
-    }
-
     pub fn metric_names(&self) -> Vec<&str> {
         let mut names: Vec<&str> = self.by_name.keys().map(String::as_str).collect();
         names.sort_unstable();

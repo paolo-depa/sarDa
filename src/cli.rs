@@ -85,11 +85,6 @@ pub struct Cli {
     #[arg(long)]
     pub json: bool,
 
-    /// Also show panels whose values are zero throughout (normally hidden,
-    /// like sadf's -O skipempty).
-    #[arg(long)]
-    pub include_empty: bool,
-
     /// Print debug details on stderr.
     #[arg(short, long)]
     pub verbose: bool,

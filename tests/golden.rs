@@ -122,7 +122,7 @@ fn store_exposes_labelled_series() {
 fn every_dashboard_query_parses_and_returns_data() {
     let ds = load(None, None);
     let store = Store::from_dataset(&ds);
-    let dash = dashboard::generate(&ds, &store, false);
+    let dash = dashboard::generate(&ds, &store);
 
     let mut exprs = Vec::new();
     let mut ids = BTreeSet::new();
@@ -138,40 +138,41 @@ fn every_dashboard_query_parses_and_returns_data() {
             collect(nested);
         }
     }
-    assert!(exprs.len() > 40, "only {} queries generated", exprs.len());
+    assert!(exprs.len() > 50, "only {} queries generated", exprs.len());
 
-    // The dashboard follows the data: every panel shows something, and every
-    // metric that carries information is reachable from a panel.
-    let metric_of = |expr: &str| expr.split('{').next().unwrap().to_string();
-    for e in &exprs {
-        assert!(
-            store.is_active(&metric_of(e)),
-            "panel for an all-zero metric: {e}"
-        );
-    }
-    let panel_metrics: BTreeSet<String> = exprs.iter().map(|e| metric_of(e)).collect();
-    let active: Vec<&str> = store
-        .metric_names()
-        .into_iter()
-        .filter(|m| store.is_active(m))
+    // Panels follow what was collected, not what the values are: an Activity
+    // present in the files has panels even if every sample is zero, and an
+    // Activity absent from them has none.
+    let metrics = store.metric_names();
+    let panel_metrics: BTreeSet<String> = exprs
+        .iter()
+        .map(|e| e.split('{').next().unwrap().to_string())
         .collect();
-    assert!(!active.is_empty());
-    for metric in active {
-        assert!(
-            panel_metrics.contains(metric),
-            "active metric {metric} has no panel"
+    let present: BTreeSet<&str> = ds.tables.iter().map(|(a, _)| a.label).collect();
+    for activity in sarda::catalog::ACTIVITIES {
+        let prefix = format!("sarda_{}_", activity.label);
+        let recorded = metrics.iter().any(|m| m.starts_with(&prefix));
+        let has_panel = panel_metrics.iter().any(|m| m.starts_with(&prefix));
+        assert_eq!(
+            has_panel, recorded,
+            "activity {}: recorded in the files = {recorded}, dashboards it = {has_panel}",
+            activity.label
         );
+        if !present.contains(activity.label) {
+            assert!(
+                !has_panel,
+                "activity {} is missing from the files",
+                activity.label
+            );
+        }
     }
-
-    // Known to be flat zero on this host, so its panel must be gone.
-    assert!(store.by_name("sarda_per_cpu_pct_nice").next().is_some());
-    assert!(!store.is_active("sarda_per_cpu_pct_nice"));
-    assert!(!panel_metrics.contains("sarda_per_cpu_pct_nice"));
-
-    // ... unless the user asks for empty panels.
-    let all = dashboard::generate(&ds, &store, true);
-    let all_text = serde_json::to_string(&all).unwrap();
-    assert!(all_text.contains("sarda_per_cpu_pct_nice"));
+    // Swap was recorded and is flat zero on this host: it keeps its panel.
+    let swap: Vec<&sarda::store::Series> = store.by_name("sarda_swap_pswpin_s").collect();
+    assert!(!swap.is_empty());
+    assert!(swap
+        .iter()
+        .all(|s| s.samples.iter().all(|(_, v)| *v == 0.0)));
+    assert!(panel_metrics.contains("sarda_swap_pswpin_s"));
 
     let variables: Vec<String> = dash["templating"]["list"]
         .as_array()

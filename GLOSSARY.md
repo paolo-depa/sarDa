@@ -61,3 +61,21 @@ _Avoid_: engine, docker (when podman is meant)
 **CSV export**:
 The optional per-Metric CSV files written with `--export-csv`, kept for workflows that predate the Viewer.
 _Avoid_: output dir, dump
+
+## Viewer layout
+
+**Dashboard**:
+The single page the Viewer opens: Rows of Panels for the data of one Session, preset to the Observation window.
+_Avoid_: view, board, page
+
+**Row**:
+A collapsible band of Panels for one group of Activities (CPU, Disks, Network devices, ...).
+_Avoid_: section, category, tab
+
+**Panel**:
+One chart inside a Row, showing the Series of one Metric or of a few related Metrics of the same Activity. Every Metric recorded in the SA files gets a Panel, even when all its Samples are zero; an Activity the files do not contain gets none.
+_Avoid_: graph, chart, widget
+
+**Variable**:
+A multi-select filter in the Dashboard header (host, cpu, dev, iface, ...) whose choices are the label values present in the data.
+_Avoid_: filter, template variable, dropdown
