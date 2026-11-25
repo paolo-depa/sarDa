@@ -343,8 +343,9 @@ impl Verdict {
 /// inclusive date bounds of files to skip (`YYYY-MM-DD`, empty for none), and
 /// the remaining positional parameters are the SA file paths.
 pub fn build_script(skip_before: Option<&str>, skip_after: Option<&str>) -> String {
-    // Uses only what a SUSE BCI micro image provides: sh, sadf, mktemp, tr,
-    // cat and rm. No sed, grep or awk.
+    // Stays within POSIX sh and coreutils (sh, mktemp, tr, cat, rm) next to
+    // sadf, with no sed, grep or awk, so the parser image can move to a
+    // minimal base without touching the script (ADR 0007).
     let mut s = SCRIPT
         .replace("__SB__", skip_before.unwrap_or(""))
         .replace("__SA__", skip_after.unwrap_or(""));
@@ -567,29 +568,6 @@ pub fn run_in_container(
     Ok(output.with_inputs(inputs))
 }
 
-/// Developer/test helper: runs the script with the host's `sadf` instead of a
-/// container. Selected by `SARDA_SADF_HOST=1`; used to record test fixtures.
-pub fn run_on_host(inputs: &[Input], skip: (Option<&str>, Option<&str>)) -> Result<SadfOutput> {
-    let abs: Vec<PathBuf> = inputs
-        .iter()
-        .map(|i| {
-            std::fs::canonicalize(&i.path)
-                .map_err(|e| Error::other(format!("{}: {e}", i.path.display())))
-        })
-        .collect::<Result<_>>()?;
-    let mut child = std::process::Command::new("sh")
-        .arg("-c")
-        .arg(build_script(skip.0, skip.1))
-        .arg("sh")
-        .args([skip.0.unwrap_or(""), skip.1.unwrap_or("")])
-        .args(&abs)
-        .stdout(Stdio::piped())
-        .spawn()?;
-    let parsed = parse_stream(BufReader::new(child.stdout.take().expect("piped")));
-    child.wait()?;
-    Ok(parsed?.with_inputs(inputs))
-}
-
 pub fn read_stream_file(path: &Path) -> Result<SadfOutput> {
     let f =
         std::fs::File::open(path).map_err(|e| Error::other(format!("{}: {e}", path.display())))?;
@@ -626,13 +604,13 @@ mod tests {
         for legacy in ["sed", "grep", "awk"] {
             assert!(
                 !s.contains(legacy) && !plain.contains(legacy),
-                "the script must run in a BCI micro image (no {legacy})"
+                "the script must stay within POSIX sh and coreutils (no {legacy}), ADR 0007"
             );
         }
         for legacy in ["sed", "grep", "awk"] {
             assert!(
                 !s.contains(legacy) && !plain.contains(legacy),
-                "the script must run in a BCI micro image (no {legacy})"
+                "the script must stay within POSIX sh and coreutils (no {legacy}), ADR 0007"
             );
         }
     }

@@ -27,6 +27,7 @@ pub fn containerfile() -> &'static str {
 }
 
 /// Inclusive date bounds of files that can be skipped without reading them.
+/// A file's day comes from its own header (`sadf -j -H`), never from its name.
 /// One day of slack on each side keeps the decision safe across the file's own
 /// timezone: a file is only skipped when it cannot contribute a sample to the
 /// Observation window.
@@ -36,7 +37,10 @@ fn skip_bounds(start: Option<i64>, end: Option<i64>) -> (Option<String>, Option<
     (start.map(|t| fmt(t - day)), end.map(|t| fmt(t + day)))
 }
 
-/// Progress goes to stderr; structured events go to stdout with `--json`.
+/// Progress goes to stderr; structured events go to stdout with `--json`. This
+/// is the only code that writes a run's result to stdout (the `--print-*`
+/// modes in `main.rs` aside), so callers can rely on stdout being only the
+/// URL, or one JSON object per line.
 pub struct Reporter {
     pub json: bool,
     pub verbose: bool,
@@ -166,44 +170,35 @@ fn wait_for_shutdown(
 pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
     let (start, end) = parse_window(cli)?;
     let inputs = existing_inputs(cli, rep)?;
-    let host_sadf = std::env::var_os("SARDA_SADF_HOST").is_some();
     let export_only = cli.no_grafana && cli.export_csv.is_some();
-    let rt = if !host_sadf || !cli.no_grafana {
-        Some(Runtime::detect(cli.runtime)?)
-    } else {
-        None
-    };
+    let rt = Runtime::detect(cli.runtime)?;
+    rep.debug(format!("using container runtime '{}'", rt.bin));
 
     let resources = Resources::new(rt.clone());
     let (tx, rx) = mpsc::channel();
     resources.handle_signals(tx);
     resources.sweep_stale();
 
-    if let Some(detected) = &rt {
-        rep.debug(format!("using container runtime '{}'", detected.bin));
-        if !host_sadf {
-            ensure_image(
-                detected,
-                &cli.sadf_image,
-                "sysstat (sadf)",
-                "Build it once on a machine with network access and load it here:\n  sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .\n  podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest   # then, on this host:\n  podman load -i sarda-sysstat.tar",
-                cli.no_pull,
-                rep,
-            )?;
-        }
-        if !cli.no_grafana {
-            ensure_image(
-                detected,
-                &cli.grafana_image,
-                "Grafana",
-                &format!(
-                    "Mirror it into your registry or load it from an archive:\n  podman pull {img} && podman save -o grafana.tar {img}   # on a connected machine\n  podman load -i grafana.tar                              # on this host",
-                    img = cli.grafana_image
-                ),
-                cli.no_pull,
-                rep,
-            )?;
-        }
+    ensure_image(
+        &rt,
+        &cli.sadf_image,
+        "sysstat (sadf)",
+        "Build it once on a machine with network access and load it here:\n  sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .\n  podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest   # then, on this host:\n  podman load -i sarda-sysstat.tar",
+        cli.no_pull,
+        rep,
+    )?;
+    if !cli.no_grafana {
+        ensure_image(
+            &rt,
+            &cli.grafana_image,
+            "Grafana",
+            &format!(
+                "Mirror it into your registry or load it from an archive:\n  podman pull {img} && podman save -o grafana.tar {img}   # on a connected machine\n  podman load -i grafana.tar                              # on this host",
+                img = cli.grafana_image
+            ),
+            cli.no_pull,
+            rep,
+        )?;
     }
 
     rep.info(format!(
@@ -212,18 +207,14 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
     ));
     let bounds = skip_bounds(start, end);
     let skip = (bounds.0.as_deref(), bounds.1.as_deref());
-    let output: SadfOutput = if host_sadf {
-        sadf::run_on_host(&inputs, skip)?
-    } else {
-        sadf::run_in_container(
-            rt.as_ref().expect("runtime detected"),
-            &cli.sadf_image,
-            &inputs,
-            skip,
-            Duration::from_secs(cli.sadf_timeout),
-            &resources,
-        )?
-    };
+    let output: SadfOutput = sadf::run_in_container(
+        &rt,
+        &cli.sadf_image,
+        &inputs,
+        skip,
+        Duration::from_secs(cli.sadf_timeout),
+        &resources,
+    )?;
 
     let verdicts = output.verdicts();
     let problems: Vec<String> = verdicts.iter().filter_map(Verdict::problem).collect();
@@ -290,7 +281,6 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
         return Ok(());
     }
 
-    let rt = rt.expect("runtime detected");
     let port = grafana::pick_port(cli.port.or(Some(DEFAULT_PORT)), cli.port.is_some())?;
     let dashboard = dashboard::generate(&ds, &store);
     rep.info(format!("Starting Grafana ({}) ...", cli.grafana_image));

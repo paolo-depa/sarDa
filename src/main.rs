@@ -1,3 +1,6 @@
+//! Entry point: the `--print-*` modes write their text to stdout and exit;
+//! every other run goes through [`sarda::session::run`].
+
 use std::process::ExitCode;
 
 use clap::Parser;

@@ -48,7 +48,7 @@ pub struct Container {
 }
 
 struct State {
-    runtime: Option<Runtime>,
+    runtime: Runtime,
     pid: u32,
     temp_base: PathBuf,
     containers: Mutex<Vec<String>>,
@@ -94,9 +94,7 @@ impl Handle {
 
     /// Removes one container now, keeping it registered.
     pub fn remove_container(&self, name: &str) {
-        if let Some(rt) = &self.0.runtime {
-            rt.remove_container(name);
-        }
+        self.0.runtime.remove_container(name);
     }
 
     /// Removes every registered container and directory. Idempotent.
@@ -134,9 +132,7 @@ impl Handle {
 
     /// Removes containers left behind by an earlier run whose process is gone.
     pub fn sweep_stale(&self) {
-        let Some(rt) = &self.0.runtime else {
-            return;
-        };
+        let rt = &self.0.runtime;
         let format = format!("{{{{.Names}}}} {{{{.Label \"{LABEL}\"}}}}");
         let Ok(out) = rt
             .command()
@@ -170,14 +166,11 @@ fn process_alive(pid: u32) -> bool {
 pub struct Resources(Handle);
 
 impl Resources {
-    /// `runtime` is `None` when no container is ever started (host `sadf`
-    /// together with `--no-grafana`); only the temp dirs and the phase logic
-    /// are then in play.
-    pub fn new(runtime: Option<Runtime>) -> Resources {
+    pub fn new(runtime: Runtime) -> Resources {
         Resources::with_temp_base(runtime, std::env::temp_dir())
     }
 
-    pub fn with_temp_base(runtime: Option<Runtime>, temp_base: PathBuf) -> Resources {
+    pub fn with_temp_base(runtime: Runtime, temp_base: PathBuf) -> Resources {
         Resources(Handle(Arc::new(State {
             runtime,
             pid: std::process::id(),
@@ -265,7 +258,8 @@ mod tests {
 
     #[test]
     fn claimed_containers_are_named_and_labelled_by_pid() {
-        let res = Resources::new(None);
+        let fake = Fake::new("claim", &[]);
+        let res = Resources::new(fake.runtime.clone());
         let pid = std::process::id();
         let c = res.claim_container(Role::Grafana);
         assert_eq!(c.name, format!("sarda-{pid}-grafana"));
@@ -284,7 +278,7 @@ mod tests {
         let fake = Fake::new("remove-all", &[]);
         let base = fake.dir.join("tmp");
         std::fs::create_dir_all(&base).unwrap();
-        let res = Resources::with_temp_base(Some(fake.runtime.clone()), base);
+        let res = Resources::with_temp_base(fake.runtime.clone(), base);
         let grafana = res.claim_container(Role::Grafana);
         let sadf = res.claim_container(Role::Sadf);
         let dir = res.claim_temp_dir();
@@ -303,7 +297,7 @@ mod tests {
     #[test]
     fn released_containers_are_not_removed() {
         let fake = Fake::new("release", &[]);
-        let res = Resources::new(Some(fake.runtime.clone()));
+        let res = Resources::new(fake.runtime.clone());
         let sadf = res.claim_container(Role::Sadf);
         let grafana = res.claim_container(Role::Grafana);
         res.release(&sadf.name);
@@ -316,7 +310,7 @@ mod tests {
         let fake = Fake::new("drop", &[]);
         let name;
         {
-            let res = Resources::new(Some(fake.runtime.clone()));
+            let res = Resources::new(fake.runtime.clone());
             name = res.claim_container(Role::Grafana).name;
         }
         assert_eq!(fake.calls(), [format!("rm -f {name}")]);
@@ -325,7 +319,7 @@ mod tests {
     #[test]
     fn handles_share_state_with_the_owner() {
         let fake = Fake::new("handle", &[]);
-        let res = Resources::new(Some(fake.runtime.clone()));
+        let res = Resources::new(fake.runtime.clone());
         let clone = (*res).clone();
         let name = clone.claim_container(Role::Sadf).name;
         drop(clone);
@@ -352,7 +346,7 @@ mod tests {
                 "lonely-name".into(),
             ],
         );
-        let res = Resources::new(Some(fake.runtime.clone()));
+        let res = Resources::new(fake.runtime.clone());
         res.sweep_stale();
 
         let calls = fake.calls();
@@ -362,10 +356,5 @@ mod tests {
         assert_eq!(removed.len(), 2, "{calls:?}");
         assert!(removed.contains(&&format!("rm -f sarda-{dead}-grafana")));
         assert!(removed.contains(&&format!("rm -f sarda-{dead}-sadf")));
-    }
-
-    #[test]
-    fn sweep_without_a_runtime_does_nothing() {
-        Resources::new(None).sweep_stale();
     }
 }

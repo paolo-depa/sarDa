@@ -138,6 +138,8 @@ impl Grafana {
         };
 
         let home = format!("{PROVISIONING_DIR}/dashboards/json/{DASHBOARD_FILE}");
+        // sarDa runs air-gapped: everything that would phone home or fetch
+        // plugins is switched off, and the only data source is the Sarda API.
         let env = [
             ("GF_SERVER_HTTP_ADDR", "127.0.0.1".to_string()),
             ("GF_SERVER_HTTP_PORT", spec.port.to_string()),

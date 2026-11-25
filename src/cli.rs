@@ -1,3 +1,5 @@
+//! The command line. `--help` is the reference for options and exit codes.
+
 use std::path::PathBuf;
 
 use clap::Parser;

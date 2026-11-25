@@ -1,6 +1,10 @@
+//! Failure categories. The exit codes are a contract with scripts and
+//! agents: they are listed in `--help` and in the README, and `tests/docs.rs`
+//! checks that both agree with [`Kind::exit_code`].
+
 use std::fmt;
 
-/// Failure categories, each mapped to a stable process exit code (see README).
+/// Failure categories, each mapped to a stable process exit code.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     Other,

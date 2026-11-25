@@ -2,7 +2,8 @@
 //! found. Panels follow what the SA files *collected*, not what the values
 //! happen to be: a recorded Activity gets its panels even when every sample
 //! is zero (an idle device, a host that never swapped), while an Activity the
-//! file does not contain gets no row and no panel. Per-entity panels use label
+//! file does not contain gets no row and no panel. A flat chart is a finding,
+//! so values never decide whether a panel exists. Per-entity panels use label
 //! variables so any host's devices work.
 
 use std::collections::BTreeSet;

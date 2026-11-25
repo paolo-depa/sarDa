@@ -73,7 +73,8 @@ impl Runtime {
     }
 
     /// Tries to pull `image`, giving up after `timeout` (an air-gapped host
-    /// may otherwise hang on name resolution).
+    /// may otherwise hang on name resolution). This is sarDa's only network
+    /// use at run time, and only `session::ensure_image` calls it.
     pub fn pull(&self, image: &str, timeout: Duration) -> bool {
         let Ok(mut child) = self
             .command()

@@ -52,7 +52,6 @@ fn sarda(path_dir: &Path) -> Command {
     let mut c = Command::new(BIN);
     c.env("PATH", path_dir)
         .env_remove("SARDA_RUNTIME")
-        .env_remove("SARDA_SADF_HOST")
         .env_remove("SARDA_GRAFANA_IMAGE")
         .env_remove("SARDA_SADF_IMAGE");
     c

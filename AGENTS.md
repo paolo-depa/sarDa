@@ -1,33 +1,11 @@
 # sarDa
 
-One Rust executable: SA files in, Grafana URL out. It converts with `sadf` in a container, serves a Prometheus-compatible API on loopback, and starts a provisioned Grafana container. Users read `README.md`; vocabulary is in `GLOSSARY.md`; the reasons behind the shape are in `docs/adr/`. Read the ADRs before changing architecture, networking, dependencies or the data path.
+One Rust executable: SA files in, Grafana URL out. The code is the source of truth: when this file or anything under `docs/agents/` disagrees with the code, the code wins and the doc is the bug. A test checks that the paths and `module::name` pointers written there still exist.
 
-## Verify
+Start at `src/lib.rs`, whose crate doc maps the data path. Vocabulary is in `GLOSSARY.md`: use its terms, and add one when you name a new concept. Users read `README.md`.
 
-- `cargo test` is hermetic: fake `podman`/`docker` scripts, a recorded `sadf` stream, no network, no images.
-- `SARDA_E2E=1 cargo test --test cli e2e_with_real_grafana` runs the real thing. It needs podman plus both images locally: `cargo run -q -- --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .` and the Grafana image named in `src/cli.rs` (`DEFAULT_GRAFANA_IMAGE`).
-- Run the E2E test after touching `grafana.rs`, `dashboard.rs`, `api.rs` or the Grafana environment variables. Unit tests cannot see Grafana's behaviour.
+Load when:
 
-## Data path
-
-`sadf.rs` (header probe per file, settled into one `Verdict` each; then a marker stream of `sadf -d` output) → `dataset.rs` (merge, window; one `Table` per Activity) → `store.rs` (labelled Series) → `api.rs` + `promql.rs` (Grafana reads here), `dashboard.rs` (generated JSON), `csvexport.rs` (`--export-csv`). `session.rs` orchestrates; `grafana.rs` starts and probes the Grafana container; `resources.rs` owns every container and temp path a run creates, and their removal.
-
-## Rules that are not visible in the code
-
-- **The probe decides what is skippable, not the file name.** `sadf -j -H` gives a file's host and `file-date`; `session::skip_bounds` keeps one day of slack around the window so a file is only skipped when its own timezone cannot bring it inside. Activities are skipped in the shell script (`tests/script.rs` covers it); never re-add a filename-based guess.
-- **The catalog is the only place that knows Activities.** Add or change one in `src/catalog.rs`; parsing, metric names, panels and docs follow. Then refresh the README table: `cargo run -q -- --print-catalog` (a test fails while it is stale). Panel titles come from `description`, so keep descriptions unique.
-- **Air-gapped.** No run-time network use beyond the single `pull` attempt in `session::ensure_image`. No plugin installs, update checks or telemetry; the Grafana `GF_*` variables in `grafana.rs` switch those off.
-- **Loopback only.** Everything binds `127.0.0.1`. Anonymous Admin in Grafana is only acceptable because of that (ADR 0005); never combine it with another bind address.
-- **Unsupported PromQL must error, never approximate.** `promql.rs` rejects what it cannot evaluate with an explanatory message; Grafana shows it in the panel.
-- **Panels follow collection, not values.** An Activity recorded in the SA files gets its row and panels even when every sample is zero; an Activity the files lack gets none. Do not reintroduce value-based filtering: a flat zero chart is a finding. `tests/golden.rs` asserts this in both directions for every catalog Activity.
-- **stdout is the result channel**: the URL, or JSON events with `--json`. Everything else goes to stderr through `Reporter`. Never `println!` elsewhere.
-- **Exit codes are a contract**: `error::Kind` maps to the table in the README, and a test checks they agree. Add a `Kind` and a README row together.
-- **Time is UTC end to end.** `sadf -d` emits UTC; `--start/--end` without an offset mean UTC.
-- **The sysstat image is the delivered package** (BCI 16.1, sysstat 12.7.9); do not compile sysstat (ADR 0007).
-- **Never infer incompatibility from empty output**: `sadf` exits 0 with zero rows for files written by a newer sysstat. `sadf::Verdict` decides from each file's own header (ADR 0007).
-- **The parser script stays within POSIX `sh` and coreutils**: `sh`, `sadf`, `mktemp`, `tr`, `cat`, `rm`. No `sed`, `grep` or `awk` (a unit test enforces it); `tests/script.rs` executes it with a fake `sadf`.
-- **No async runtime.** New crates must be vendorable: check with `scripts/dist.sh` (ADR 0004).
-
-## Fixtures
-
-`tests/fixtures/sadf.stream` is recorded `sadf` output, so tests need no `sadf`. `tests/fixtures/golden/` holds the CSV files the retired Python tool produced from the same input; `tests/golden.rs` holds the Rust export to them. Change that output format only on purpose, and update the golden files in the same commit. `SARDA_SADF_HOST=1` runs `sadf` on the host instead of the container, for recording fixtures only; `tests/fixtures/README.md` has the commands.
+- `docs/adr/`: before changing architecture, networking, dependencies, the sysstat image or the data path. They say why the shape is what it is.
+- `docs/agents/verify.md`: before running, writing or changing tests, or touching `src/grafana.rs`, `src/dashboard.rs` or `src/api.rs`.
+- `docs/agents/constraints.md`: before adding a dependency, network access, a port, a container, an output, an error or a metric.
