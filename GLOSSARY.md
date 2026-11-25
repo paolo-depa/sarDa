@@ -42,6 +42,10 @@ _Avoid_: time filter, date range
 One run of the executable: parse, serve, start the Grafana instance, wait for Ctrl-C, clean up.
 _Avoid_: job, run, instance
 
+**Session resources**:
+The containers (parser, Grafana) and temp paths one Session creates. All of them are removed when the Session ends, however it ends: normal exit, error, Ctrl-C or SIGTERM. Leftovers from a Session whose process died are swept at the next start.
+_Avoid_: leftovers, artifacts, state
+
 **Grafana instance**:
 The Grafana server started for a Session, provisioned with the SAR data source and the Dashboard, and removed when the Session ends.
 _Avoid_: viewer (Grafana's role for a read-only user, and the person opening dashboards), dashboard container

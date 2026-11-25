@@ -123,37 +123,6 @@ impl Runtime {
             .map(|o| String::from_utf8_lossy(&o.stdout).trim() == "true")
             .unwrap_or(false)
     }
-
-    /// Removes containers left behind by a previous sarDa run that was killed
-    /// before it could clean up. Only containers carrying our label whose
-    /// owning process no longer exists are touched.
-    pub fn remove_stale(&self) {
-        let Ok(out) = self
-            .command()
-            .args([
-                "ps",
-                "-a",
-                "--filter",
-                &format!("label={}", crate::grafana::LABEL),
-                "--format",
-                "{{.Names}}",
-            ])
-            .stderr(Stdio::null())
-            .output()
-        else {
-            return;
-        };
-        for name in String::from_utf8_lossy(&out.stdout).lines() {
-            let pid = name
-                .strip_prefix(crate::grafana::NAME_PREFIX)
-                .and_then(|p| p.parse::<u32>().ok());
-            if let Some(pid) = pid {
-                if !std::path::Path::new(&format!("/proc/{pid}")).exists() {
-                    self.remove_container(name);
-                }
-            }
-        }
-    }
 }
 
 pub fn missing_image_help(image: &str, role: &str, build_hint: &str) -> String {

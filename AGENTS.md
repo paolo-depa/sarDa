@@ -10,7 +10,7 @@ One Rust executable: SA files in, Grafana URL out. It converts with `sadf` in a 
 
 ## Data path
 
-`sadf.rs` (header probe per file, then a marker stream of `sadf -d` output) → `dataset.rs` (merge, window; one `Table` per Activity) → `store.rs` (labelled Series) → `api.rs` + `promql.rs` (Grafana reads here), `dashboard.rs` (generated JSON), `csvexport.rs` (`--export-csv`). `session.rs` orchestrates; `grafana.rs` owns the Grafana container and its cleanup.
+`sadf.rs` (header probe per file, then a marker stream of `sadf -d` output) → `dataset.rs` (merge, window; one `Table` per Activity) → `store.rs` (labelled Series) → `api.rs` + `promql.rs` (Grafana reads here), `dashboard.rs` (generated JSON), `csvexport.rs` (`--export-csv`). `session.rs` orchestrates; `grafana.rs` starts and probes the Grafana container; `resources.rs` owns every container and temp path a run creates, and their removal.
 
 ## Rules that are not visible in the code
 
@@ -23,7 +23,6 @@ One Rust executable: SA files in, Grafana URL out. It converts with `sadf` in a 
 - **stdout is the result channel**: the URL, or JSON events with `--json`. Everything else goes to stderr through `Reporter`. Never `println!` elsewhere.
 - **Exit codes are a contract**: `error::Kind` maps to the table in the README, and a test checks they agree. Add a `Kind` and a README row together.
 - **Time is UTC end to end.** `sadf -d` emits UTC; `--start/--end` without an offset mean UTC.
-- **Cleanup must survive SIGTERM and Ctrl-C** in every phase (`session::install_signal_handler`). A new container or temp path needs a matching removal there and in `Grafana::cleanup`.
 - **The sysstat image is the delivered package** (BCI 16.1, sysstat 12.7.9); do not compile sysstat (ADR 0007).
 - **Compatibility is enforced host-side before the data path.** `sadf::read_sa_version` reads each file's magic header and compares it with the version in the `@@VERSION` stream marker; a newer file aborts with `Kind::IncompatibleFile` (exit 8), as does any file the probe cannot read. Never infer incompatibility from empty output: `sadf` exits 0 with zero rows for newer files.
 - **The parser script stays within POSIX `sh` and coreutils**: `sh`, `sadf`, `mktemp`, `tr`, `cat`, `rm`. No `sed`, `grep` or `awk` (a unit test enforces it); `tests/script.rs` executes it with a fake `sadf`.

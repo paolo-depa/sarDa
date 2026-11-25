@@ -7,6 +7,7 @@ pub mod dataset;
 pub mod error;
 pub mod grafana;
 pub mod promql;
+pub mod resources;
 pub mod runtime;
 pub mod sadf;
 pub mod session;

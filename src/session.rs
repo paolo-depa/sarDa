@@ -1,9 +1,8 @@
 //! One sarDa run: convert, serve, start the Grafana, wait, clean up.
 
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, RecvTimeoutError};
-use std::sync::{Arc, OnceLock};
+use std::sync::Arc;
 use std::time::Duration;
 
 use serde_json::{json, Value};
@@ -12,7 +11,8 @@ use crate::cli::{Cli, DEFAULT_PORT};
 use crate::dashboard::{self, DASHBOARD_UID};
 use crate::dataset::{self, Dataset};
 use crate::error::{Error, Kind, Result};
-use crate::grafana::{self, Grafana, GrafanaSpec, NAME_PREFIX};
+use crate::grafana::{self, Grafana, GrafanaSpec};
+use crate::resources::{Handle, Resources};
 use crate::runtime::{missing_image_help, Runtime};
 use crate::sadf::{self, SadfOutput};
 use crate::store::Store;
@@ -22,9 +22,6 @@ use crate::{api, csvexport};
 const CONTAINERFILE: &str = include_str!("../container/Containerfile.sysstat");
 const PULL_TIMEOUT: Duration = Duration::from_secs(30);
 const READY_TIMEOUT: Duration = Duration::from_secs(120);
-
-static SERVING: AtomicBool = AtomicBool::new(false);
-static RUNTIME: OnceLock<Runtime> = OnceLock::new();
 
 pub fn containerfile() -> &'static str {
     CONTAINERFILE
@@ -155,22 +152,6 @@ impl Reporter {
     }
 }
 
-fn install_signal_handler(tx: mpsc::Sender<()>) {
-    let _ = ctrlc::set_handler(move || {
-        if SERVING.load(Ordering::SeqCst) {
-            let _ = tx.send(());
-        } else {
-            let pid = std::process::id();
-            if let Some(rt) = RUNTIME.get() {
-                rt.remove_container(&format!("sarda-sadf-{pid}"));
-                rt.remove_container(&format!("{NAME_PREFIX}{pid}"));
-            }
-            let _ = std::fs::remove_dir_all(std::env::temp_dir().join(format!("sarda-{pid}")));
-            std::process::exit(130);
-        }
-    });
-}
-
 fn ensure_image(
     rt: &Runtime,
     image: &str,
@@ -240,8 +221,12 @@ fn summary(ds: &Dataset, store: &Store) -> Value {
     })
 }
 
-fn wait_for_shutdown(rx: &mpsc::Receiver<()>, grafana: Option<&Grafana>) -> Result<()> {
-    SERVING.store(true, Ordering::SeqCst);
+fn wait_for_shutdown(
+    resources: &Handle,
+    rx: &mpsc::Receiver<()>,
+    grafana: Option<&Grafana>,
+) -> Result<()> {
+    resources.mark_serving();
     loop {
         match rx.recv_timeout(Duration::from_secs(2)) {
             Ok(()) | Err(RecvTimeoutError::Disconnected) => return Ok(()),
@@ -262,20 +247,24 @@ fn wait_for_shutdown(rx: &mpsc::Receiver<()>, grafana: Option<&Grafana>) -> Resu
 pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
     let (start, end) = parse_window(cli)?;
     let files = existing_files(cli, rep)?;
-    let (tx, rx) = mpsc::channel();
-    install_signal_handler(tx);
-
     let host_sadf = std::env::var_os("SARDA_SADF_HOST").is_some();
     let export_only = cli.no_grafana && cli.export_csv.is_some();
-    let mut rt = None;
-    if !host_sadf || !cli.no_grafana {
-        let detected = Runtime::detect(cli.runtime)?;
+    let rt = if !host_sadf || !cli.no_grafana {
+        Some(Runtime::detect(cli.runtime)?)
+    } else {
+        None
+    };
+
+    let resources = Resources::new(rt.clone());
+    let (tx, rx) = mpsc::channel();
+    resources.handle_signals(tx);
+    resources.sweep_stale();
+
+    if let Some(detected) = &rt {
         rep.debug(format!("using container runtime '{}'", detected.bin));
-        let _ = RUNTIME.set(detected.clone());
-        detected.remove_stale();
         if !host_sadf {
             ensure_image(
-                &detected,
+                detected,
                 &cli.sadf_image,
                 "sysstat (sadf)",
                 "Build it once on a machine with network access and load it here:\n  sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .\n  podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest   # then, on this host:\n  podman load -i sarda-sysstat.tar",
@@ -285,7 +274,7 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
         }
         if !cli.no_grafana {
             ensure_image(
-                &detected,
+                detected,
                 &cli.grafana_image,
                 "Grafana",
                 &format!(
@@ -296,7 +285,6 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
                 rep,
             )?;
         }
-        rt = Some(detected);
     }
 
     rep.info(format!(
@@ -314,6 +302,7 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
             &files,
             skip,
             Duration::from_secs(cli.sadf_timeout),
+            &resources,
         )?
     };
     let names: Vec<String> = files
@@ -387,7 +376,7 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
         ));
         rep.result_line(&api_url);
         rep.event(json!({"event": "api_ready", "api_url": api_url, "data": info}));
-        wait_for_shutdown(&rx, None)?;
+        wait_for_shutdown(&resources, &rx, None)?;
         rep.event(json!({"event": "stopped"}));
         return Ok(());
     }
@@ -405,6 +394,7 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
             scrape_interval: format!("{}s", (store.interval_ms / 1000).max(1)),
             dashboard: &dashboard,
         },
+        &resources,
     )?;
     grafana.wait_ready(READY_TIMEOUT)?;
 
@@ -427,9 +417,9 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
         "data": info,
     }));
 
-    let result = wait_for_shutdown(&rx, Some(&grafana));
+    let result = wait_for_shutdown(&resources, &rx, Some(&grafana));
     rep.info("Stopping Grafana and cleaning up ...");
-    drop(grafana);
+    resources.remove_all();
     rep.event(json!({"event": "stopped"}));
     result
 }

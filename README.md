@@ -186,7 +186,7 @@ The Sarda API understands a subset of PromQL: selectors with `=`, `!=`, `=~`, `!
 | `no usable data` with `--start/--end` | times without an offset are **UTC**; add one, e.g. `+01:00` |
 | Grafana cannot reach the data | something blocks loopback connections; check `-v` output and local firewall/proxy settings |
 | port 3000 busy | sarda picks a free port automatically; pass `--port` to choose |
-| leftover containers after a crash | the next run removes stale `sarda-<pid>` containers whose process is gone |
+| leftover containers after a crash | the next run removes stale `sarda-<pid>-sadf` / `sarda-<pid>-grafana` containers whose process is gone |
 
 ## Building
 

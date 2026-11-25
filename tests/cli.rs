@@ -5,7 +5,8 @@
 use std::io::{BufRead, BufReader};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
+use std::time::Duration;
 
 const BIN: &str = env!("CARGO_BIN_EXE_sarda");
 
@@ -295,6 +296,97 @@ fn missing_sa_files_are_skipped_but_not_all() {
         .output()
         .unwrap();
     assert_eq!(out.status.code(), Some(2));
+}
+
+fn wait_for(path: &Path) {
+    for _ in 0..500 {
+        if path.exists() {
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    panic!("timed out waiting for {}", path.display());
+}
+
+fn terminate(child: &mut Child) -> Option<i32> {
+    Command::new("kill")
+        .args(["-TERM", &child.id().to_string()])
+        .status()
+        .unwrap();
+    child.wait().unwrap().code()
+}
+
+fn rm_calls(log: &Path) -> Vec<String> {
+    std::fs::read_to_string(log)
+        .unwrap_or_default()
+        .lines()
+        .map(str::to_string)
+        .collect()
+}
+
+#[test]
+fn sigterm_while_converting_removes_the_parser_container() {
+    let dir = scratch("sigterm-sadf");
+    let (log, started) = (dir.join("rm.log"), dir.join("started"));
+    fake_runtime(
+        &dir,
+        "podman",
+        &format!(
+            "case \"$1\" in\n rm) echo \"$@\" >> '{}';;\n run) touch '{}'; sleep 5;;\nesac",
+            log.display(),
+            started.display()
+        ),
+    );
+    let mut child = sarda(&dir)
+        .arg("--no-grafana")
+        .args(sa_files())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    wait_for(&started);
+    let pid = child.id();
+
+    assert_eq!(terminate(&mut child), Some(130));
+    assert_eq!(rm_calls(&log), [format!("rm -f sarda-{pid}-sadf")]);
+}
+
+#[test]
+fn sigterm_while_grafana_starts_removes_its_container_and_temp_dir() {
+    let dir = scratch("sigterm-grafana");
+    let (log, started) = (dir.join("rm.log"), dir.join("started"));
+    let tmp = dir.join("tmp");
+    std::fs::create_dir_all(&tmp).unwrap();
+    // `run -d` is Grafana (and never becomes healthy); any other `run` is sadf.
+    fake_runtime(
+        &dir,
+        "podman",
+        &format!(
+            "case \"$1\" in\n container) echo true;;\n rm) echo \"$@\" >> '{log}';;\n run) case \"$2\" in -d) touch '{started}';; *) cat '{stream}';; esac;;\nesac",
+            log = log.display(),
+            started = started.display(),
+            stream = fixtures().join("sadf.stream").display()
+        ),
+    );
+    let mut child = sarda(&dir)
+        .env("TMPDIR", &tmp)
+        .args(["--port", "0"])
+        .args(sa_files())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    wait_for(&started);
+    let pid = child.id();
+    let session_dir = tmp.join(format!("sarda-{pid}"));
+    assert!(
+        session_dir.join("provisioning").is_dir(),
+        "created before the signal"
+    );
+
+    assert_eq!(terminate(&mut child), Some(130));
+    assert_eq!(rm_calls(&log), [format!("rm -f sarda-{pid}-grafana")]);
+    assert!(!session_dir.exists(), "temp dir should be removed");
 }
 
 fn http_get(port: u16, path: &str) -> String {

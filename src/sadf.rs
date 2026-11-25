@@ -32,6 +32,7 @@ use serde_json::Value;
 
 use crate::catalog::ACTIVITIES;
 use crate::error::{Error, Result};
+use crate::resources::{Handle, Role};
 use crate::runtime::Runtime;
 
 #[derive(Debug, Clone, Default)]
@@ -314,14 +315,13 @@ pub fn run_in_container(
     files: &[PathBuf],
     skip: (Option<&str>, Option<&str>),
     timeout: Duration,
+    resources: &Handle,
 ) -> Result<SadfOutput> {
-    let name = format!("sarda-sadf-{}", std::process::id());
+    let container = resources.claim_container(Role::Sadf);
+    let name = container.name;
     let mut cmd = rt.command();
+    cmd.args(["run", "--rm"]).args(&container.args);
     cmd.args([
-        "run",
-        "--rm",
-        "--name",
-        &name,
         "--network=none",
         "--security-opt",
         "label=disable",
@@ -352,14 +352,18 @@ pub fn run_in_container(
     let done = Arc::new(AtomicBool::new(false));
     let timed_out = Arc::new(AtomicBool::new(false));
     let watchdog = {
-        let (done, timed_out, rt, name) =
-            (done.clone(), timed_out.clone(), rt.clone(), name.clone());
+        let (done, timed_out, resources, name) = (
+            done.clone(),
+            timed_out.clone(),
+            resources.clone(),
+            name.clone(),
+        );
         std::thread::spawn(move || {
             let start = Instant::now();
             while !done.load(Ordering::Relaxed) {
                 if start.elapsed() > timeout {
                     timed_out.store(true, Ordering::Relaxed);
-                    rt.remove_container(&name);
+                    resources.remove_container(&name);
                     return;
                 }
                 std::thread::sleep(Duration::from_millis(100));
@@ -377,6 +381,8 @@ pub fn run_in_container(
     done.store(true, Ordering::Relaxed);
     let _ = watchdog.join();
     let err_text = err_thread.join().unwrap_or_default();
+    // `run --rm` removed the container itself.
+    resources.release(&name);
 
     if timed_out.load(Ordering::Relaxed) {
         return Err(Error::other(format!(

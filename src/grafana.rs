@@ -2,7 +2,7 @@
 
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpListener, TcpStream};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::Stdio;
 use std::time::{Duration, Instant};
 
@@ -10,17 +10,15 @@ use serde_json::Value;
 
 use crate::dashboard::{DASHBOARD_UID, DATA_SOURCE_UID};
 use crate::error::{Error, Kind, Result};
+use crate::resources::{Handle, Role};
 use crate::runtime::Runtime;
 
-pub const LABEL: &str = "io.github.sarda.session";
-pub const NAME_PREFIX: &str = "sarda-";
 const PROVISIONING_DIR: &str = "/etc/grafana/provisioning";
 const DASHBOARD_FILE: &str = "sarda.json";
 
 pub struct Grafana {
     rt: Runtime,
     name: String,
-    dir: PathBuf,
     pub port: u16,
 }
 
@@ -115,11 +113,11 @@ pub fn http_get(port: u16, path: &str, timeout: Duration) -> Option<(u16, String
 }
 
 impl Grafana {
-    pub fn start(rt: &Runtime, spec: &GrafanaSpec) -> Result<Grafana> {
-        let pid = std::process::id();
-        let name = format!("{NAME_PREFIX}{pid}");
-        let dir = std::env::temp_dir().join(format!("sarda-{pid}"));
-        let prov = dir.join("provisioning");
+    /// Starts the container. What it creates is registered with `resources`,
+    /// which removes it again however the run ends.
+    pub fn start(rt: &Runtime, spec: &GrafanaSpec, resources: &Handle) -> Result<Grafana> {
+        let container = resources.claim_container(Role::Grafana);
+        let prov = resources.claim_temp_dir().join("provisioning");
         write_file(
             &prov.join("datasources/sarda.yaml"),
             &data_source_yaml(spec.api_addr, &spec.scrape_interval),
@@ -133,10 +131,9 @@ impl Grafana {
             &serde_json::to_string_pretty(spec.dashboard).unwrap_or_default(),
         )?;
 
-        let mut grafana = Grafana {
+        let grafana = Grafana {
             rt: rt.clone(),
-            name: name.clone(),
-            dir,
+            name: container.name.clone(),
             port: spec.port,
         };
 
@@ -155,8 +152,8 @@ impl Grafana {
             ("GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH", home),
         ];
         let mut cmd = rt.command();
-        cmd.args(["run", "-d", "--rm", "--name", &name, "--label"])
-            .arg(format!("{LABEL}={pid}"))
+        cmd.args(["run", "-d", "--rm"])
+            .args(&container.args)
             .arg("--network=host")
             .arg("-v")
             .arg(format!("{}:{PROVISIONING_DIR}:ro,z", prov.display()));
@@ -170,7 +167,6 @@ impl Grafana {
             .output()
             .map_err(|e| Error::new(Kind::GrafanaFailed, format!("starting {}: {e}", rt.bin)))?;
         if !out.status.success() {
-            grafana.cleanup();
             return Err(Error::new(
                 Kind::GrafanaFailed,
                 format!(
@@ -254,17 +250,6 @@ impl Grafana {
 
     pub fn container_name(&self) -> &str {
         &self.name
-    }
-
-    fn cleanup(&mut self) {
-        self.rt.remove_container(&self.name);
-        let _ = std::fs::remove_dir_all(&self.dir);
-    }
-}
-
-impl Drop for Grafana {
-    fn drop(&mut self) {
-        self.cleanup();
     }
 }
 
