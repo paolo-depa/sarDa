@@ -183,7 +183,7 @@ pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
         &rt,
         &cli.sadf_image,
         "sysstat (sadf)",
-        "Build it once on a machine with network access and load it here:\n  sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .\n  podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest   # then, on this host:\n  podman load -i sarda-sysstat.tar",
+        "Build it once on a machine with network access and load it here:\n  sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .\n  podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest   # then, on this host:\n  podman load -i sarda-sysstat.tar\nA prebuilt image is published for every release, so a connected host can pull it instead (pass it with --sadf-image, or tag it localhost/sarda-sysstat:latest):\n  podman pull ghcr.io/paolo-depa/sarda-sysstat:latest",
         cli.no_pull,
         rep,
     )?;

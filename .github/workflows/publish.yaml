@@ -1,0 +1,80 @@
+# Publish the sysstat parser image to the GitHub Container Registry.
+#
+# A release is a git tag of the form v0.0.N (the first is v0.0.1). Pushing such
+# a tag builds the multi-arch image from container/Containerfile.sysstat and
+# pushes it to ghcr.io/<owner>/sarda-sysstat under the release version (the tag
+# without its leading v) and latest. A GitHub Release page is created to match.
+#
+#   push tag v0.0.1  ->  ghcr.io/<owner>/sarda-sysstat:0.0.1  +  :latest
+#
+# The image is exactly the one `sarda --print-containerfile` builds, so a
+# connected host can pull it straight from GHCR and load it onto an air-gapped
+# machine. Only the tag's own checkout is used; nothing else is fetched.
+
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# packages: write is what lets the build push to GHCR with GITHUB_TOKEN;
+# contents: write lets it create the GitHub Release page for the tag.
+permissions:
+  contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/sarda-sysstat
+  # bci/bci-base:16.1 is published for amd64/arm64/ppc64le/s390x; amd64 and
+  # arm64 are the set worth building on hosted runners. Reduce to
+  # linux/amd64 only if you need a single-arch image.
+  PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the tag
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (emulate the non-native arches)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release version (tag without its leading v)
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push the sysstat image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: container/Containerfile.sysstat
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.version.outputs.version }}
+
+      - name: Create the GitHub Release for the tag
+        # Runs only after the image pushed successfully (steps are sequential).
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
