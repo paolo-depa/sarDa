@@ -314,6 +314,39 @@ fn empty_window_exits_5() {
 }
 
 #[test]
+fn conversion_reports_each_file_as_it_starts() {
+    let dir = scratch("progress");
+    working_podman(&dir);
+    let out = sarda(&dir)
+        .args(["--no-grafana", "--export-csv"])
+        .arg(dir.join("csv"))
+        .args(sa_files())
+        .output()
+        .unwrap();
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(err.contains("[1/2] sa20261125"), "{err}");
+    assert!(err.contains("[2/2] sa20261126"), "{err}");
+}
+
+#[test]
+fn a_conversion_that_prints_nothing_is_stopped_and_named_as_stalled() {
+    let dir = scratch("stall");
+    fake_runtime(
+        &dir,
+        "podman",
+        "case \"$1\" in\n info|image|ps|rm|container) exit 0;;\n run) sleep 3;;\n *) exit 0;;\nesac",
+    );
+    let out = sarda(&dir)
+        .args(["--no-grafana", "--sadf-timeout", "1"])
+        .args(sa_files())
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(1));
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(err.contains("printed nothing for 1s"), "{err}");
+}
+
+#[test]
 fn a_directory_stands_for_its_daily_files() {
     let dir = scratch("dirarg");
     working_podman(&dir);

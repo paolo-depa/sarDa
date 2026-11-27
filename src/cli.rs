@@ -74,8 +74,8 @@ pub struct Cli {
     #[arg(long, value_name = "IMAGE", default_value = DEFAULT_SADF_IMAGE, env = "SARDA_SADF_IMAGE")]
     pub sadf_image: String,
 
-    /// Give up on sadf after this many seconds.
-    #[arg(long, value_name = "SECONDS", default_value_t = 600)]
+    /// Give up on sadf when it prints nothing for this many seconds.
+    #[arg(long, value_name = "SECONDS", default_value_t = 120)]
     pub sadf_timeout: u64,
 
     /// Do not try to pull missing images.

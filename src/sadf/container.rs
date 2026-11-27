@@ -2,7 +2,7 @@
 
 use std::io::{BufReader, Read};
 use std::process::Stdio;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
@@ -11,16 +11,19 @@ use crate::resources::{Handle, Role};
 use crate::runtime::Runtime;
 
 use super::script::build_script;
-use super::stream::{parse_stream, Input, SadfOutput};
+use super::stream::{parse_stream_with, Input, SadfOutput};
 
 /// Runs the script in a throwaway container created from `image`.
+/// `on_file` is told the index of each input as the script starts on it. The
+/// container is removed when it prints nothing for `stall`.
 pub fn run_in_container(
     rt: &Runtime,
     image: &str,
     inputs: &[Input],
     skip: (Option<&str>, Option<&str>),
-    timeout: Duration,
+    stall: Duration,
     resources: &Handle,
+    mut on_file: impl FnMut(usize),
 ) -> Result<SadfOutput> {
     let container = resources.claim_container(Role::Sadf);
     let name = container.name;
@@ -56,17 +59,21 @@ pub fn run_in_container(
 
     let done = Arc::new(AtomicBool::new(false));
     let timed_out = Arc::new(AtomicBool::new(false));
+    let started = Instant::now();
+    let last_output = Arc::new(AtomicU64::new(0));
     let watchdog = {
-        let (done, timed_out, resources, name) = (
+        let (done, timed_out, resources, name, last_output) = (
             done.clone(),
             timed_out.clone(),
             resources.clone(),
             name.clone(),
+            last_output.clone(),
         );
         std::thread::spawn(move || {
-            let start = Instant::now();
             while !done.load(Ordering::Relaxed) {
-                if start.elapsed() > timeout {
+                let quiet_for =
+                    started.elapsed().as_millis() as u64 - last_output.load(Ordering::Relaxed);
+                if quiet_for > stall.as_millis() as u64 {
                     timed_out.store(true, Ordering::Relaxed);
                     resources.remove_container(&name);
                     return;
@@ -81,7 +88,15 @@ pub fn run_in_container(
         s
     });
 
-    let parsed = parse_stream(BufReader::new(stdout));
+    let parsed = parse_stream_with(BufReader::new(stdout), |line| {
+        last_output.store(started.elapsed().as_millis() as u64, Ordering::Relaxed);
+        if let Some(index) = line
+            .strip_prefix("@@FILE ")
+            .and_then(|i| i.trim().parse().ok())
+        {
+            on_file(index);
+        }
+    });
     let status = child.wait();
     done.store(true, Ordering::Relaxed);
     let _ = watchdog.join();
@@ -91,8 +106,8 @@ pub fn run_in_container(
 
     if timed_out.load(Ordering::Relaxed) {
         return Err(Error::other(format!(
-            "sadf did not finish within {}s; raise --sadf-timeout",
-            timeout.as_secs()
+            "sadf printed nothing for {}s and was stopped; raise --sadf-timeout",
+            stall.as_secs()
         )));
     }
     let output = parsed?;

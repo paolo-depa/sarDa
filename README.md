@@ -64,7 +64,7 @@ A directory stands for the `saDD` / `saYYYYMMDD` files in it, so `sarda /var/log
 | `--port PORT` | Grafana port on 127.0.0.1 (default 3000, or any free port if 3000 is taken; `0` = any free port) |
 | `--runtime auto\|podman\|docker` | container runtime (default `auto`) |
 | `--grafana-image IMAGE`, `--sadf-image IMAGE` | override the images |
-| `--sadf-timeout SECONDS` | give up on the conversion (default 600) |
+| `--sadf-timeout SECONDS` | give up when the conversion prints nothing for this long (default 120); a long conversion that keeps making progress is never cut off |
 | `--no-pull` | never try to pull a missing image |
 | `--export-csv DIR` | also write the per-activity CSV files (the format of the former Python tool) |
 | `--no-grafana` | do not start Grafana: only serve the API, or with `--export-csv` just export and exit |

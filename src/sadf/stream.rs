@@ -106,11 +106,20 @@ impl SadfOutput {
 }
 
 pub fn parse_stream<R: BufRead>(reader: R) -> Result<SadfOutput> {
+    parse_stream_with(reader, |_| {})
+}
+
+/// Like [`parse_stream`], and calls `on_line` with every line as it arrives.
+pub fn parse_stream_with<R: BufRead>(
+    reader: R,
+    mut on_line: impl FnMut(&str),
+) -> Result<SadfOutput> {
     let mut out = SadfOutput::default();
     let mut current: Option<RawActivity> = None;
     let mut probe: Option<usize> = None;
     for line in reader.lines() {
         let line = line.map_err(|e| Error::other(format!("reading sadf output: {e}")))?;
+        on_line(&line);
         if let Some(rest) = line.strip_prefix("@@VERSION ") {
             out.sadf_version = Version::parse(rest);
         } else if let Some(rest) = line.strip_prefix("@@FILE ") {

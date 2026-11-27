@@ -209,6 +209,11 @@ fn convert(
         skip,
         Duration::from_secs(cli.sadf_timeout),
         resources,
+        |index| {
+            if let (true, Some(input)) = (inputs.len() > 1, inputs.get(index)) {
+                rep.info(format!("  [{}/{}] {}", index + 1, inputs.len(), input.name));
+            }
+        },
     )?;
 
     let verdicts = output.verdicts();
