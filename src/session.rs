@@ -329,7 +329,7 @@ fn serve_grafana(cli: &Cli, s: &Serving, rep: &Reporter) -> Result<()> {
         s.store.max_ts_ms + 1000
     );
     rep.info(format!(
-        "\nGrafana is ready. Open: {url}\nPress Ctrl-C to stop and clean up."
+        "\nGrafana is ready. Open: {url}\nChanges made in Grafana are not saved. Press Ctrl-C to stop and clean up."
     ));
     rep.result_line(&url);
     rep.event(json!({

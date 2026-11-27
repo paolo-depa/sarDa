@@ -8,7 +8,7 @@
 sarda /var/log/sa/sa20261125 /var/log/sa/sa20261126
 # ...
 # Grafana is ready. Open: http://127.0.0.1:3000/d/sarda/sarda?orgId=1&from=...&to=...
-# Press Ctrl-C to stop and clean up.
+# Changes made in Grafana are not saved. Press Ctrl-C to stop and clean up.
 ```
 
 It converts the files, starts a preconfigured Grafana container, loads your data into it and prints the URL. Ctrl-C removes the container and every temporary file.
