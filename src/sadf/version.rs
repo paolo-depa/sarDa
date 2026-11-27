@@ -48,35 +48,58 @@ impl std::fmt::Display for Version {
 pub(super) const SYSSTAT_MAGIC: u16 = 0xd596;
 pub(super) const FORMAT_MAGIC: u16 = 0x2175;
 
-/// Reads the sysstat version a system activity file was written with, from
-/// its magic header. Errors when the file is not an SA file, or when it is in
-/// a format older than the one whose layout is known here.
-pub fn read_sa_version(path: &Path) -> std::result::Result<Version, String> {
+/// What a file's magic header says it is.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SaHeader {
+    /// A system activity file in the layout known here, written by this
+    /// sysstat version.
+    Current(Version),
+    /// A system activity file in an older layout; `sadf -c` can convert it.
+    OldFormat,
+    /// Not a system activity file (a text report, a log, an empty file ...).
+    NotSa,
+}
+
+/// Reads the magic header of `path`.
+pub fn read_sa_header(path: &Path) -> SaHeader {
     use std::io::Read;
     let mut buf = [0u8; 8];
-    std::fs::File::open(path)
+    if std::fs::File::open(path)
         .and_then(|mut f| f.read_exact(&mut buf))
-        .map_err(|_| "file is too short to be a system activity file".to_string())?;
+        .is_err()
+    {
+        return SaHeader::NotSa;
+    }
     let little = u16::from_le_bytes([buf[0], buf[1]]) == SYSSTAT_MAGIC;
     let big = u16::from_be_bytes([buf[0], buf[1]]) == SYSSTAT_MAGIC;
     if !little && !big {
-        return Err("not a system activity file".into());
+        return SaHeader::NotSa;
     }
-    let short = |i: usize| {
-        let pair = [buf[i], buf[i + 1]];
-        if little {
-            u16::from_le_bytes(pair)
-        } else {
-            u16::from_be_bytes(pair)
-        }
+    let pair = [buf[2], buf[3]];
+    let format = if little {
+        u16::from_le_bytes(pair)
+    } else {
+        u16::from_be_bytes(pair)
     };
-    match short(2) {
-        FORMAT_MAGIC => Ok(Version {
+    if format == FORMAT_MAGIC {
+        SaHeader::Current(Version {
             major: buf[4],
             minor: buf[5],
             patch: buf[6],
-        }),
-        _ => Err("old system activity file format".into()),
+        })
+    } else {
+        SaHeader::OldFormat
+    }
+}
+
+/// The sysstat version a system activity file was written with. Errors when
+/// the file is not an SA file, or when it is in a format older than the one
+/// whose layout is known here.
+pub fn read_sa_version(path: &Path) -> std::result::Result<Version, String> {
+    match read_sa_header(path) {
+        SaHeader::Current(version) => Ok(version),
+        SaHeader::OldFormat => Err("old system activity file format".into()),
+        SaHeader::NotSa => Err("not a system activity file".into()),
     }
 }
 
@@ -160,6 +183,16 @@ mod tests {
         let short = dir.join("short");
         std::fs::write(&short, b"abc").unwrap();
         assert!(read_sa_version(&short).is_err());
+        assert_eq!(read_sa_header(&junk), SaHeader::NotSa);
+        assert_eq!(read_sa_header(&short), SaHeader::NotSa);
+        assert_eq!(read_sa_header(&dir.join("absent")), SaHeader::NotSa);
+
+        let old = dir.join("old");
+        let mut bytes = SYSSTAT_MAGIC.to_le_bytes().to_vec();
+        bytes.extend_from_slice(&0x2171u16.to_le_bytes());
+        bytes.extend_from_slice(&[9, 1, 6, 0, 0, 0]);
+        std::fs::write(&old, bytes).unwrap();
+        assert_eq!(read_sa_header(&old), SaHeader::OldFormat);
     }
 
     #[test]

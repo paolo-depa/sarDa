@@ -314,6 +314,64 @@ fn empty_window_exits_5() {
 }
 
 #[test]
+fn a_directory_stands_for_its_daily_files() {
+    let dir = scratch("dirarg");
+    working_podman(&dir);
+    let csv = dir.join("csv");
+    let out = sarda(&dir)
+        .args(["--no-grafana", "--json", "--export-csv"])
+        .arg(&csv)
+        .arg(fixtures().join("sa"))
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(csv.join("per_cpu.csv").is_file());
+}
+
+#[test]
+fn a_text_report_among_the_files_is_skipped_with_a_warning() {
+    let dir = scratch("textreport");
+    working_podman(&dir);
+    let report = dir.join("sar20261125");
+    std::fs::write(&report, "Linux 6.4 (host)  11/25/26  _x86_64_\n").unwrap();
+    let out = sarda(&dir)
+        .args(["--no-grafana", "--export-csv"])
+        .arg(dir.join("csv"))
+        .arg(&report)
+        .args(sa_files())
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        err.contains("sar20261125 is not a system activity file"),
+        "{err}"
+    );
+}
+
+#[test]
+fn only_text_reports_exit_8() {
+    let dir = scratch("onlytext");
+    working_podman(&dir);
+    let report = dir.join("sar20261125");
+    std::fs::write(&report, "not binary\n").unwrap();
+    let out = sarda(&dir)
+        .arg("--no-grafana")
+        .arg(&report)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(8));
+}
+
+#[test]
 fn missing_sa_files_are_skipped_but_not_all() {
     let dir = scratch("missing");
     working_podman(&dir);

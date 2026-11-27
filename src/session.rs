@@ -14,6 +14,7 @@ use crate::dashboard::{self, DASHBOARD_UID};
 use crate::dataset::{self, Dataset};
 use crate::error::{Error, Kind, Result};
 use crate::grafana::{self, Grafana, GrafanaSpec};
+use crate::inputs;
 use crate::resources::{Handle, Resources};
 use crate::runtime::{missing_image_help, Runtime};
 use crate::sadf::{self, Input, SadfOutput, Verdict};
@@ -113,24 +114,6 @@ fn parse_window(cli: &Cli) -> Result<(Option<i64>, Option<i64>)> {
         }
     }
     Ok((start, end))
-}
-
-fn existing_inputs(cli: &Cli, rep: &Reporter) -> Result<Vec<Input>> {
-    if cli.files.is_empty() {
-        return Err(Error::new(Kind::Usage, "no SA files given (see --help)"));
-    }
-    let mut files = Vec::new();
-    for f in &cli.files {
-        if f.is_file() {
-            files.push(Input::new(f));
-        } else {
-            rep.warn(format!("{} is not a file; skipping", f.display()));
-        }
-    }
-    if files.is_empty() {
-        return Err(Error::new(Kind::Usage, "none of the given SA files exist"));
-    }
-    Ok(files)
 }
 
 fn summary(ds: &Dataset, store: &Store, warnings: &[String]) -> Value {
@@ -363,7 +346,7 @@ fn serve_grafana(cli: &Cli, s: &Serving, rep: &Reporter) -> Result<()> {
 
 pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
     let window = parse_window(cli)?;
-    let inputs = existing_inputs(cli, rep)?;
+    let inputs = inputs::resolve(&cli.files, rep)?;
     let rt = Runtime::detect(cli.runtime)?;
     rep.debug(format!("using container runtime '{}'", rt.bin));
 

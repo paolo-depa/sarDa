@@ -2,6 +2,7 @@
 //!
 //! The data path, in the order the modules touch the data:
 //!
+//! * [`inputs`] turns the paths on the command line into SA files;
 //! * [`sadf`] checks each input file (one `Verdict` per file) and runs `sadf`
 //!   in a container, returning a marker stream of `sadf -d` output;
 //! * [`dataset`] merges the files and applies the Observation window, giving
@@ -24,6 +25,7 @@ pub mod dashboard;
 pub mod dataset;
 pub mod error;
 pub mod grafana;
+pub mod inputs;
 pub mod promql;
 pub mod resources;
 pub mod runtime;

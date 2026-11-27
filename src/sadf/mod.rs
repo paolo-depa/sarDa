@@ -32,4 +32,4 @@ pub use container::run_in_container;
 pub use script::build_script;
 pub use stream::{parse_stream, FileProbe, Input, RawActivity, SadfOutput};
 pub use verdict::{Incompatibility, State, Verdict};
-pub use version::{read_sa_version, Version};
+pub use version::{read_sa_header, read_sa_version, SaHeader, Version};

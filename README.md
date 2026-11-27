@@ -53,8 +53,10 @@ Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` 
 ## Usage
 
 ```text
-sarda [OPTIONS] <SA_FILE>...
+sarda [OPTIONS] <SA_FILE|DIR>...
 ```
+
+A directory stands for the `saDD` / `saYYYYMMDD` files in it, so `sarda /var/log/sa` works. A path that is not a system activity file (such as the text report `sar20261125`) is skipped with a warning, which also makes `sarda /var/log/sa/*` safe; exit code 8 is only for when none is usable.
 
 | Option | Meaning |
 |---|---|
@@ -98,7 +100,7 @@ stdout carries only the result (the URL, or JSON events with `--json`); progress
 | 5 | no usable data in the SA files or in the `--start`/`--end` window |
 | 6 | Grafana failed to start or cannot reach the data |
 | 7 | a network port is unavailable |
-| 8 | an SA file cannot be read by the image's sysstat: written by a newer sysstat, or not a system activity file |
+| 8 | an SA file cannot be read by the image's sysstat (written by a newer sysstat, or corrupt), or none of the given files is a system activity file |
 
 ### JSON events (`--json`)
 

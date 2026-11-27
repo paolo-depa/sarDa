@@ -26,7 +26,7 @@ EXIT CODES:
   5  no usable data in the SA files (or in the --start/--end window)
   6  Grafana failed to start or cannot reach the data
   7  a network port is unavailable
-  8  an SA file cannot be read by the image's sysstat (newer sysstat, or not a system activity file)
+  8  an SA file cannot be read by the image's sysstat (newer sysstat, or corrupt), or no given file is a system activity file
 
 ENVIRONMENT:
   SARDA_RUNTIME, SARDA_GRAFANA_IMAGE, SARDA_SADF_IMAGE provide defaults for
@@ -45,8 +45,9 @@ available locally; see --print-containerfile.";
 #[derive(Debug, Parser)]
 #[command(name = "sarda", version, after_help = AFTER_HELP)]
 pub struct Cli {
-    /// SA files to load (typically saYYYYMMDD from /var/log/sa).
-    #[arg(value_name = "SA_FILE")]
+    /// SA files to load, or directories holding them (typically
+    /// /var/log/sa). Files that are not SA files are skipped with a warning.
+    #[arg(value_name = "SA_FILE|DIR")]
     pub files: Vec<PathBuf>,
 
     /// Keep only samples at or after this time (RFC 3339; no offset means UTC).
@@ -65,7 +66,7 @@ pub struct Cli {
     #[arg(long, value_enum, default_value = "auto", env = "SARDA_RUNTIME")]
     pub runtime: RuntimeChoice,
 
-    /// Grafana image for the grafana.
+    /// Grafana image.
     #[arg(long, value_name = "IMAGE", default_value = DEFAULT_GRAFANA_IMAGE, env = "SARDA_GRAFANA_IMAGE")]
     pub grafana_image: String,
 
