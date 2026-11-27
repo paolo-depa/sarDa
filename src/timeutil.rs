@@ -41,7 +41,7 @@ fn parse_date_time(date: &str, time: &str) -> Option<i64> {
     let h = num(t.next()?)?;
     let mi = num(t.next()?)?;
     let s = match t.next() {
-        Some(sec) => num(sec.split('.').next()?)?,
+        Some(sec) => num(sec.split(['.', ',']).next()?)?,
         None => 0,
     };
     if t.next().is_some() || h > 23 || mi > 59 || s > 60 {
@@ -57,8 +57,25 @@ pub fn parse_sadf(ts: &str) -> Option<i64> {
     parse_date_time(date, time)
 }
 
+/// `hh:mm`, `hhmm` or `hh`, as printed by RFC 3339, `journalctl -o short-iso`
+/// and `date +%z`. Returns seconds.
+fn parse_offset(off: &str) -> Option<i64> {
+    let (h, m) = match off.split_once(':') {
+        Some((h, m)) => (h, m),
+        None if off.len() == 4 => off.split_at(2),
+        None => (off, "0"),
+    };
+    let (h, m) = (num(h)?, num(m)?);
+    if h > 23 || m > 59 {
+        return None;
+    }
+    Some(h * 3600 + m * 60)
+}
+
 /// Parses an RFC 3339 timestamp. A missing offset means UTC. The date and
-/// time may be separated by `T` or a space, and `Z` is accepted.
+/// time may be separated by `T` or a space, `Z` is accepted, and so are the
+/// offset and fraction spellings of `journalctl -o short-iso(-precise)` and
+/// `dmesg --time-format iso` (`+0100`, `+01`, `,123456`).
 pub fn parse_user(input: &str) -> Result<i64, String> {
     let bad = || {
         format!(
@@ -75,10 +92,7 @@ pub fn parse_user(input: &str) -> Result<i64, String> {
     } else if let Some(pos) = rest.rfind(['+', '-']) {
         let (t, off) = rest.split_at(pos);
         let sign = if off.starts_with('-') { -1 } else { 1 };
-        let off = &off[1..];
-        let (oh, om) = off.split_once(':').unwrap_or((off, "0"));
-        let secs = num(oh).ok_or_else(bad)? * 3600 + num(om).ok_or_else(bad)? * 60;
-        (t, sign * secs)
+        (t, sign * parse_offset(&off[1..]).ok_or_else(bad)?)
     } else {
         (rest, 0)
     };
@@ -143,6 +157,36 @@ mod tests {
         let utc = parse_user("2026-11-25T07:00:00Z").unwrap();
         assert_eq!(parse_user("2026-11-25T08:00:00+01:00").unwrap(), utc);
         assert_eq!(parse_user("2026-11-25T02:00:00-05:00").unwrap(), utc);
+    }
+
+    #[test]
+    fn journalctl_and_dmesg_spellings_are_accepted() {
+        let utc = parse_user("2026-11-25T07:00:00Z").unwrap();
+        for text in [
+            "2026-11-25T08:00:00+0100",
+            "2026-11-25T08:00:00+01",
+            "2026-11-25T08:00:00.123456+0100",
+            "2026-11-25T08:00:00,123456+01:00",
+            "2026-11-25 08:00:00+01:00",
+        ] {
+            assert_eq!(parse_user(text).unwrap(), utc, "{text}");
+        }
+        assert_eq!(
+            parse_user("2026-11-25T01:30:00-0530").unwrap(),
+            parse_user("2026-11-25T07:00:00Z").unwrap()
+        );
+    }
+
+    #[test]
+    fn nonsense_offsets_are_rejected_not_misread() {
+        for text in [
+            "2026-11-25T08:00:00+100",
+            "2026-11-25T08:00:00+25:00",
+            "2026-11-25T08:00:00+01:75",
+            "2026-11-25T08:00:00+",
+        ] {
+            assert!(parse_user(text).is_err(), "{text}");
+        }
     }
 
     #[test]
