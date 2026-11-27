@@ -30,17 +30,25 @@ fn readme() -> String {
     std::fs::read_to_string(root().join("README.md")).unwrap()
 }
 
-/// `(file name, text)` of every source file.
+/// `(path below src/, text)` of every source file, including submodules.
 fn sources() -> Vec<(String, String)> {
-    let mut out: Vec<(String, String)> = std::fs::read_dir(root().join("src"))
-        .unwrap()
-        .map(|e| e.unwrap().path())
-        .filter(|p| p.extension().is_some_and(|x| x == "rs"))
-        .map(|p| {
-            let name = p.file_name().unwrap().to_string_lossy().into_owned();
-            (name, std::fs::read_to_string(&p).unwrap())
-        })
-        .collect();
+    fn walk(dir: &Path, out: &mut Vec<(String, String)>) {
+        for entry in std::fs::read_dir(dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                walk(&path, out);
+            } else if path.extension().is_some_and(|x| x == "rs") {
+                let name = path
+                    .strip_prefix(root().join("src"))
+                    .unwrap()
+                    .display()
+                    .to_string();
+                out.push((name, std::fs::read_to_string(&path).unwrap()));
+            }
+        }
+    }
+    let mut out = Vec::new();
+    walk(&root().join("src"), &mut out);
     out.sort();
     out
 }
@@ -152,10 +160,13 @@ fn agent_docs_point_only_at_things_that_exist() {
     let test_run = Regex::new(r"--test (\w+) (\w+)").unwrap();
     let word = |name: &str| Regex::new(&format!(r"\b{}\b", regex::escape(name))).unwrap();
     let in_source = |module: &str, name: &str| {
-        sources
+        let own = format!("{module}.rs");
+        let dir = format!("{module}/");
+        let files: Vec<_> = sources
             .iter()
-            .find(|(f, _)| f == &format!("{module}.rs"))
-            .map(|(_, text)| word(name).is_match(text))
+            .filter(|(f, _)| f == &own || f.starts_with(&dir))
+            .collect();
+        (!files.is_empty()).then(|| files.iter().any(|(_, text)| word(name).is_match(text)))
     };
 
     for (doc, text) in agent_docs() {

@@ -16,5 +16,5 @@ Each rule names the one place that states it. Read that place, not this line; if
 | Panels follow what was collected, not values | `dashboard` module doc; `tests/golden.rs` |
 | Unsupported PromQL is an error, never an approximation | `promql` module doc |
 | A file's day comes from its header, not its name; incompatibility is never inferred from empty output | `session::skip_bounds`; ADR 0007 |
-| The parser image is the delivered sysstat, and its script stays POSIX `sh` plus coreutils | ADR 0007; the script test in `src/sadf.rs` |
+| The parser image is the delivered sysstat, and its script stays POSIX `sh` plus coreutils | ADR 0007; the script test in `src/sadf/script.rs` |
 | No async runtime; crates must be vendorable | ADR 0004; `scripts/dist.sh` |
