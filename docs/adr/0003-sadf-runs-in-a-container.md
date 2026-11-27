@@ -7,3 +7,5 @@
 Each file is first probed with `sadf -j -H`, which also yields its host and day, so sarda can skip files outside the Observation window without reading their data. When the probe fails, `sadf -c` is tried once to convert a datafile in the old (9.1.6+) format, and only the converted file is used if it probes cleanly.
 
 Timestamps come out in UTC (container timezone), so the Observation window is filtered in Rust on parsed timestamps rather than with `sadf -s/-e`. A file written by a newer sysstat than the image provides yields no data, sometimes without any error, so sarDa refuses such files before parsing (exit 8; see ADR 0007 for the version check and the image contents).
+
+The sysstat image defaults to the one each release publishes to GHCR, so a connected host needs no setup. A missing image is pulled once, with the engine's progress on stderr and no timeout (`--no-pull` forbids it). For a host that cannot pull, `sarda prepare --save` archives both images on a connected host and `sarda load` restores them; the archive keeps the image names, so the defaults are found again.
