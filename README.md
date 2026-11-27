@@ -18,44 +18,37 @@ It converts the files, starts a preconfigured Grafana container, loads your data
 | Requirement | Why |
 |---|---|
 | `podman` or `docker` (detected automatically, podman first) | runs `sadf` and Grafana |
-| a **sysstat image** | provides `sadf` (SUSE BCI 16.1, sysstat 12.7.9); build it once, see below |
+| a **sysstat image** (default `ghcr.io/paolo-depa/sarda-sysstat:0.0.1`) | provides `sadf` (SUSE BCI 16.1, sysstat 12.7.9) |
 | a **Grafana image** (default `docker.io/grafana/grafana-oss:12.4.3`) | the dashboard server |
 | Linux | Grafana uses host networking |
 
-Nothing else: no Python, no sysstat on the host, no Grafana plugins, no network access while running.
+Nothing else: no Python, no sysstat on the host, no Grafana plugins, and no network access once the two images are present.
 
 ## Prepare the images (once)
 
-sarda never installs or downloads anything at run time. If an image is missing it tries one `pull` and then stops with instructions (use `--no-pull` to skip the attempt).
+If an image is missing, sarda pulls it (with the engine's progress on stderr) and carries on; `--no-pull` skips the attempt and stops with instructions instead. On a connected machine nothing needs preparing.
 
-On a machine **with** network access:
-
-```sh
-sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .
-podman pull docker.io/grafana/grafana-oss:12.4.3
-podman save -o sarda-images.tar localhost/sarda-sysstat:latest docker.io/grafana/grafana-oss:12.4.3
-```
-
-On the **air-gapped** machine:
+On an **air-gapped** machine, carry the images over from a connected one. `save` keeps the image names, so the defaults are found again after `load`:
 
 ```sh
+# connected machine
+podman pull ghcr.io/paolo-depa/sarda-sysstat:0.0.1 docker.io/grafana/grafana-oss:12.4.3
+podman save -o sarda-images.tar ghcr.io/paolo-depa/sarda-sysstat:0.0.1 docker.io/grafana/grafana-oss:12.4.3
+
+# air-gapped machine
 podman load -i sarda-images.tar
 ```
 
-Or skip the build: each release publishes the sysstat image to the GitHub Container Registry, so a connected machine can pull it instead. A release tags both the version (the tag without its `v`) and `latest`:
+Each release publishes the sysstat image to the GitHub Container Registry, tagged with the version (the tag without its `v`) and `latest`. To build it yourself instead (`podman build --arch <arch>` for other architectures), pass the result with `--sadf-image`:
 
 ```sh
-podman pull ghcr.io/paolo-depa/sarda-sysstat:latest   # or :0.0.1 for a pinned release
-podman tag  ghcr.io/paolo-depa/sarda-sysstat:latest localhost/sarda-sysstat:latest
-podman pull docker.io/grafana/grafana-oss:12.4.3
-podman save -o sarda-images.tar localhost/sarda-sysstat:latest docker.io/grafana/grafana-oss:12.4.3
+sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .
+sarda --sadf-image localhost/sarda-sysstat:latest /var/log/sa/sa20261125
 ```
-
-On a connected host you can also drop the `tag`/`save` and just pass `--sadf-image ghcr.io/paolo-depa/sarda-sysstat:latest`.
 
 The sysstat image is `registry.suse.com/bci/bci-base:16.1` with the sysstat package it delivers (12.7.9 today; about 125 MB). sarDa checks every SA file's own version header and **refuses files written by a newer sysstat**, because `sadf` returns no data at all for them instead of failing. To read such files, put an image with a newer sysstat behind `--sadf-image`.
 
-Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` / `SARDA_GRAFANA_IMAGE`), for example from an internal registry, and `podman build --arch <arch>` for other architectures. The sysstat inside the sysstat image must be at least as new as the one that wrote your SA files; sarDa enforces this and exits with code 8 when it is not.
+Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` / `SARDA_GRAFANA_IMAGE`), for example from an internal registry. The sysstat inside the sysstat image must be at least as new as the one that wrote your SA files; sarDa enforces this and exits with code 8 when it is not.
 
 ## Usage
 

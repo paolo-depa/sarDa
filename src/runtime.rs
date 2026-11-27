@@ -2,8 +2,8 @@
 //! Everything here shells out to the `podman` / `docker` CLI, which share the
 //! subset of commands used.
 
+use std::os::fd::AsFd;
 use std::process::{Command, Stdio};
-use std::time::{Duration, Instant};
 
 use crate::error::{Error, Kind, Result};
 
@@ -72,33 +72,25 @@ impl Runtime {
             .unwrap_or(false)
     }
 
-    /// Tries to pull `image`, giving up after `timeout` (an air-gapped host
-    /// may otherwise hang on name resolution). This is sarDa's only network
-    /// use at run time, and only `session::ensure_image` calls it.
-    pub fn pull(&self, image: &str, timeout: Duration) -> bool {
-        let Ok(mut child) = self
-            .command()
-            .args(["pull", "--quiet", image])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-        else {
-            return false;
+    /// Pulls `image`, showing the engine's progress on stderr (stdout is
+    /// reserved for sarDa's result). There is no timeout: a slow link is not
+    /// a failure, Ctrl-C ends it, and `--no-pull` skips it. This is sarDa's
+    /// only network use at run time, and only `session::ensure_image` and
+    /// `prepare` call it.
+    pub fn pull(&self, image: &str) -> bool {
+        let to_stderr = || {
+            std::io::stderr()
+                .as_fd()
+                .try_clone_to_owned()
+                .map_or_else(|_| Stdio::null(), Stdio::from)
         };
-        let start = Instant::now();
-        loop {
-            match child.try_wait() {
-                Ok(Some(status)) => return status.success(),
-                Ok(None) if start.elapsed() < timeout => {
-                    std::thread::sleep(Duration::from_millis(200))
-                }
-                _ => {
-                    let _ = child.kill();
-                    let _ = child.wait();
-                    return false;
-                }
-            }
-        }
+        self.command()
+            .args(["pull", image])
+            .stdout(to_stderr())
+            .stderr(Stdio::inherit())
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false)
     }
 
     pub fn remove_container(&self, name: &str) {

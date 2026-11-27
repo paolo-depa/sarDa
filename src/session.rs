@@ -21,7 +21,6 @@ use crate::store::Store;
 use crate::timeutil;
 
 const CONTAINERFILE: &str = include_str!("../container/Containerfile.sysstat");
-const PULL_TIMEOUT: Duration = Duration::from_secs(30);
 const READY_TIMEOUT: Duration = Duration::from_secs(120);
 
 pub fn containerfile() -> &'static str {
@@ -91,7 +90,7 @@ fn ensure_image(
     let pullable = !no_pull && !image.starts_with("localhost/");
     if pullable {
         rep.info(format!("Pulling {role} image {image} ..."));
-        if rt.pull(image, PULL_TIMEOUT) {
+        if rt.pull(image) {
             return Ok(());
         }
     }
@@ -169,7 +168,11 @@ fn wait_for_shutdown(
     }
 }
 
-const SADF_IMAGE_HINT: &str = "Build it once on a machine with network access and load it here:\n  sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .\n  podman save -o sarda-sysstat.tar localhost/sarda-sysstat:latest   # then, on this host:\n  podman load -i sarda-sysstat.tar\nA prebuilt image is published for every release, so a connected host can pull it instead (pass it with --sadf-image, or tag it localhost/sarda-sysstat:latest):\n  podman pull ghcr.io/paolo-depa/sarda-sysstat:latest";
+fn sadf_image_hint(image: &str) -> String {
+    format!(
+        "Fetch it on a machine with network access and load it here:\n  podman pull {image} && podman save -o sarda-sysstat.tar {image}   # then, on this host:\n  podman load -i sarda-sysstat.tar\nOr build it from the Containerfile: sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f -   (then pass --sadf-image localhost/sarda-sysstat:latest)"
+    )
+}
 
 fn grafana_image_hint(image: &str) -> String {
     format!(
@@ -182,7 +185,7 @@ fn ensure_images(cli: &Cli, rt: &Runtime, rep: &Reporter) -> Result<()> {
         rt,
         &cli.sadf_image,
         "sysstat (sadf)",
-        SADF_IMAGE_HINT,
+        &sadf_image_hint(&cli.sadf_image),
         cli.no_pull,
         rep,
     )?;

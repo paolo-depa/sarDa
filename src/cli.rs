@@ -7,7 +7,13 @@ use clap::Parser;
 use crate::runtime::RuntimeChoice;
 
 pub const DEFAULT_GRAFANA_IMAGE: &str = "docker.io/grafana/grafana-oss:12.4.3";
-pub const DEFAULT_SADF_IMAGE: &str = "localhost/sarda-sysstat:latest";
+/// Published for every release (`.github/workflows/publish.yaml`), so a
+/// connected host needs no setup and `docker save` keeps the name for an
+/// air-gapped one.
+pub const DEFAULT_SADF_IMAGE: &str = concat!(
+    "ghcr.io/paolo-depa/sarda-sysstat:",
+    env!("CARGO_PKG_VERSION")
+);
 pub const DEFAULT_PORT: u16 = 3000;
 
 const AFTER_HELP: &str = "\

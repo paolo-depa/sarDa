@@ -144,8 +144,47 @@ fn missing_images_exit_4_with_instructions() {
     let out = sarda(&dir).args(sa_files()).output().unwrap();
     assert_eq!(out.status.code(), Some(4));
     let err = String::from_utf8_lossy(&out.stderr);
-    assert!(err.contains("localhost/sarda-sysstat:latest"), "{err}");
+    assert!(err.contains(sarda::cli::DEFAULT_SADF_IMAGE), "{err}");
     assert!(err.contains("--print-containerfile"), "{err}");
+}
+
+/// The fake engine lacks every image until it has been asked to pull it, and
+/// prints its progress on stdout like docker does.
+#[test]
+fn a_missing_image_is_pulled_with_progress_on_stderr_and_the_run_goes_on() {
+    let dir = scratch("pull");
+    let stream = fixtures().join("sadf.stream");
+    fake_runtime(
+        &dir,
+        "podman",
+        &format!(
+            "case \"$1\" in\n info|ps|rm|container) exit 0;;\n image) test -e '{pulled}' ;;\n pull) echo \"Pulling $2\"; touch '{pulled}';;\n run) cat '{stream}';;\n *) exit 0;;\nesac",
+            pulled = dir.join("pulled").display(),
+            stream = stream.display()
+        ),
+    );
+    let csv = dir.join("csv");
+    let out = sarda(&dir)
+        .args(["--no-grafana", "--json", "--export-csv"])
+        .arg(&csv)
+        .args(sa_files())
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        err.contains("Pulling ghcr.io/paolo-depa/sarda-sysstat"),
+        "{err}"
+    );
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        stdout.lines().all(|l| l.starts_with('{')),
+        "pull output leaked into stdout: {stdout}"
+    );
 }
 
 #[test]
