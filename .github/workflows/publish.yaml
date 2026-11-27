@@ -7,7 +7,7 @@
 #
 #   push tag v0.0.1  ->  ghcr.io/<owner>/sarda-sysstat:0.0.1  +  :latest
 #
-# The image is exactly the one `sarda --print-containerfile` builds, so a
+# The image is exactly the one `sarda containerfile` builds, so a
 # connected host can pull it straight from GHCR and load it onto an air-gapped
 # machine. Only the tag's own checkout is used; nothing else is fetched.
 

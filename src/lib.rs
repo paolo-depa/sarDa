@@ -10,7 +10,8 @@
 //!   cells);
 //! * [`store`] turns the tables into labelled Series;
 //! * [`api`] and [`promql`] serve them to Grafana, [`dashboard`] generates the
-//!   dashboard JSON, [`csvexport`] writes `--export-csv`;
+//!   dashboard JSON, [`csvexport`] writes `sarda export-csv`;
+//! * [`images`] fetches and archives the two images for `prepare` / `load`;
 //! * [`session`] orchestrates a run, [`grafana`] starts and probes the Grafana
 //!   container, and [`resources`] owns every container and temp path a run
 //!   creates, and their removal.
@@ -25,6 +26,7 @@ pub mod dashboard;
 pub mod dataset;
 pub mod error;
 pub mod grafana;
+pub mod images;
 pub mod inputs;
 pub mod promql;
 pub mod resources;

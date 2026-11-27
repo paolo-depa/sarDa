@@ -75,7 +75,7 @@ The container engine found on the host, either `podman` or `docker`.
 _Avoid_: engine, docker (when podman is meant)
 
 **CSV export**:
-The optional per-Metric CSV files written with `--export-csv`, kept for workflows that predate the Grafana instance.
+The optional per-Metric CSV files written with `sarda export-csv`, kept for workflows that predate the Grafana instance.
 _Avoid_: output dir, dump
 
 ## Dashboard layout

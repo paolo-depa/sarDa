@@ -8,7 +8,7 @@
 # A release publishes this image to ghcr.io/<owner>/sarda-sysstat, which is
 # sarda's default. To build it yourself on a machine with network access:
 #
-#   sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .
+#   sarda prepare --build --sadf-image localhost/sarda-sysstat:latest
 #   sarda --sadf-image localhost/sarda-sysstat:latest <SA files>
 FROM registry.suse.com/bci/bci-base:16.1
 RUN zypper --non-interactive install --no-recommends sysstat \

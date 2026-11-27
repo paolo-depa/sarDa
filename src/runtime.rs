@@ -72,12 +72,10 @@ impl Runtime {
             .unwrap_or(false)
     }
 
-    /// Pulls `image`, showing the engine's progress on stderr (stdout is
-    /// reserved for sarDa's result). There is no timeout: a slow link is not
-    /// a failure, Ctrl-C ends it, and `--no-pull` skips it. This is sarDa's
-    /// only network use at run time, and only `session::ensure_image` and
-    /// `prepare` call it.
-    pub fn pull(&self, image: &str) -> bool {
+    /// Runs `<bin> <args>` with the engine's output on stderr (stdout is
+    /// reserved for sarDa's result), `stdin` as given, and no timeout: a slow
+    /// link is not a failure, and Ctrl-C ends it.
+    fn stream(&self, args: &[&str], stdin: Stdio) -> std::io::Result<bool> {
         let to_stderr = || {
             std::io::stderr()
                 .as_fd()
@@ -85,11 +83,59 @@ impl Runtime {
                 .map_or_else(|_| Stdio::null(), Stdio::from)
         };
         self.command()
-            .args(["pull", image])
+            .args(args)
+            .stdin(stdin)
             .stdout(to_stderr())
             .stderr(Stdio::inherit())
             .status()
             .map(|s| s.success())
+    }
+
+    /// Pulls `image`. This is sarDa's only network use at run time; only
+    /// `session::ensure_image` and `images::prepare` call it.
+    pub fn pull(&self, image: &str) -> bool {
+        self.stream(&["pull", image], Stdio::null())
+            .unwrap_or(false)
+    }
+
+    /// Builds `image` from a Containerfile given on stdin, with `context`
+    /// (an empty directory) as the build context.
+    pub fn build(&self, image: &str, containerfile: &str, context: &std::path::Path) -> bool {
+        let Ok(mut child) = self
+            .command()
+            .args(["build", "-t", image, "-f", "-"])
+            .arg(context)
+            .stdin(Stdio::piped())
+            .stdout(
+                std::io::stderr()
+                    .as_fd()
+                    .try_clone_to_owned()
+                    .map_or_else(|_| Stdio::null(), Stdio::from),
+            )
+            .stderr(Stdio::inherit())
+            .spawn()
+        else {
+            return false;
+        };
+        if let Some(mut stdin) = child.stdin.take() {
+            use std::io::Write;
+            let _ = stdin.write_all(containerfile.as_bytes());
+        }
+        child.wait().map(|s| s.success()).unwrap_or(false)
+    }
+
+    /// Writes `images` to one archive.
+    pub fn save(&self, archive: &std::path::Path, images: &[&str]) -> bool {
+        let archive = archive.to_string_lossy();
+        let mut args = vec!["save", "-o", archive.as_ref()];
+        args.extend_from_slice(images);
+        self.stream(&args, Stdio::null()).unwrap_or(false)
+    }
+
+    /// Loads an archive written by [`Runtime::save`].
+    pub fn load(&self, archive: &std::path::Path) -> bool {
+        let archive = archive.to_string_lossy();
+        self.stream(&["load", "-i", archive.as_ref()], Stdio::null())
             .unwrap_or(false)
     }
 

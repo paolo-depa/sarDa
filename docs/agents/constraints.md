@@ -6,7 +6,7 @@ Each rule names the one place that states it. Read that place, not this line; if
 
 | Rule | Source of truth |
 |---|---|
-| Air-gapped: no run-time network use except the one image pull; no plugins, update checks or telemetry | `runtime::pull`; the `GF_*` list in `src/grafana.rs`; `README.md` ("What you need") |
+| Air-gapped: no run-time network use except pulling a missing image (`sarda prepare` pulls and builds on purpose); no plugins, update checks or telemetry | `runtime::pull`; the `GF_*` list in `src/grafana.rs`; `README.md` ("What you need") |
 | Everything binds loopback; Grafana's anonymous Admin depends on it | ADR 0005; `tests/docs.rs` forbids `0.0.0.0` and `[::]` in `src/` |
 | stdout carries only the URL or JSON events | `session::Reporter`; `tests/docs.rs` limits `print!`/`println!` to `src/session.rs` and `src/main.rs` |
 | Exit codes are a contract | `error::Kind`; `tests/docs.rs` compares `README.md` and `--help` with it |

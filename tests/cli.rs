@@ -86,14 +86,14 @@ fn invalid_time_is_a_usage_error() {
 }
 
 #[test]
-fn print_modes_need_no_runtime() {
+fn print_commands_need_no_runtime() {
     let empty = scratch("print");
-    let out = sarda(&empty).arg("--print-containerfile").output().unwrap();
+    let out = sarda(&empty).arg("containerfile").output().unwrap();
     assert!(out.status.success());
     let text = String::from_utf8_lossy(&out.stdout);
     assert!(text.contains("FROM ") && text.contains("sysstat"));
 
-    let out = sarda(&empty).arg("--print-catalog").output().unwrap();
+    let out = sarda(&empty).arg("catalog").output().unwrap();
     assert!(String::from_utf8_lossy(&out.stdout).contains("| Dashboard row |"));
 }
 
@@ -121,7 +121,7 @@ fn a_stopped_podman_falls_back_to_docker() {
     working_runtime(&dir, "docker");
     let csv = dir.join("csv");
     let out = sarda(&dir)
-        .args(["--no-grafana", "--export-csv"])
+        .args(["export-csv"])
         .arg(&csv)
         .args(sa_files())
         .output()
@@ -145,7 +145,135 @@ fn missing_images_exit_4_with_instructions() {
     assert_eq!(out.status.code(), Some(4));
     let err = String::from_utf8_lossy(&out.stderr);
     assert!(err.contains(sarda::cli::DEFAULT_SADF_IMAGE), "{err}");
-    assert!(err.contains("--print-containerfile"), "{err}");
+    assert!(err.contains("sarda prepare"), "{err}");
+}
+
+/// A fake engine that only records its arguments, one call per line.
+fn recording_runtime(dir: &Path) -> PathBuf {
+    let log = dir.join("calls");
+    fake_runtime(
+        dir,
+        "podman",
+        &format!(
+            "echo \"$@\" >> '{}'\ncase \"$1\" in build) cat >/dev/null;; esac\nexit 0",
+            log.display()
+        ),
+    );
+    log
+}
+
+fn calls(log: &Path) -> Vec<String> {
+    std::fs::read_to_string(log)
+        .unwrap_or_default()
+        .lines()
+        .map(str::to_string)
+        .collect()
+}
+
+#[test]
+fn prepare_pulls_both_images_and_saves_them_in_one_archive() {
+    let dir = scratch("prepare");
+    let log = recording_runtime(&dir);
+    let archive = dir.join("images.tar");
+    let out = sarda(&dir)
+        .args(["prepare", "--save"])
+        .arg(&archive)
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let calls = calls(&log);
+    let sadf = sarda::cli::DEFAULT_SADF_IMAGE;
+    let grafana = sarda::cli::DEFAULT_GRAFANA_IMAGE;
+    assert!(calls.contains(&format!("pull {sadf}")), "{calls:?}");
+    assert!(calls.contains(&format!("pull {grafana}")), "{calls:?}");
+    assert!(
+        calls.contains(&format!("save -o {} {sadf} {grafana}", archive.display())),
+        "{calls:?}"
+    );
+    assert!(String::from_utf8_lossy(&out.stdout).is_empty());
+}
+
+#[test]
+fn prepare_build_builds_the_sysstat_image_instead_of_pulling_it() {
+    let dir = scratch("prepare-build");
+    let log = recording_runtime(&dir);
+    let out = sarda(&dir).args(["prepare", "--build"]).output().unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let calls = calls(&log);
+    let sadf = sarda::cli::DEFAULT_SADF_IMAGE;
+    assert!(
+        calls
+            .iter()
+            .any(|c| c.starts_with(&format!("build -t {sadf} -f - "))),
+        "{calls:?}"
+    );
+    assert!(!calls.contains(&format!("pull {sadf}")), "{calls:?}");
+}
+
+#[test]
+fn a_failed_pull_in_prepare_exits_4() {
+    let dir = scratch("prepare-fail");
+    fake_runtime(
+        &dir,
+        "podman",
+        "case \"$1\" in pull) exit 1;; *) exit 0;; esac",
+    );
+    let out = sarda(&dir).arg("prepare").output().unwrap();
+    assert_eq!(out.status.code(), Some(4));
+}
+
+#[test]
+fn load_hands_the_archive_to_the_runtime() {
+    let dir = scratch("load");
+    let log = recording_runtime(&dir);
+    let archive = dir.join("images.tar");
+    std::fs::write(&archive, "x").unwrap();
+    let out = sarda(&dir).arg("load").arg(&archive).output().unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(calls(&log).contains(&format!("load -i {}", archive.display())));
+    let out = sarda(&dir)
+        .arg("load")
+        .arg(dir.join("absent.tar"))
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2));
+}
+
+#[test]
+fn options_written_before_a_subcommand_are_refused_not_dropped() {
+    let dir = scratch("stray");
+    working_podman(&dir);
+    let out = sarda(&dir)
+        .args(["--start", "2026-11-25T00:00:00Z", "api"])
+        .args(sa_files())
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&out.stderr).contains("after the subcommand"));
+
+    let csv = dir.join("csv");
+    let out = sarda(&dir)
+        .args(["--json", "export-csv"])
+        .arg(&csv)
+        .args(sa_files())
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "--json is allowed before a subcommand"
+    );
 }
 
 /// The fake engine lacks every image until it has been asked to pull it, and
@@ -165,7 +293,7 @@ fn a_missing_image_is_pulled_with_progress_on_stderr_and_the_run_goes_on() {
     );
     let csv = dir.join("csv");
     let out = sarda(&dir)
-        .args(["--no-grafana", "--json", "--export-csv"])
+        .args(["export-csv", "--json"])
         .arg(&csv)
         .args(sa_files())
         .output()
@@ -193,7 +321,7 @@ fn export_csv_runs_the_whole_pipeline_with_a_fake_runtime() {
     working_podman(&dir);
     let csv = dir.join("csv");
     let out = sarda(&dir)
-        .args(["--no-grafana", "--json", "--export-csv"])
+        .args(["export-csv", "--json"])
         .arg(&csv)
         .args(sa_files())
         .output()
@@ -236,7 +364,7 @@ fn an_unreadable_file_aborts_the_run() {
     runtime_with_stream(&dir, "podman", &stream);
     let csv = dir.join("csv");
     let out = sarda(&dir)
-        .args(["--no-grafana", "--export-csv"])
+        .args(["export-csv"])
         .arg(&csv)
         .args(sa_files())
         .output()
@@ -262,11 +390,7 @@ fn every_unreadable_file_is_named() {
     )
     .unwrap();
     runtime_with_stream(&dir, "podman", &stream);
-    let out = sarda(&dir)
-        .args(["--no-grafana"])
-        .args(sa_files())
-        .output()
-        .unwrap();
+    let out = sarda(&dir).args(["api"]).args(sa_files()).output().unwrap();
     assert_eq!(out.status.code(), Some(8));
     let err = String::from_utf8_lossy(&out.stderr);
     assert!(
@@ -288,11 +412,7 @@ fn a_file_from_a_newer_sysstat_is_refused() {
     bytes[4..7].copy_from_slice(&[12, 9, 0]);
     std::fs::write(&newer, bytes).unwrap();
     working_podman(&dir);
-    let out = sarda(&dir)
-        .args(["--no-grafana"])
-        .arg(&newer)
-        .output()
-        .unwrap();
+    let out = sarda(&dir).args(["api"]).arg(&newer).output().unwrap();
     assert_eq!(out.status.code(), Some(8));
     let err = String::from_utf8_lossy(&out.stderr);
     assert!(err.contains("written by sysstat 12.9.0"), "{err}");
@@ -305,7 +425,7 @@ fn empty_window_exits_5() {
     let dir = scratch("window");
     working_podman(&dir);
     let out = sarda(&dir)
-        .args(["--no-grafana", "--end", "2000-01-01T00:00:00Z"])
+        .args(["api", "--end", "2000-01-01T00:00:00Z"])
         .args(sa_files())
         .output()
         .unwrap();
@@ -318,7 +438,7 @@ fn conversion_reports_each_file_as_it_starts() {
     let dir = scratch("progress");
     working_podman(&dir);
     let out = sarda(&dir)
-        .args(["--no-grafana", "--export-csv"])
+        .args(["export-csv"])
         .arg(dir.join("csv"))
         .args(sa_files())
         .output()
@@ -337,7 +457,7 @@ fn a_conversion_that_prints_nothing_is_stopped_and_named_as_stalled() {
         "case \"$1\" in\n info|image|ps|rm|container) exit 0;;\n run) sleep 3;;\n *) exit 0;;\nesac",
     );
     let out = sarda(&dir)
-        .args(["--no-grafana", "--sadf-timeout", "1"])
+        .args(["api", "--sadf-timeout", "1"])
         .args(sa_files())
         .output()
         .unwrap();
@@ -352,7 +472,7 @@ fn a_directory_stands_for_its_daily_files() {
     working_podman(&dir);
     let csv = dir.join("csv");
     let out = sarda(&dir)
-        .args(["--no-grafana", "--json", "--export-csv"])
+        .args(["export-csv", "--json"])
         .arg(&csv)
         .arg(fixtures().join("sa"))
         .output()
@@ -372,7 +492,7 @@ fn a_text_report_among_the_files_is_skipped_with_a_warning() {
     let report = dir.join("sar20261125");
     std::fs::write(&report, "Linux 6.4 (host)  11/25/26  _x86_64_\n").unwrap();
     let out = sarda(&dir)
-        .args(["--no-grafana", "--export-csv"])
+        .args(["export-csv"])
         .arg(dir.join("csv"))
         .arg(&report)
         .args(sa_files())
@@ -396,11 +516,7 @@ fn only_text_reports_exit_8() {
     working_podman(&dir);
     let report = dir.join("sar20261125");
     std::fs::write(&report, "not binary\n").unwrap();
-    let out = sarda(&dir)
-        .arg("--no-grafana")
-        .arg(&report)
-        .output()
-        .unwrap();
+    let out = sarda(&dir).arg("api").arg(&report).output().unwrap();
     assert_eq!(out.status.code(), Some(8));
 }
 
@@ -412,7 +528,7 @@ fn missing_sa_files_are_skipped_but_not_all() {
     let mut files = sa_files();
     files.push(dir.join("does-not-exist"));
     let out = sarda(&dir)
-        .args(["--no-grafana", "--export-csv"])
+        .args(["export-csv"])
         .arg(&csv)
         .args(&files)
         .output()
@@ -421,7 +537,7 @@ fn missing_sa_files_are_skipped_but_not_all() {
     assert!(String::from_utf8_lossy(&out.stderr).contains("does-not-exist"));
 
     let out = sarda(&dir)
-        .arg("--no-grafana")
+        .arg("api")
         .arg(dir.join("nope"))
         .output()
         .unwrap();
@@ -468,7 +584,7 @@ fn sigterm_while_converting_removes_the_parser_container() {
         ),
     );
     let mut child = sarda(&dir)
-        .arg("--no-grafana")
+        .arg("api")
         .args(sa_files())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -539,7 +655,7 @@ fn file_warnings_reach_stderr_and_the_json_events() {
     runtime_with_stream(&dir, "podman", &stream);
     let stderr = dir.join("stderr");
     let mut child = sarda(&dir)
-        .args(["--no-grafana", "--json"])
+        .args(["api", "--json"])
         .args(sa_files())
         .stdout(Stdio::piped())
         .stderr(std::fs::File::create(&stderr).unwrap())
@@ -562,7 +678,7 @@ fn api_mode_serves_queries_and_stops_cleanly_on_sigterm() {
     let dir = scratch("api");
     working_podman(&dir);
     let mut child = sarda(&dir)
-        .args(["--no-grafana", "--json"])
+        .args(["api", "--json"])
         .args(sa_files())
         .stdout(Stdio::piped())
         .stderr(Stdio::null())

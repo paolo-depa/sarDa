@@ -9,7 +9,7 @@ description: Run sarda to inspect sysstat SA files (saYYYYMMDD, /var/log/sa) as 
 
 ## Run it
 
-1. Check it is ready: `sarda --help` and `podman info` (or `docker info`). Missing images are reported with build/load instructions (exit 4); relay those to the user instead of working around them.
+1. Check it is ready: `sarda --help` and `podman info` (or `docker info`). Missing images are pulled; if that fails (exit 4) the message says to run `sarda prepare --save` on a connected host and `sarda load` here; relay those to the user instead of working around them.
 2. Start in the background with `--json` and read events from stdout:
 
    ```sh
@@ -22,7 +22,7 @@ description: Run sarda to inspect sysstat SA files (saYYYYMMDD, /var/log/sa) as 
 ## Pick the mode
 
 - **Dashboard for the user**: the default.
-- **Analyse the data yourself**: add `--no-grafana`. The `api_ready` event gives `api_url`; query it:
+- **Analyse the data yourself**: use `sarda api`. The `api_ready` event gives `api_url`; query it:
 
   ```sh
   curl -s "$API/api/v1/query" --data-urlencode 'query=avg(sarda_per_cpu_pct_idle{cpu="all"})'
@@ -31,8 +31,8 @@ description: Run sarda to inspect sysstat SA files (saYYYYMMDD, /var/log/sa) as 
   curl -s "$API/api/v1/label/__name__/values"
   ```
 
-  Metrics are `sarda_<activity>_<column>` with labels `host` and a per-entity label (`cpu`, `dev`, `iface`, ...); `sarda --print-catalog` lists every activity. PromQL is a subset: selectors, `sum/avg/min/max/count` with `by`/`without`, number arithmetic. Anything else returns an explicit error.
-- **CSV only**: `sarda --no-grafana --export-csv DIR <files>` exits when done (`exported` event).
+  Metrics are `sarda_<activity>_<column>` with labels `host` and a per-entity label (`cpu`, `dev`, `iface`, ...); `sarda catalog` lists every activity. PromQL is a subset: selectors, `sum/avg/min/max/count` with `by`/`without`, number arithmetic. Anything else returns an explicit error.
+- **CSV only**: `sarda export-csv DIR <files>` exits when done (`exported` event).
 
 ## Narrow the data
 
@@ -40,4 +40,4 @@ description: Run sarda to inspect sysstat SA files (saYYYYMMDD, /var/log/sa) as 
 
 ## Exit codes
 
-`3` no container runtime · `4` image missing · `5` no usable data (check `--start/--end` and the offset; check the sysstat image is not older than the files) · `6` Grafana failed to start · `7` port unavailable (retry without `--port`) · `8` an SA file the image's sysstat cannot read (written by a newer sysstat, or not an SA file): use `--sadf-image` with a newer sysstat, or older files. Details and the full table are in the README.
+`3` no container runtime · `4` image missing · `5` no usable data (check `--start/--end` and the offset; check the sysstat image is not older than the files) · `6` Grafana failed to start · `7` port unavailable (retry without `--port`) · `8` an SA file the image's sysstat cannot read (written by a newer sysstat, or corrupt; files that are not SA files are skipped with a warning, and a directory stands for the `saYYYYMMDD` files in it): use `--sadf-image` with a newer sysstat, or older files. Details and the full table are in the README.

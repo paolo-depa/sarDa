@@ -7,8 +7,10 @@ use std::time::Duration;
 
 use serde_json::{json, Value};
 
-use crate::api::{self, ApiServer};
-use crate::cli::{Cli, DEFAULT_PORT};
+use crate::api;
+use crate::cli::{
+    ApiArgs, EngineArgs, ExportCsvArgs, GrafanaArgs, InputArgs, OpenArgs, DEFAULT_PORT,
+};
 use crate::csvexport;
 use crate::dashboard::{self, DASHBOARD_UID};
 use crate::dataset::{self, Dataset};
@@ -40,7 +42,7 @@ fn skip_bounds(start: Option<i64>, end: Option<i64>) -> (Option<String>, Option<
 }
 
 /// Progress goes to stderr; structured events go to stdout with `--json`. This
-/// is the only code that writes a run's result to stdout (the `--print-*`
+/// is the only code that writes a run's result to stdout (the `containerfile` and `catalog`
 /// modes in `main.rs` aside), so callers can rely on stdout being only the
 /// URL, or one JSON object per line.
 pub struct Reporter {
@@ -101,7 +103,7 @@ fn ensure_image(
     ))
 }
 
-fn parse_window(cli: &Cli) -> Result<(Option<i64>, Option<i64>)> {
+fn parse_window(cli: &InputArgs) -> Result<(Option<i64>, Option<i64>)> {
     let parse = |v: &Option<String>| -> Result<Option<i64>> {
         v.as_deref()
             .map(|s| timeutil::parse_user(s).map_err(|e| Error::new(Kind::Usage, e)))
@@ -153,32 +155,37 @@ fn wait_for_shutdown(
 
 fn sadf_image_hint(image: &str) -> String {
     format!(
-        "Fetch it on a machine with network access and load it here:\n  podman pull {image} && podman save -o sarda-sysstat.tar {image}   # then, on this host:\n  podman load -i sarda-sysstat.tar\nOr build it from the Containerfile: sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f -   (then pass --sadf-image localhost/sarda-sysstat:latest)"
+        "On a machine with network access, run `sarda prepare --save sarda-images.tar`, then on this host `sarda load sarda-images.tar`.\nTo build {image} from the Containerfile instead: sarda prepare --build --sadf-image {image}"
     )
 }
 
 fn grafana_image_hint(image: &str) -> String {
     format!(
-        "Mirror it into your registry or load it from an archive:\n  podman pull {image} && podman save -o grafana.tar {image}   # on a connected machine\n  podman load -i grafana.tar                              # on this host"
+        "On a machine with network access, run `sarda prepare --save sarda-images.tar`, then on this host `sarda load sarda-images.tar`.\nOr mirror {image} into your registry and pass it with --grafana-image."
     )
 }
 
-fn ensure_images(cli: &Cli, rt: &Runtime, rep: &Reporter) -> Result<()> {
+fn ensure_images(
+    engine: &EngineArgs,
+    grafana_image: Option<&str>,
+    rt: &Runtime,
+    rep: &Reporter,
+) -> Result<()> {
     ensure_image(
         rt,
-        &cli.sadf_image,
+        &engine.sadf_image,
         "sysstat (sadf)",
-        &sadf_image_hint(&cli.sadf_image),
-        cli.no_pull,
+        &sadf_image_hint(&engine.sadf_image),
+        engine.no_pull,
         rep,
     )?;
-    if !cli.no_grafana {
+    if let Some(image) = grafana_image {
         ensure_image(
             rt,
-            &cli.grafana_image,
+            image,
             "Grafana",
-            &grafana_image_hint(&cli.grafana_image),
-            cli.no_pull,
+            &grafana_image_hint(image),
+            engine.no_pull,
             rep,
         )?;
     }
@@ -189,7 +196,8 @@ fn ensure_images(cli: &Cli, rt: &Runtime, rep: &Reporter) -> Result<()> {
 /// stops the Session. Returns the stream with the warnings and the details
 /// the verdicts produced.
 fn convert(
-    cli: &Cli,
+    input: &InputArgs,
+    engine: &EngineArgs,
     rt: &Runtime,
     inputs: &[Input],
     window: (Option<i64>, Option<i64>),
@@ -204,10 +212,10 @@ fn convert(
     let skip = (bounds.0.as_deref(), bounds.1.as_deref());
     let output = sadf::run_in_container(
         rt,
-        &cli.sadf_image,
+        &engine.sadf_image,
         inputs,
         skip,
-        Duration::from_secs(cli.sadf_timeout),
+        Duration::from_secs(input.sadf_timeout),
         resources,
         |index| {
             if let (true, Some(input)) = (inputs.len() > 1, inputs.get(index)) {
@@ -277,56 +285,118 @@ fn export_csv(ds: &Dataset, dir: &Path, rep: &Reporter) -> Result<()> {
     Ok(())
 }
 
-/// `--no-grafana`: serve only the Sarda API until Ctrl-C.
-fn serve_api_only(
-    api_url: &str,
-    info: &Value,
-    resources: &Handle,
-    rx: &mpsc::Receiver<()>,
+/// Everything a command needs once the SA files have been read.
+struct Loaded {
+    rt: Runtime,
+    resources: Resources,
+    shutdown: mpsc::Receiver<()>,
+    ds: Dataset,
+    store: Arc<Store>,
+    info: Value,
+}
+
+/// The shared start of every command that reads SA files: resolve the
+/// inputs, make sure the images are there, convert, and load.
+fn read_files(
+    input: &InputArgs,
+    engine: &EngineArgs,
+    grafana_image: Option<&str>,
     rep: &Reporter,
-) -> Result<()> {
+) -> Result<Loaded> {
+    let window = parse_window(input)?;
+    let inputs = inputs::resolve(&input.files, rep)?;
+    let rt = Runtime::detect(engine.runtime)?;
+    rep.debug(format!("using container runtime '{}'", rt.bin));
+
+    let resources = Resources::new(rt.clone());
+    let (tx, shutdown) = mpsc::channel();
+    resources.handle_signals(tx);
+    resources.sweep_stale();
+
+    ensure_images(engine, grafana_image, &rt, rep)?;
+    let (output, warnings, details) =
+        convert(input, engine, &rt, &inputs, window, &resources, rep)?;
+    let (ds, store, info) = load(&output, window, warnings, &details, rep)?;
+    Ok(Loaded {
+        rt,
+        resources,
+        shutdown,
+        ds,
+        store,
+        info,
+    })
+}
+
+/// `sarda export-csv`: write the CSV files and exit.
+pub fn export_csv_only(args: &ExportCsvArgs, rep: &Reporter) -> Result<()> {
+    let loaded = read_files(&args.input, &args.engine, None, rep)?;
+    export_csv(&loaded.ds, &args.dir, rep)
+}
+
+/// `sarda api`: serve only the Sarda API until Ctrl-C.
+pub fn serve_api_only(args: &ApiArgs, rep: &Reporter) -> Result<()> {
+    let loaded = read_files(&args.input, &args.engine, None, rep)?;
+    let api = api::serve(loaded.store.clone(), "127.0.0.1:0")?;
+    let api_url = format!("http://{}", api.addr);
+    rep.debug(format!("Sarda API listening on {api_url}"));
     rep.info(format!(
         "Sarda API ready on {api_url} (Prometheus-compatible; Ctrl-C to stop)"
     ));
-    rep.result_line(api_url);
-    rep.event(json!({"event": "api_ready", "api_url": api_url, "data": info}));
-    wait_for_shutdown(resources, rx, None)?;
+    rep.result_line(&api_url);
+    rep.event(json!({"event": "api_ready", "api_url": api_url, "data": loaded.info}));
+    wait_for_shutdown(&loaded.resources, &loaded.shutdown, None)?;
     rep.event(json!({"event": "stopped"}));
     Ok(())
 }
 
-struct Serving<'a> {
-    rt: &'a Runtime,
-    ds: &'a Dataset,
-    store: &'a Store,
-    api: &'a ApiServer,
-    info: &'a Value,
-    resources: &'a Handle,
-    rx: &'a mpsc::Receiver<()>,
-}
+/// `sarda open`: start the Grafana instance, announce the URL and wait for
+/// Ctrl-C.
+pub fn serve_grafana(args: &OpenArgs, rep: &Reporter) -> Result<()> {
+    let grafana_args: &GrafanaArgs = &args.grafana;
+    let loaded = read_files(
+        &args.input,
+        &args.engine,
+        Some(&grafana_args.grafana_image),
+        rep,
+    )?;
+    let Loaded {
+        rt,
+        resources,
+        shutdown,
+        ds,
+        store,
+        info,
+    } = &loaded;
+    let api = api::serve(store.clone(), "127.0.0.1:0")?;
+    let api_url = format!("http://{}", api.addr);
+    rep.debug(format!("Sarda API listening on {api_url}"));
 
-/// Starts the Grafana instance, announces the URL and waits for Ctrl-C.
-fn serve_grafana(cli: &Cli, s: &Serving, rep: &Reporter) -> Result<()> {
-    let port = grafana::pick_port(cli.port.or(Some(DEFAULT_PORT)), cli.port.is_some())?;
-    let dashboard = dashboard::generate(s.ds, s.store);
-    rep.info(format!("Starting Grafana ({}) ...", cli.grafana_image));
+    let port = grafana::pick_port(
+        grafana_args.port.or(Some(DEFAULT_PORT)),
+        grafana_args.port.is_some(),
+    )?;
+    let dashboard = dashboard::generate(ds, store);
+    rep.info(format!(
+        "Starting Grafana ({}) ...",
+        grafana_args.grafana_image
+    ));
     let grafana = Grafana::start(
-        s.rt,
+        rt,
         &GrafanaSpec {
-            image: &cli.grafana_image,
+            image: &grafana_args.grafana_image,
             port,
-            api_addr: s.api.addr,
-            scrape_interval: format!("{}s", (s.store.interval_ms / 1000).max(1)),
+            api_addr: api.addr,
+            scrape_interval: format!("{}s", (store.interval_ms / 1000).max(1)),
             dashboard: &dashboard,
         },
-        s.resources,
+        resources,
     )?;
     grafana.wait_ready(READY_TIMEOUT)?;
 
     let url = format!(
         "http://127.0.0.1:{port}/d/{DASHBOARD_UID}/sarda?orgId=1&from={}&to={}",
-        s.store.min_ts_ms,
-        s.store.max_ts_ms + 1000
+        store.min_ts_ms,
+        store.max_ts_ms + 1000
     );
     rep.info(format!(
         "\nGrafana is ready. Open: {url}\nChanges made in Grafana are not saved. Press Ctrl-C to stop and clean up."
@@ -336,59 +406,30 @@ fn serve_grafana(cli: &Cli, s: &Serving, rep: &Reporter) -> Result<()> {
         "event": "ready",
         "url": url,
         "grafana_port": port,
-        "api_url": format!("http://{}", s.api.addr),
-        "runtime": s.rt.bin,
+        "api_url": api_url,
+        "runtime": rt.bin,
         "container": grafana.container_name(),
-        "data": s.info,
+        "data": info,
     }));
+    if grafana_args.open {
+        open_in_browser(&url, rep);
+    }
 
-    let result = wait_for_shutdown(s.resources, s.rx, Some(&grafana));
+    let result = wait_for_shutdown(resources, shutdown, Some(&grafana));
     rep.info("Stopping Grafana and cleaning up ...");
-    s.resources.remove_all();
+    resources.remove_all();
     rep.event(json!({"event": "stopped"}));
     result
 }
 
-pub fn run(cli: &Cli, rep: &Reporter) -> Result<()> {
-    let window = parse_window(cli)?;
-    let inputs = inputs::resolve(&cli.files, rep)?;
-    let rt = Runtime::detect(cli.runtime)?;
-    rep.debug(format!("using container runtime '{}'", rt.bin));
-
-    let resources = Resources::new(rt.clone());
-    let (tx, rx) = mpsc::channel();
-    resources.handle_signals(tx);
-    resources.sweep_stale();
-
-    ensure_images(cli, &rt, rep)?;
-    let (output, warnings, details) = convert(cli, &rt, &inputs, window, &resources, rep)?;
-    let (ds, store, info) = load(&output, window, warnings, &details, rep)?;
-
-    if let Some(dir) = &cli.export_csv {
-        export_csv(&ds, dir, rep)?;
-        if cli.no_grafana {
-            return Ok(());
-        }
+fn open_in_browser(url: &str, rep: &Reporter) {
+    let started = std::process::Command::new("xdg-open")
+        .arg(url)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn();
+    if let Err(e) = started {
+        rep.warn(format!("could not open a browser with xdg-open: {e}"));
     }
-
-    let api = api::serve(store.clone(), "127.0.0.1:0")?;
-    let api_url = format!("http://{}", api.addr);
-    rep.debug(format!("Sarda API listening on {api_url}"));
-
-    if cli.no_grafana {
-        return serve_api_only(&api_url, &info, &resources, &rx, rep);
-    }
-    serve_grafana(
-        cli,
-        &Serving {
-            rt: &rt,
-            ds: &ds,
-            store: &store,
-            api: &api,
-            info: &info,
-            resources: &resources,
-            rx: &rx,
-        },
-        rep,
-    )
 }

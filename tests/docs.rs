@@ -80,7 +80,7 @@ fn readme_catalog_table_is_current() {
     assert_eq!(
         text[start..end].trim(),
         catalog::markdown_table().trim(),
-        "README catalog table is stale; regenerate it with `cargo run -q -- --print-catalog`"
+        "README catalog table is stale; regenerate it with `cargo run -q -- catalog`"
     );
 }
 
@@ -122,7 +122,7 @@ fn help_lists_every_exit_code() {
 }
 
 #[test]
-fn stdout_is_written_only_by_the_reporter_and_the_print_modes() {
+fn stdout_is_written_only_by_the_reporter_and_the_print_commands() {
     let writes_stdout = Regex::new(r"(^|[^e])print(ln)?!\(").unwrap();
     for (name, text) in sources() {
         if name == "session.rs" || name == "main.rs" {
@@ -134,7 +134,7 @@ fn stdout_is_written_only_by_the_reporter_and_the_print_modes() {
             }
             assert!(
                 !writes_stdout.is_match(line),
-                "src/{name}:{}: writes to stdout; only `session::Reporter` and the --print-* modes in main.rs may",
+                "src/{name}:{}: writes to stdout; only `session::Reporter` and the containerfile and catalog commands in main.rs may",
                 i + 1
             );
         }

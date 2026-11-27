@@ -30,7 +30,7 @@ pub struct Activity {
     /// Options passed to `sadf` after `--`.
     pub sadf_opts: &'static str,
     pub dimension: Option<Dimension>,
-    /// Whether `--export-csv` also writes one pivoted file per metric.
+    /// Whether `sarda export-csv` also writes one pivoted file per metric.
     pub csv_pivot: bool,
     /// Dashboard row title.
     pub group: &'static str,

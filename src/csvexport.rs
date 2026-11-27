@@ -1,4 +1,4 @@
-//! `--export-csv`: the per-Activity CSV files the original Python tool wrote,
+//! `sarda export-csv`: the per-Activity CSV files the original Python tool wrote,
 //! including one pivoted file per metric for Activities with a Dimension.
 
 use std::collections::{BTreeMap, BTreeSet};

@@ -28,23 +28,17 @@ Nothing else: no Python, no sysstat on the host, no Grafana plugins, and no netw
 
 If an image is missing, sarda pulls it (with the engine's progress on stderr) and carries on; `--no-pull` skips the attempt and stops with instructions instead. On a connected machine nothing needs preparing.
 
-On an **air-gapped** machine, carry the images over from a connected one. `save` keeps the image names, so the defaults are found again after `load`:
+On an **air-gapped** machine, carry the images over from a connected one. The archive keeps the image names, so the defaults are found again after `load`:
 
 ```sh
 # connected machine
-podman pull ghcr.io/paolo-depa/sarda-sysstat:0.0.1 docker.io/grafana/grafana-oss:12.4.3
-podman save -o sarda-images.tar ghcr.io/paolo-depa/sarda-sysstat:0.0.1 docker.io/grafana/grafana-oss:12.4.3
+sarda prepare --save sarda-images.tar
 
 # air-gapped machine
-podman load -i sarda-images.tar
+sarda load sarda-images.tar
 ```
 
-Each release publishes the sysstat image to the GitHub Container Registry, tagged with the version (the tag without its `v`) and `latest`. To build it yourself instead (`podman build --arch <arch>` for other architectures), pass the result with `--sadf-image`:
-
-```sh
-sarda --print-containerfile | podman build -t localhost/sarda-sysstat:latest -f - .
-sarda --sadf-image localhost/sarda-sysstat:latest /var/log/sa/sa20261125
-```
+`sarda prepare` pulls the sysstat and Grafana images (without `--save` that is all it does). Each release publishes the sysstat image to the GitHub Container Registry, tagged with the version (the tag without its `v`) and `latest`. To build it yourself instead, use `sarda prepare --build --sadf-image localhost/sarda-sysstat:latest` (it builds from `sarda containerfile`, so it needs network access too) and pass the same `--sadf-image` when you run sarda.
 
 The sysstat image is `registry.suse.com/bci/bci-base:16.1` with the sysstat package it delivers (12.7.9 today; about 125 MB). sarDa checks every SA file's own version header and **refuses files written by a newer sysstat**, because `sadf` returns no data at all for them instead of failing. To read such files, put an image with a newer sysstat behind `--sadf-image`.
 
@@ -53,24 +47,29 @@ Use other images with `--sadf-image` / `--grafana-image` (or `SARDA_SADF_IMAGE` 
 ## Usage
 
 ```text
-sarda [OPTIONS] <SA_FILE|DIR>...
+sarda [OPTIONS] <SA_FILE|DIR>...        open a dashboard (the default)
+sarda export-csv [OPTIONS] <DIR> <SA_FILE|DIR>...
+sarda api [OPTIONS] <SA_FILE|DIR>...
+sarda prepare [--save FILE] [--build]   fetch the images
+sarda load <FILE>                       load an archive written by prepare --save
+sarda containerfile | catalog           print the sysstat Containerfile / the table below
 ```
 
 A directory stands for the `saDD` / `saYYYYMMDD` files in it, so `sarda /var/log/sa` works. A path that is not a system activity file (such as the text report `sar20261125`) is skipped with a warning, which also makes `sarda /var/log/sa/*` safe; exit code 8 is only for when none is usable.
 
+Options go after the subcommand name; `--json` and `--verbose` may also go before it.
+
 | Option | Meaning |
 |---|---|
-| `--start TIME`, `--end TIME` | keep only this window. RFC 3339, e.g. `2026-11-25T08:00:00+01:00`; **no offset means UTC** |
+| `--start TIME`, `--end TIME` | keep only this window. RFC 3339, e.g. `2026-11-25T08:00:00+01:00` (also the `+0100` form of `journalctl -o short-iso`); **no offset means UTC** |
 | `--port PORT` | Grafana port on 127.0.0.1 (default 3000, or any free port if 3000 is taken; `0` = any free port) |
+| `--open` | open the dashboard in the default browser (`xdg-open`) |
 | `--runtime auto\|podman\|docker` | container runtime (default `auto`) |
 | `--grafana-image IMAGE`, `--sadf-image IMAGE` | override the images |
 | `--sadf-timeout SECONDS` | give up when the conversion prints nothing for this long (default 120); a long conversion that keeps making progress is never cut off |
 | `--no-pull` | never try to pull a missing image |
-| `--export-csv DIR` | also write the per-activity CSV files (the format of the former Python tool) |
-| `--no-grafana` | do not start Grafana: only serve the API, or with `--export-csv` just export and exit |
 | `--json` | machine-readable events on stdout (see below) |
 | `-v`, `--verbose` | debug details on stderr |
-| `--print-containerfile`, `--print-catalog` | print the sysstat Containerfile / the table below and exit |
 
 Examples:
 
@@ -79,10 +78,10 @@ Examples:
 sarda --start 2026-11-25T06:00:00Z --end 2026-11-25T12:00:00Z --port 3100 /var/log/sa/sa20261125
 
 # CSV only, no containers besides the conversion
-sarda --no-grafana --export-csv ./csv /var/log/sa/sa2026112*
+sarda export-csv ./csv /var/log/sa/sa2026112*
 
 # use your own Grafana or Prometheus-compatible client
-sarda --no-grafana /var/log/sa/sa20261125     # prints http://127.0.0.1:<port>
+sarda api /var/log/sa/sa20261125     # prints http://127.0.0.1:<port>
 curl 'http://127.0.0.1:<port>/api/v1/query?query=avg(sarda_per_cpu_pct_idle)'
 ```
 
@@ -109,8 +108,8 @@ One JSON object per line on stdout:
 | `event` | When | Main fields |
 |---|---|---|
 | `ready` | Grafana is up | `url`, `grafana_port`, `api_url`, `container`, `runtime`, `data` |
-| `api_ready` | `--no-grafana` API is up | `api_url`, `data` |
-| `exported` | `--export-csv` finished | `dir`, `files` |
+| `api_ready` | `sarda api`: the API is up | `api_url`, `data` |
+| `exported` | `sarda export-csv` finished | `dir`, `files` |
 | `stopped` | clean shutdown | |
 | `error` | failure | `kind`, `exit_code`, `message` |
 
